@@ -1,0 +1,77 @@
+networks:
+  osa_network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+
+services:
+  mongodb:
+    image: mongo:8-noble
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - osa_network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  # Required by the DAPR runtime even though osaHealth does not use the actor pattern.
+  # The DAPR sidecar will not start without a reachable placement service.
+  dapr-placement:
+    image: daprio/placement:1.17.7-linux-amd64
+    command: ["./placement", "--port", "50006"]
+    networks:
+      - osa_network
+
+  # TODO: Placeholder — replaced by the F# Oxpecker service in OH-3
+  api:
+    image: alpine:3
+    command: ["sleep", "infinity"]
+    ports:
+      - 3500:3500   # exposed for dev only
+    networks:
+      - osa_network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  api-dapr:
+    image: daprio/daprd:1.17.7-stablecomponents
+    command: [
+      "./daprd",
+      "--app-id", "osa-api",
+      "--app-port", "8080",
+      "--dapr-http-port", "3500",
+      "--placement-host-address", "dapr-placement:50006",
+      "--components-path", "/components",
+      "--log-as-json"
+    ]
+    volumes:
+      - ./dapr/components:/components
+      - ./dapr/secrets.json:/secrets/secrets.json:ro
+    depends_on:
+      - api
+      - dapr-placement
+      - mongodb
+    network_mode: "service:api"
+
+  mongo-express:
+    image: mongo-express:1
+    restart: always
+    ports:
+      - 8081:8081
+    depends_on:
+      - mongodb
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@mongodb:27017/
+      ME_CONFIG_BASICAUTH_ENABLED: true
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGOEXPRESS_ROOT_USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGOEXPRESS_ROOT_PASSWORD}
+    networks:
+      - osa_network

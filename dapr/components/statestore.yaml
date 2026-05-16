@@ -1,0 +1,26 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore
+auth:
+  secretStore: local-secret-store
+spec:
+  type: state.mongodb
+  version: v1
+  metadata:
+    - name: host
+      value: "mongodb:27017"
+    - name: username
+      secretKeyRef:
+        name: mongoUsername
+    - name: password
+      secretKeyRef:
+        name: mongoPassword
+    - name: databaseName
+      value: "osahealth"
+    - name: params
+      value: "?authSource=admin"
+    - name: writeConcern
+      value: "majority"
+    - name: readConcern
+      value: "majority"
