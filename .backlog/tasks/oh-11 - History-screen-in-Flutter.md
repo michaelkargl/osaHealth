@@ -4,6 +4,7 @@ title: History screen in Flutter
 status: To Do
 assignee: []
 created_date: '2026-05-16 11:47'
+updated_date: '2026-05-16 13:47'
 labels:
   - flutter
   - mobile
@@ -15,7 +16,7 @@ ordinal: 11000
 ## Description
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
-Display a chronological list of past recordings, filterable by category. Serves as the user's personal health timeline.
+The personal health timeline screen. Recordings are loaded from local SQLite first (fast, works offline) and the user can pull-to-refresh to sync from the server. The list is ordered by date descending and can be filtered by Category. Each list item shows the date, category name, and a one-line value summary (e.g. 120/80 mmHg, 72 bpm). Tapping opens a detail view showing all metric values for that recording with their labels and units.
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria

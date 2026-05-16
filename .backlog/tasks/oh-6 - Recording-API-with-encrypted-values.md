@@ -4,6 +4,7 @@ title: Recording API with encrypted values
 status: To Do
 assignee: []
 created_date: '2026-05-16 11:47'
+updated_date: '2026-05-16 13:47'
 labels:
   - backend
   - data
@@ -15,7 +16,7 @@ ordinal: 6000
 ## Description
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
-Implement the core health data recording endpoints. A Recording groups one or more Entry values (one per metric) taken at the same moment. Metric values are encrypted at rest via DAPR Cryptography while metadata remains plaintext for queryability.
+Implement the core health data recording endpoints. A Recording is a timestamped session (e.g. a blood pressure measurement at 09:00). It groups one or more Entries, each identified by a compound key (recordingId + metricId) — one Entry per metric in the chosen Category. Entry values are sensitive and encrypted via the DAPR Cryptography HTTP API before storage. Recording metadata (userId, categoryId, date) stays plaintext so the DAPR query API can filter by user and date range without decrypting. The F# service decrypts Entry values after fetching them, before returning to the client. The syncedAt field on Recording supports the Flutter offline-first sync queue.
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria

@@ -4,6 +4,7 @@ title: Global Metric and Category seed data
 status: To Do
 assignee: []
 created_date: '2026-05-16 11:47'
+updated_date: '2026-05-16 13:47'
 labels:
   - backend
   - data
@@ -15,7 +16,7 @@ ordinal: 5000
 ## Description
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
-Define and seed the global set of metrics and categories that all users share. No UI needed — this is managed directly in the data layer as the buffet of available health measurements.
+Define and seed the global catalog of Metrics and Categories that all users share as a buffet — no per-user metric management UI is needed. A Metric is the atomic unit (e.g. Pulse: number, bpm). A Category groups an ordered list of Metrics (e.g. Blood Pressure = [Systolic, Diastolic, Pulse]). This design allows Pulse to appear in multiple categories while remaining a single source of truth. Seed data is stored via DAPR state on service startup. Baseline categories to seed: Blood Pressure (Systolic mmHg, Diastolic mmHg, Pulse bpm), Body Weight (Weight kg), Blood Glucose (Glucose mmol/L), Body Temperature (Temperature °C).
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria

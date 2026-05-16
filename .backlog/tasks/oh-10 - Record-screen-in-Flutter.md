@@ -4,6 +4,7 @@ title: Record screen in Flutter
 status: To Do
 assignee: []
 created_date: '2026-05-16 11:47'
+updated_date: '2026-05-16 13:47'
 labels:
   - flutter
   - mobile
@@ -15,7 +16,7 @@ ordinal: 10000
 ## Description
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
-The primary data entry screen. User picks a category from the global buffet, fills in values for each metric, and saves. Works offline with background sync when connectivity returns.
+The primary data entry screen. The user selects a Category from the global catalog fetched from OH-5. The form dynamically renders a numeric input field for each Metric in that Category (label, unit, and type come from the Metric schema — no hardcoded fields). On save, the Recording and its Entries are written to local SQLite immediately so the app feels instant. A background sync service (OH-8) then pushes the recording to the backend when online and marks syncedAt. A small visual indicator (e.g. cloud icon) shows pending-sync state per recording.
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
