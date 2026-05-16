@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.dapr.io)",
+      "Bash(backlog doctor *)",
+      "Bash(backlog serve *)",
+      "Bash(backlog *)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:backlog.md)",
+      "Bash(npm show *)",
+      "Bash(npx backlog *)",
+      "Skill(claude-mem:learn-codebase)"
+    ]
+  }
+}

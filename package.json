@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "backlog.md": "^1.45.1",
+    "husky": "^9.1.7"
+  },
+  "scripts": {
+    "backlog": "npx backlog board",
+    "backlog:ui": "npx backlog browser",
+    "backlog:init": "npx backlog init -- --force",
+    "backend": "dotnet run --project src/osaHealth.Api/osaHealth.Api.fsproj",
+    "husky:init": "husky",
+    "ai:init": "npx claude-mem install",
+    "test": "echo 'test'"
+  }
+}
