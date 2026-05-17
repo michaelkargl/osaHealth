@@ -6,7 +6,14 @@
 BeforeAll {
     # Dot-sourcing makes the script's functions available without running
     # Invoke-Main (see the InvocationName guard at the bottom of init.ps1).
-    . (Join-Path $PSScriptRoot 'init.ps1')
+    # Dummy values satisfy the mandatory parameters; individual tests override as needed.
+    . (Join-Path $PSScriptRoot 'init.ps1') `
+        -VaultAddr       'http://vault:8200' `
+        -DaprSecretsPath '/tmp/test-secrets.json' `
+        -MongoUser       'testuser' `
+        -MongoPassword   'testpass' `
+        -UnsealKey       '' `
+        -RootToken       ''
 }
 
 Describe 'Test-VaultRunning' {
