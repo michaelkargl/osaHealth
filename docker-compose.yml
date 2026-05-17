@@ -79,9 +79,10 @@ services:
     build:
       context: ./src/osaHealth.Api
     ports:
-      - 3500:3500
-    expose:
-      - "8080"
+      - 13500:3500
+      # 8080 is the app's Kestrel port; published so the Swagger UI at
+      # http://localhost:18080/swagger is reachable from the host.
+      - 18080:8080
     networks:
       - osa_network
     depends_on:
@@ -112,7 +113,7 @@ services:
       vault-init:
         condition: service_completed_successfully
     network_mode: "service:api"
-
+ 
   mongo-express:
     image: mongo-express:1
     restart: always
