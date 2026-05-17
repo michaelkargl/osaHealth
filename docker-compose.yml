@@ -46,17 +46,11 @@ services:
 
   vault-init:
     image: mcr.microsoft.com/dotnet/sdk:11.0-preview
-    entrypoint: ["pwsh", "-File", "/vault/init/init.ps1"]
+    entrypoint: ["pwsh", "-File", "/vault/init/init.ps1", "-VaultAddr", "http://vault:8200", "-DaprSecretsPath", "/dapr/secrets.json", "-MongoUser", "${MONGO_ROOT_USER}", "-MongoPassword", "${MONGO_ROOT_PASSWORD}", "-UnsealKey", "${VAULT_UNSEAL_KEY:-}", "-RootToken", "${VAULT_ROOT_TOKEN:-}", "-PollIntervalSec", "2"]
     restart: "no"
     volumes:
       - ./vault/init:/vault/init:ro
       - ./dapr:/dapr
-    environment:
-      VAULT_ADDR: "http://vault:8200"
-      VAULT_UNSEAL_KEY: "${VAULT_UNSEAL_KEY:-}"
-      VAULT_ROOT_TOKEN: "${VAULT_ROOT_TOKEN:-}"
-      MONGO_ROOT_USER: "${MONGO_ROOT_USER}"
-      MONGO_ROOT_PASSWORD: "${MONGO_ROOT_PASSWORD}"
     depends_on:
       vault:
         condition: service_healthy
