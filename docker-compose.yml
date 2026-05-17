@@ -4,6 +4,7 @@ networks:
 
 volumes:
   mongodb_data:
+  vault_data:
 
 services:
   mongodb:
@@ -20,7 +21,48 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  
+
+  vault:
+    image: hashicorp/vault:1.17
+    user: "0"
+    entrypoint: ["vault", "server", "-config=/vault/config/config.hcl"]
+    volumes:
+      - vault_data:/vault/data
+      - ./vault/config:/vault/config:ro
+    ports:
+      - 8200:8200
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+    networks:
+      - osa_network
+    healthcheck:
+      test: ["CMD-SHELL", "vault status; rc=$$?; [ $$rc -eq 0 ] || [ $$rc -eq 2 ]"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  vault-init:
+    image: hashicorp/vault:1.17
+    entrypoint: ["/bin/sh", "/vault/init/init.sh"]
+    restart: "no"
+    volumes:
+      - ./vault/init:/vault/init:ro
+      - ./dapr:/dapr
+    environment:
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_UNSEAL_KEY: "${VAULT_UNSEAL_KEY:-}"
+      VAULT_ROOT_TOKEN: "${VAULT_ROOT_TOKEN:-}"
+      MONGO_ROOT_USER: "${MONGO_ROOT_USER}"
+      MONGO_ROOT_PASSWORD: "${MONGO_ROOT_PASSWORD}"
+    depends_on:
+      vault:
+        condition: service_healthy
+    networks:
+      - osa_network
+
   # Required by the DAPR runtime even though osaHealth does not use the actor pattern.
   # The DAPR sidecar will not start without a reachable placement service.
   dapr-placement:
@@ -34,7 +76,7 @@ services:
     image: alpine:3
     command: ["sleep", "infinity"]
     ports:
-      - 3500:3500   # exposed for dev only
+      - 3500:3500
     networks:
       - osa_network
     depends_on:
@@ -56,9 +98,14 @@ services:
       - ./dapr/components:/components
       - ./dapr/secrets.json:/secrets/secrets.json:ro
     depends_on:
-      - api
-      - dapr-placement
-      - mongodb
+      api:
+        condition: service_started
+      dapr-placement:
+        condition: service_started
+      mongodb:
+        condition: service_healthy
+      vault-init:
+        condition: service_completed_successfully
     network_mode: "service:api"
 
   mongo-express:

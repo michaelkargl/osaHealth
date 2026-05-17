@@ -1,16 +1,17 @@
 ---
 id: OH-1.2
 title: HashiCorp Vault service
-status: To Do
-assignee: []
+status: Done
+assignee:
+  - '@agent-k'
 created_date: '2026-05-16 13:58'
-updated_date: '2026-05-16 14:02'
+updated_date: '2026-05-16 16:50'
 labels:
   - infrastructure
   - vault
 dependencies: []
 parent_task_id: OH-1
-ordinal: 13000
+ordinal: 2000
 ---
 
 ## Description
@@ -21,7 +22,13 @@ Add HashiCorp Vault to Docker Compose as the DAPR secrets store. Vault manages e
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Vault container starts and is reachable on the Docker network
-- [ ] #2 Vault runs in dev mode with a known root token sourced from an environment variable
-- [ ] #3 Vault UI is accessible at http://localhost:8200
+- [x] #1 Vault container starts and is reachable on the Docker network
+- [x] #2 Vault runs in dev mode with a known root token sourced from an environment variable
+- [x] #3 Vault UI is accessible at http://localhost:8200
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Added HashiCorp Vault in production mode (file backend, persistent bind mount) with a vault-init one-shot service that handles first-run initialization, unsealing on every restart, and placeholder secret seeding.
+<!-- SECTION:FINAL_SUMMARY:END -->

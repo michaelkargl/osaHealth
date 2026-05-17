@@ -3,7 +3,7 @@ kind: Component
 metadata:
   name: statestore
 auth:
-  secretStore: local-secret-store
+  secretStore: vault-secret-store
 spec:
   type: state.mongodb
   version: v1
@@ -12,10 +12,12 @@ spec:
       value: "mongodb:27017"
     - name: username
       secretKeyRef:
-        name: mongoUsername
+        name: mongodb
+        key: username
     - name: password
       secretKeyRef:
-        name: mongoPassword
+        name: mongodb
+        key: password
     - name: databaseName
       value: "osahealth"
     - name: params

@@ -1,18 +1,18 @@
 ---
 id: OH-1.1
 title: MongoDB service
-status: In Progress
+status: Done
 assignee:
   - '@michael'
 created_date: '2026-05-16 13:58'
-updated_date: '2026-05-16 14:22'
+updated_date: '2026-05-16 16:08'
 labels:
   - infrastructure
   - mongodb
 dependencies:
   - OH-1
 parent_task_id: OH-1
-ordinal: 2000
+ordinal: 1000
 ---
 
 ## Description
