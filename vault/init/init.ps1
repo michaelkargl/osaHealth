@@ -22,13 +22,26 @@
 #>
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
-    [Parameter(Mandatory)][string] $VaultAddr,
-    [Parameter(Mandatory)][string] $DaprSecretsPath,
-    [Parameter(Mandatory)][string] $MongoUser,
-    [Parameter(Mandatory)][string] $MongoPassword,
-    [Parameter(Mandatory)][string] $UnsealKey,
-    [Parameter(Mandatory)][string] $RootToken,
-    [Parameter()][int] $PollIntervalSec = 2
+    [Parameter(Mandatory)]
+    [string] $VaultAddr,
+
+    [Parameter(Mandatory)]
+    [string] $DaprSecretsPath,
+
+    [Parameter(Mandatory)]
+    [string] $MongoUser,
+
+    [Parameter(Mandatory)]
+    [string] $MongoPassword,
+
+    [Parameter(Mandatory)]
+    [string] $UnsealKey,
+
+    [Parameter(Mandatory)]
+    [string] $RootToken,
+
+    [Parameter()]
+    [int] $PollIntervalSec = 2
 )
 
 function Invoke-VaultApi {
@@ -64,9 +77,17 @@ function Invoke-VaultApi {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory)][string] $Path,
-        [ValidateSet('Get', 'Post', 'Put', 'Delete')][string] $Method = 'Get',
+        [Parameter(Mandatory)]
+        [string] $Path,
+
+        [Parameter()]
+        [ValidateSet('Get', 'Post', 'Put', 'Delete')]
+        [string] $Method = 'Get',
+
+        [Parameter()]
         [object] $Body,
+
+        [Parameter()]
         [string] $Token
     )
 
@@ -141,7 +162,10 @@ function Wait-ForVault {
         Seconds between reachability polls. Defaults to 2.
     #>
     [CmdletBinding()]
-    param([Parameter()][int] $PollIntervalSec = 2)
+    param(
+        [Parameter()]
+        [int] $PollIntervalSec = 2
+    )
 
     if ($WhatIfPreference) {
         Write-Host "What if: Waiting for Vault at $VaultAddr to become reachable."
@@ -206,7 +230,10 @@ function Invoke-VaultUnseal {
         The unseal key share to submit.
     #>
     [CmdletBinding(SupportsShouldProcess = $true)]
-    param([Parameter(Mandatory)][string] $Key)
+    param(
+        [Parameter(Mandatory)]
+        [string] $Key
+    )
 
     if ($PSCmdlet.ShouldProcess($VaultAddr, 'Unseal Vault')) {
         $response = Invoke-VaultApi -Path 'v1/sys/unseal' -Method Put -Body @{ key = $Key }
@@ -232,8 +259,11 @@ function Enable-SecretsEngine {
     #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
-        [Parameter(Mandatory)][string] $Token,
-        [Parameter()][string] $MountPath = 'secret'
+        [Parameter(Mandatory)]
+        [string] $Token,
+
+        [Parameter()]
+        [string] $MountPath = 'secret'
     )
 
     if ($PSCmdlet.ShouldProcess("$VaultAddr ($MountPath)", 'Enable kv-v2 secrets engine')) {
@@ -265,10 +295,17 @@ function Set-MongoSecret {
     #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
-        [Parameter(Mandatory)][string] $Token,
-        [Parameter(Mandatory)][string] $Username,
-        [Parameter(Mandatory)][string] $Password,
-        [Parameter()][string] $MountPath = 'secret'
+        [Parameter(Mandatory)]
+        [string] $Token,
+
+        [Parameter(Mandatory)]
+        [string] $Username,
+
+        [Parameter(Mandatory)]
+        [string] $Password,
+
+        [Parameter()]
+        [string] $MountPath = 'secret'
     )
 
     if ($PSCmdlet.ShouldProcess("$VaultAddr ($MountPath/mongodb)", 'Write MongoDB credentials')) {
@@ -294,8 +331,11 @@ function Write-DaprToken {
     #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
-        [Parameter(Mandatory)][string] $Token,
-        [Parameter(Mandatory)][string] $Path
+        [Parameter(Mandatory)]
+        [string] $Token,
+
+        [Parameter(Mandatory)]
+        [string] $Path
     )
 
     if ($PSCmdlet.ShouldProcess($Path, 'Write DAPR secrets file')) {
@@ -326,8 +366,11 @@ function Write-InitSummary {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory)][string] $UnsealKey,
-        [Parameter(Mandatory)][string] $RootToken
+        [Parameter(Mandatory)]
+        [string] $UnsealKey,
+
+        [Parameter(Mandatory)]
+        [string] $RootToken
     )
 
     $line = '=' * 60
@@ -343,8 +386,6 @@ function Write-InitSummary {
     Write-Host $line
     Write-Host ''
 }
-
-# ── main ─────────────────────────────────────────────────────────────────────
 
 function Invoke-Main {
     [CmdletBinding(SupportsShouldProcess = $true)]
