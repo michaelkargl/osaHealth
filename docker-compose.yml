@@ -45,7 +45,7 @@ services:
       start_period: 5s
 
   vault-init:
-    image: mcr.microsoft.com/powershell:7.4-ubuntu-22.04
+    image: mcr.microsoft.com/dotnet/sdk:11.0-preview
     entrypoint: ["pwsh", "-File", "/vault/init/init.ps1"]
     restart: "no"
     volumes:
