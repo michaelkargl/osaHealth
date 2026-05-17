@@ -101,7 +101,7 @@ function Invoke-VaultApi {
     if ($Token) {
         $params['Headers'] = @{ 'X-Vault-Token' = $Token }
     }
-    if ($PSBoundParameters.ContainsKey('Body') -and $null -ne $Body) {
+    if ($null -ne $Body) {
         $params['Body']        = ($Body | ConvertTo-Json -Depth 10 -Compress)
         $params['ContentType'] = 'application/json'
     }
@@ -197,23 +197,23 @@ function Initialize-Vault {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param()
 
-    if ($PSCmdlet.ShouldProcess($VaultAddr, 'Initialize Vault (operator init, 1 key share)')) {
-        $body     = @{ secret_shares = 1; secret_threshold = 1 }
-        $response = Invoke-VaultApi -Path 'v1/sys/init' -Method Put -Body $body
-
-        if (-not $response.keys_base64 -or -not $response.root_token) {
-            throw 'Vault init succeeded but the response contained no unseal key or root token.'
-        }
-
+    if (-not $PSCmdlet.ShouldProcess($VaultAddr, 'Initialize Vault (operator init, 1 key share)')) {
         return [pscustomobject]@{
-            UnsealKey = $response.keys_base64[0]
-            RootToken = $response.root_token
+            UnsealKey = '<unseal-key-not-generated-in-whatif>'
+            RootToken = '<root-token-not-generated-in-whatif>'
         }
     }
 
+    $body     = @{ secret_shares = 1; secret_threshold = 1 }
+    $response = Invoke-VaultApi -Path 'v1/sys/init' -Method Put -Body $body
+
+    if (-not $response.keys_base64 -or -not $response.root_token) {
+        throw 'Vault init succeeded but the response contained no unseal key or root token.'
+    }
+
     return [pscustomobject]@{
-        UnsealKey = '<unseal-key-not-generated-in-whatif>'
-        RootToken = '<root-token-not-generated-in-whatif>'
+        UnsealKey = $response.keys_base64[0]
+        RootToken = $response.root_token
     }
 }
 
@@ -274,43 +274,40 @@ function Enable-SecretsEngine {
 
 <#
 .SYNOPSIS
-    Writes MongoDB credentials to Vault.
+    Writes a secret to Vault's kv-v2 secrets engine.
 
 .DESCRIPTION
-    Stores MongoDB root credentials in Vault's kv-v2 secrets engine at the
-    specified mount path under the mongodb secret path.
+    Stores a secret in Vault's kv-v2 secrets engine at the given key under the
+    'secret' mount. The value is a hashtable of field names to field values.
 
 .PARAMETER Token
     Vault authentication token with permission to write secrets.
 
-.PARAMETER Username
-    MongoDB root username.
+.PARAMETER Key
+    The secret path to write to (e.g. 'mongodb').
 
-.PARAMETER Password
-    MongoDB root password.
+.PARAMETER Value
+    The secret data to write as a hashtable of field names to values.
 
-.PARAMETER MountPath
-    Mount path of the kv-v2 secrets engine. Defaults to 'secret'.
+.EXAMPLE
+    Set-VaultSecret -Token $root -Key 'mongodb' -Value @{ username = 'admin'; password = 's3cr3t' }
 #>
-function Set-MongoSecret {
+function Set-VaultSecret {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
         [Parameter(Mandatory)]
         [string] $Token,
 
         [Parameter(Mandatory)]
-        [string] $Username,
+        [string] $Key,
 
         [Parameter(Mandatory)]
-        [string] $Password,
-
-        [Parameter()]
-        [string] $MountPath = 'secret'
+        [object] $Value
     )
 
-    if ($PSCmdlet.ShouldProcess("$VaultAddr ($MountPath/mongodb)", 'Write MongoDB credentials')) {
-        $body = @{ data = @{ username = $Username; password = $Password } }
-        Invoke-VaultApi -Path "v1/$MountPath/data/mongodb" -Method Post -Body $body -Token $Token | Out-Null
+    if ($PSCmdlet.ShouldProcess("$VaultAddr (secret/$Key)", 'Write vault secret')) {
+        $body = @{ data = $Value }
+        Invoke-VaultApi -Path "v1/secret/data/$Key" -Method Post -Body $body -Token $Token | Out-Null
     }
 }
 
@@ -401,7 +398,7 @@ function Invoke-Main {
         $init = Initialize-Vault
         Invoke-VaultUnseal -Key $init.UnsealKey
         Enable-SecretsEngine -Token $init.RootToken
-        Set-MongoSecret -Token $init.RootToken -Username $MongoUser -Password $MongoPassword
+        Set-VaultSecret -Token $init.RootToken -Key 'mongodb' -Value @{ username = $MongoUser; password = $MongoPassword }
         Write-DaprToken -Token $init.RootToken -Path $DaprSecretsPath
         Write-InitSummary -UnsealKey $init.UnsealKey -RootToken $init.RootToken
     }

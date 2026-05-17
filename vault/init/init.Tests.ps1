@@ -129,11 +129,11 @@ Describe 'Enable-SecretsEngine' {
     }
 }
 
-Describe 'Set-MongoSecret' {
-    It 'writes the credentials to the kv-v2 mongodb path' {
+Describe 'Set-VaultSecret' {
+    It 'writes a secret to the kv-v2 secrets engine at the given path' {
         Mock Invoke-VaultApi { }
 
-        Set-MongoSecret -Token 'hvs.root' -Username 'admin' -Password 's3cret'
+        Set-VaultSecret -Token 'hvs.root' -Key 'mongodb' -Value @{ username = 'admin'; password = 's3cret' }
 
         Should -Invoke Invoke-VaultApi -Times 1 -Exactly -ParameterFilter {
             $Path -eq 'v1/secret/data/mongodb' -and $Method -eq 'Post'
@@ -142,7 +142,7 @@ Describe 'Set-MongoSecret' {
 
     It 'does not call the API in -WhatIf mode' {
         Mock Invoke-VaultApi { throw 'API must not be called under WhatIf' }
-        Set-MongoSecret -Token 'hvs.root' -Username 'admin' -Password 's3cret' -WhatIf
+        Set-VaultSecret -Token 'hvs.root' -Key 'mongodb' -Value @{ username = 'admin'; password = 's3cret' } -WhatIf
         Should -Invoke Invoke-VaultApi -Times 0 -Exactly
     }
 }
