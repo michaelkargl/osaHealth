@@ -2,11 +2,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:11.0-preview AS build
 WORKDIR /src
 
-COPY osaHealth.Api.fsproj .
-RUN dotnet restore osaHealth.Api.fsproj
-
 COPY . .
-RUN dotnet publish osaHealth.Api.fsproj -c Release -o /app --no-restore
+RUN dotnet publish osaHealth.Api.fsproj -c Release -o /app
 
 # Runtime stage — minimal ASP.NET Core image.
 FROM mcr.microsoft.com/dotnet/aspnet:11.0-preview AS runtime

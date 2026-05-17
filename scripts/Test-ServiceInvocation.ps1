@@ -1,5 +1,5 @@
 
-$ServiceInvocationBaseUrl = 'http://localhost:3500/v1.0/invoke/osa-api/method'
+$ServiceInvocationBaseUrl = 'http://localhost:13500/v1.0/invoke/osa-api/method'
 $FgGray = @{ ForegroundColor = 'DarkGray' }
 $FgGreen = @{ ForegroundColor = 'Green' }
 $FgRed = @{ ForegroundColor = 'Red' }
@@ -7,8 +7,7 @@ $FgRed = @{ ForegroundColor = 'Red' }
 Write-Host @FgGray "Invoking the osa-api /health endpoint through the DAPR sidecar"
 $Response = Invoke-WebRequest `
             -Method Get `
-            -Uri "$ServiceInvocationBaseUrl/health" `
-            -SkipHttpErrorCheck
+            -Uri "$ServiceInvocationBaseUrl/health"
 
 Write-Host @FgGray "Received HTTP $($Response.StatusCode): $($Response.Content)"
 
