@@ -44,37 +44,37 @@ param(
     [int] $PollIntervalSec = 2
 )
 
+<#
+.SYNOPSIS
+    Sends an HTTP request to the Vault API.
+
+.DESCRIPTION
+    Single entry point for all Vault HTTP calls. Constructs the full URI, adds authentication
+    headers if a token is provided, and serializes the request body to JSON. Tests mock this
+    function to verify API calls without touching a running Vault instance.
+
+.PARAMETER Path
+    API endpoint path relative to the vault server (e.g. 'v1/sys/init', 'v1/sys/unseal').
+
+.PARAMETER Method
+    HTTP method: Get, Post, Put, or Delete. Defaults to Get.
+
+.PARAMETER Body
+    Optional object to send as JSON-serialized request body.
+
+.PARAMETER Token
+    Vault authentication token. If provided, included in the X-Vault-Token header.
+
+.EXAMPLE
+    Invoke-VaultApi -Path 'v1/sys/seal-status' -Method Get
+
+.EXAMPLE
+    Invoke-VaultApi -Path 'v1/sys/init' -Method Put -Body @{ secret_shares = 1; secret_threshold = 1 }
+
+.EXAMPLE
+    Invoke-VaultApi -Path 'v1/sys/unseal' -Method Put -Body @{ key = 'unseal-key-here' } -Token $rootToken
+#>
 function Invoke-VaultApi {
-    <#
-    .SYNOPSIS
-        Sends an HTTP request to the Vault API.
-
-    .DESCRIPTION
-        Single entry point for all Vault HTTP calls. Constructs the full URI, adds authentication
-        headers if a token is provided, and serializes the request body to JSON. Tests mock this
-        function to verify API calls without touching a running Vault instance.
-
-    .PARAMETER Path
-        API endpoint path relative to the vault server (e.g. 'v1/sys/init', 'v1/sys/unseal').
-
-    .PARAMETER Method
-        HTTP method: Get, Post, Put, or Delete. Defaults to Get.
-
-    .PARAMETER Body
-        Optional object to send as JSON-serialized request body.
-
-    .PARAMETER Token
-        Vault authentication token. If provided, included in the X-Vault-Token header.
-
-    .EXAMPLE
-        Invoke-VaultApi -Path 'v1/sys/seal-status' -Method Get
-
-    .EXAMPLE
-        Invoke-VaultApi -Path 'v1/sys/init' -Method Put -Body @{ secret_shares = 1; secret_threshold = 1 }
-
-    .EXAMPLE
-        Invoke-VaultApi -Path 'v1/sys/unseal' -Method Put -Body @{ key = 'unseal-key-here' } -Token $rootToken
-    #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
@@ -109,15 +109,15 @@ function Invoke-VaultApi {
     Invoke-RestMethod @params
 }
 
-function Test-VaultRunning {
-    <#
-    .SYNOPSIS
-        Tests whether Vault is reachable.
+<#
+.SYNOPSIS
+    Tests whether Vault is reachable.
 
-    .DESCRIPTION
-        Queries the Vault seal-status endpoint to determine if the server is up and responding.
-        Returns $true if reachable (sealed or unsealed), $false if not yet up or unreachable.
-    #>
+.DESCRIPTION
+    Queries the Vault seal-status endpoint to determine if the server is up and responding.
+    Returns $true if reachable (sealed or unsealed), $false if not yet up or unreachable.
+#>
+function Test-VaultRunning {
     [CmdletBinding()]
     param()
     try {
@@ -129,15 +129,15 @@ function Test-VaultRunning {
     }
 }
 
-function Test-VaultInitialized {
-    <#
-    .SYNOPSIS
-        Tests whether Vault has already been initialized.
+<#
+.SYNOPSIS
+    Tests whether Vault has already been initialized.
 
-    .DESCRIPTION
-        Queries the Vault init endpoint to check the initialized flag. Returns $true if Vault
-        has been initialized, $false if not yet initialized or if the check fails.
-    #>
+.DESCRIPTION
+    Queries the Vault init endpoint to check the initialized flag. Returns $true if Vault
+    has been initialized, $false if not yet initialized or if the check fails.
+#>
+function Test-VaultInitialized {
     [CmdletBinding()]
     param()
     try {
@@ -149,18 +149,18 @@ function Test-VaultInitialized {
     }
 }
 
+<#
+.SYNOPSIS
+    Blocks until Vault becomes reachable.
+
+.DESCRIPTION
+    Polls the Vault server repeatedly until it responds to API requests. Skipped under
+    -WhatIf so the script stays previewable without a running Vault instance.
+
+.PARAMETER PollIntervalSec
+    Seconds between reachability polls. Defaults to 2.
+#>
 function Wait-ForVault {
-    <#
-    .SYNOPSIS
-        Blocks until Vault becomes reachable.
-
-    .DESCRIPTION
-        Polls the Vault server repeatedly until it responds to API requests. Skipped under
-        -WhatIf so the script stays previewable without a running Vault instance.
-
-    .PARAMETER PollIntervalSec
-        Seconds between reachability polls. Defaults to 2.
-    #>
     [CmdletBinding()]
     param(
         [Parameter()]
@@ -179,21 +179,21 @@ function Wait-ForVault {
     Write-Host 'Vault is up.'
 }
 
+<#
+.SYNOPSIS
+    Initializes Vault with operator init.
+
+.DESCRIPTION
+    Runs Vault's operator init with a single key share, which generates and returns the
+    unseal key and root token. Under -WhatIf no key material is generated; placeholders
+    are returned instead so the rest of the preview can run.
+
+.EXAMPLE
+    $init = Initialize-Vault
+    $init.UnsealKey
+    $init.RootToken
+#>
 function Initialize-Vault {
-    <#
-    .SYNOPSIS
-        Initializes Vault with operator init.
-
-    .DESCRIPTION
-        Runs Vault's operator init with a single key share, which generates and returns the
-        unseal key and root token. Under -WhatIf no key material is generated; placeholders
-        are returned instead so the rest of the preview can run.
-
-    .EXAMPLE
-        $init = Initialize-Vault
-        $init.UnsealKey
-        $init.RootToken
-    #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     param()
 
@@ -217,18 +217,18 @@ function Initialize-Vault {
     }
 }
 
+<#
+.SYNOPSIS
+    Submits an unseal key share to Vault.
+
+.DESCRIPTION
+    Sends an unseal key share to the Vault unsealing endpoint. After receiving the
+    configured threshold of key shares, Vault becomes unsealed.
+
+.PARAMETER Key
+    The unseal key share to submit.
+#>
 function Invoke-VaultUnseal {
-    <#
-    .SYNOPSIS
-        Submits an unseal key share to Vault.
-
-    .DESCRIPTION
-        Sends an unseal key share to the Vault unsealing endpoint. After receiving the
-        configured threshold of key shares, Vault becomes unsealed.
-
-    .PARAMETER Key
-        The unseal key share to submit.
-    #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
         [Parameter(Mandatory)]
@@ -243,20 +243,20 @@ function Invoke-VaultUnseal {
     }
 }
 
+<#
+.SYNOPSIS
+    Enables the kv-v2 secrets engine.
+
+.DESCRIPTION
+    Enables Vault's key-value version 2 secrets engine at the specified mount path.
+
+.PARAMETER Token
+    Vault authentication token with permission to mount secrets engines.
+
+.PARAMETER MountPath
+    Mount path for the secrets engine. Defaults to 'secret'.
+#>
 function Enable-SecretsEngine {
-    <#
-    .SYNOPSIS
-        Enables the kv-v2 secrets engine.
-
-    .DESCRIPTION
-        Enables Vault's key-value version 2 secrets engine at the specified mount path.
-
-    .PARAMETER Token
-        Vault authentication token with permission to mount secrets engines.
-
-    .PARAMETER MountPath
-        Mount path for the secrets engine. Defaults to 'secret'.
-    #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
         [Parameter(Mandatory)]
@@ -272,27 +272,27 @@ function Enable-SecretsEngine {
     }
 }
 
+<#
+.SYNOPSIS
+    Writes MongoDB credentials to Vault.
+
+.DESCRIPTION
+    Stores MongoDB root credentials in Vault's kv-v2 secrets engine at the
+    specified mount path under the mongodb secret path.
+
+.PARAMETER Token
+    Vault authentication token with permission to write secrets.
+
+.PARAMETER Username
+    MongoDB root username.
+
+.PARAMETER Password
+    MongoDB root password.
+
+.PARAMETER MountPath
+    Mount path of the kv-v2 secrets engine. Defaults to 'secret'.
+#>
 function Set-MongoSecret {
-    <#
-    .SYNOPSIS
-        Writes MongoDB credentials to Vault.
-
-    .DESCRIPTION
-        Stores MongoDB root credentials in Vault's kv-v2 secrets engine at the
-        specified mount path under the mongodb secret path.
-
-    .PARAMETER Token
-        Vault authentication token with permission to write secrets.
-
-    .PARAMETER Username
-        MongoDB root username.
-
-    .PARAMETER Password
-        MongoDB root password.
-
-    .PARAMETER MountPath
-        Mount path of the kv-v2 secrets engine. Defaults to 'secret'.
-    #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
         [Parameter(Mandatory)]
@@ -314,21 +314,21 @@ function Set-MongoSecret {
     }
 }
 
+<#
+.SYNOPSIS
+    Writes the Vault root token to the DAPR secrets file.
+
+.DESCRIPTION
+    Writes the Vault root token as a JSON object to the file that the DAPR
+    vault-secret-store component reads. Creates the parent directory if it does not exist.
+
+.PARAMETER Token
+    Vault root token to write.
+
+.PARAMETER Path
+    File path where the secrets JSON will be written.
+#>
 function Write-DaprToken {
-    <#
-    .SYNOPSIS
-        Writes the Vault root token to the DAPR secrets file.
-
-    .DESCRIPTION
-        Writes the Vault root token as a JSON object to the file that the DAPR
-        vault-secret-store component reads. Creates the parent directory if it does not exist.
-
-    .PARAMETER Token
-        Vault root token to write.
-
-    .PARAMETER Path
-        File path where the secrets JSON will be written.
-    #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
         [Parameter(Mandatory)]
@@ -349,21 +349,21 @@ function Write-DaprToken {
     }
 }
 
+<#
+.SYNOPSIS
+    Displays the initialization summary.
+
+.DESCRIPTION
+    Prints the Vault unseal key and root token that the operator must copy into
+    the .env file after a first-run initialization.
+
+.PARAMETER UnsealKey
+    Vault unseal key generated during initialization.
+
+.PARAMETER RootToken
+    Vault root token generated during initialization.
+#>
 function Write-InitSummary {
-    <#
-    .SYNOPSIS
-        Displays the initialization summary.
-
-    .DESCRIPTION
-        Prints the Vault unseal key and root token that the operator must copy into
-        the .env file after a first-run initialization.
-
-    .PARAMETER UnsealKey
-        Vault unseal key generated during initialization.
-
-    .PARAMETER RootToken
-        Vault root token generated during initialization.
-    #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
