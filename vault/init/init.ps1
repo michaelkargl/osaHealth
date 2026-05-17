@@ -3,9 +3,6 @@
     Initializes and unseals the osaHealth HashiCorp Vault instance.
 
 .DESCRIPTION
-    PowerShell port of vault/init/init.sh. It talks to Vault over its HTTP API
-    via Invoke-RestMethod, so it needs neither the `vault` CLI nor a POSIX shell.
-
     On first run it initializes Vault, unseals it, enables the kv-v2 secrets
     engine, seeds the MongoDB credentials, and writes the DAPR token file.
     On every subsequent run it unseals Vault with VAULT_UNSEAL_KEY and refreshes
@@ -13,12 +10,6 @@
 
     Every state-changing operation is gated behind ShouldProcess, so the script
     can be previewed end to end with -WhatIf without touching Vault.
-
-.EXAMPLE
-    pwsh -File ./init.ps1
-
-.EXAMPLE
-    pwsh -File ./init.ps1 -WhatIf
 #>
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
@@ -50,8 +41,7 @@ param(
 
 .DESCRIPTION
     Single entry point for all Vault HTTP calls. Constructs the full URI, adds authentication
-    headers if a token is provided, and serializes the request body to JSON. Tests mock this
-    function to verify API calls without touching a running Vault instance.
+    headers if a token is provided, and serializes the request body to JSON.
 
 .PARAMETER Path
     API endpoint path relative to the vault server (e.g. 'v1/sys/init', 'v1/sys/unseal').
@@ -252,23 +242,17 @@ function Invoke-VaultUnseal {
 
 .PARAMETER Token
     Vault authentication token with permission to mount secrets engines.
-
-.PARAMETER MountPath
-    Mount path for the secrets engine. Defaults to 'secret'.
 #>
 function Enable-SecretsEngine {
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
         [Parameter(Mandatory)]
         [string] $Token,
-
-        [Parameter()]
-        [string] $MountPath = 'secret'
     )
 
-    if ($PSCmdlet.ShouldProcess("$VaultAddr ($MountPath)", 'Enable kv-v2 secrets engine')) {
+    if ($PSCmdlet.ShouldProcess("$VaultAddr (secret)", 'Enable kv-v2 secrets engine')) {
         $body = @{ type = 'kv'; options = @{ version = '2' } }
-        Invoke-VaultApi -Path "v1/sys/mounts/$MountPath" -Method Post -Body $body -Token $Token | Out-Null
+        Invoke-VaultApi -Path "v1/sys/mounts/secret" -Method Post -Body $body -Token $Token | Out-Null
     }
 }
 
