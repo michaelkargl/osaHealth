@@ -45,8 +45,8 @@ services:
       start_period: 5s
 
   vault-init:
-    image: hashicorp/vault:1.17
-    entrypoint: ["/bin/sh", "/vault/init/init.sh"]
+    image: mcr.microsoft.com/powershell:7.4-ubuntu-22.04
+    entrypoint: ["pwsh", "-File", "/vault/init/init.ps1"]
     restart: "no"
     volumes:
       - ./vault/init:/vault/init:ro

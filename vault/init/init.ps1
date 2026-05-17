@@ -1,0 +1,263 @@
+<#
+.SYNOPSIS
+    Initializes and unseals the osaHealth HashiCorp Vault instance.
+
+.DESCRIPTION
+    PowerShell port of vault/init/init.sh. It talks to Vault over its HTTP API
+    via Invoke-RestMethod, so it needs neither the `vault` CLI nor a POSIX shell.
+
+    On first run it initializes Vault, unseals it, enables the kv-v2 secrets
+    engine, seeds the MongoDB credentials, and writes the DAPR token file.
+    On every subsequent run it unseals Vault with VAULT_UNSEAL_KEY and refreshes
+    the DAPR token file.
+
+    Every state-changing operation is gated behind ShouldProcess, so the script
+    can be previewed end to end with -WhatIf without touching Vault.
+
+.EXAMPLE
+    pwsh -File ./init.ps1
+
+.EXAMPLE
+    pwsh -File ./init.ps1 -WhatIf
+#>
+[CmdletBinding(SupportsShouldProcess = $true)]
+param(
+    # Base URL of the Vault server.
+    [string] $VaultAddr       = $(if ($env:VAULT_ADDR) { $env:VAULT_ADDR } else { 'http://vault:8200' }),
+
+    # File the DAPR vault-secret-store reads the root token from.
+    [string] $DaprSecretsPath = $(if ($env:DAPR_SECRETS_PATH) { $env:DAPR_SECRETS_PATH } else { '/dapr/secrets.json' }),
+
+    # MongoDB credentials seeded into Vault on first run.
+    [string] $MongoUser       = $(if ($env:MONGO_ROOT_USER) { $env:MONGO_ROOT_USER } else { 'changeme' }),
+    [string] $MongoPassword   = $(if ($env:MONGO_ROOT_PASSWORD) { $env:MONGO_ROOT_PASSWORD } else { 'changeme' }),
+
+    # Credentials from .env, used on subsequent runs once Vault is initialized.
+    [string] $UnsealKey       = $env:VAULT_UNSEAL_KEY,
+    [string] $RootToken       = $env:VAULT_ROOT_TOKEN,
+
+    # Seconds between reachability polls while waiting for Vault to come up.
+    [int]    $PollIntervalSec = 2
+)
+
+# ── Vault HTTP API helpers ───────────────────────────────────────────────────
+
+# Single entry point for every Vault HTTP call. Tests mock this function.
+function Invoke-VaultApi {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string] $Path,
+        [ValidateSet('Get', 'Post', 'Put', 'Delete')][string] $Method = 'Get',
+        [object] $Body,
+        [string] $Token
+    )
+
+    $uri = '{0}/{1}' -f $VaultAddr.TrimEnd('/'), $Path.TrimStart('/')
+
+    $params = @{
+        Uri         = $uri
+        Method      = $Method
+        ErrorAction = 'Stop'
+    }
+    if ($Token) {
+        $params['Headers'] = @{ 'X-Vault-Token' = $Token }
+    }
+    if ($PSBoundParameters.ContainsKey('Body') -and $null -ne $Body) {
+        $params['Body']        = ($Body | ConvertTo-Json -Depth 10 -Compress)
+        $params['ContentType'] = 'application/json'
+    }
+
+    Invoke-RestMethod @params
+}
+
+# Returns $true if Vault is reachable (sealed or unsealed), $false if not yet up.
+function Test-VaultRunning {
+    [CmdletBinding()]
+    param()
+    try {
+        Invoke-VaultApi -Path 'v1/sys/seal-status' -Method Get | Out-Null
+        return $true
+    }
+    catch {
+        return $false
+    }
+}
+
+# Returns $true if Vault reports that it has already been initialized.
+function Test-VaultInitialized {
+    [CmdletBinding()]
+    param()
+    try {
+        $status = Invoke-VaultApi -Path 'v1/sys/init' -Method Get
+        return [bool] $status.initialized
+    }
+    catch {
+        return $false
+    }
+}
+
+# Blocks until Vault answers the API. Skipped under -WhatIf so the script
+# stays previewable without a running Vault.
+function Wait-ForVault {
+    [CmdletBinding()]
+    param([int] $PollIntervalSec = 2)
+
+    if ($WhatIfPreference) {
+        Write-Host "What if: Waiting for Vault at $VaultAddr to become reachable."
+        return
+    }
+
+    while (-not (Test-VaultRunning)) {
+        Write-Host 'Waiting for Vault...'
+        Start-Sleep -Seconds $PollIntervalSec
+    }
+    Write-Host 'Vault is up.'
+}
+
+# ── State-changing operations (all gated behind ShouldProcess) ───────────────
+
+# Runs `operator init` with a single key share. Returns the unseal key and
+# root token. Under -WhatIf no key material is generated and placeholders
+# are returned so the rest of the preview can run.
+function Initialize-Vault {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param()
+
+    if ($PSCmdlet.ShouldProcess($VaultAddr, 'Initialize Vault (operator init, 1 key share)')) {
+        $body     = @{ secret_shares = 1; secret_threshold = 1 }
+        $response = Invoke-VaultApi -Path 'v1/sys/init' -Method Put -Body $body
+
+        if (-not $response.keys_base64 -or -not $response.root_token) {
+            throw 'Vault init succeeded but the response contained no unseal key or root token.'
+        }
+
+        return [pscustomobject]@{
+            UnsealKey = $response.keys_base64[0]
+            RootToken = $response.root_token
+        }
+    }
+
+    return [pscustomobject]@{
+        UnsealKey = '<unseal-key-not-generated-in-whatif>'
+        RootToken = '<root-token-not-generated-in-whatif>'
+    }
+}
+
+# Submits an unseal key share to Vault.
+function Invoke-VaultUnseal {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param([Parameter(Mandatory)][string] $Key)
+
+    if ($PSCmdlet.ShouldProcess($VaultAddr, 'Unseal Vault')) {
+        $response = Invoke-VaultApi -Path 'v1/sys/unseal' -Method Put -Body @{ key = $Key }
+        if ($response.sealed) {
+            throw 'Vault is still sealed after submitting the unseal key.'
+        }
+    }
+}
+
+# Enables the kv-v2 secrets engine at the given mount path.
+function Enable-SecretsEngine {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        [Parameter(Mandatory)][string] $Token,
+        [string] $MountPath = 'secret'
+    )
+
+    if ($PSCmdlet.ShouldProcess("$VaultAddr ($MountPath)", 'Enable kv-v2 secrets engine')) {
+        $body = @{ type = 'kv'; options = @{ version = '2' } }
+        Invoke-VaultApi -Path "v1/sys/mounts/$MountPath" -Method Post -Body $body -Token $Token | Out-Null
+    }
+}
+
+# Writes the MongoDB credentials to secret/mongodb (kv-v2).
+function Set-MongoSecret {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        [Parameter(Mandatory)][string] $Token,
+        [Parameter(Mandatory)][string] $Username,
+        [Parameter(Mandatory)][string] $Password,
+        [string] $MountPath = 'secret'
+    )
+
+    if ($PSCmdlet.ShouldProcess("$VaultAddr ($MountPath/mongodb)", 'Write MongoDB credentials')) {
+        $body = @{ data = @{ username = $Username; password = $Password } }
+        Invoke-VaultApi -Path "v1/$MountPath/data/mongodb" -Method Post -Body $body -Token $Token | Out-Null
+    }
+}
+
+# Writes the root token to the file the DAPR vault-secret-store reads.
+function Write-DaprToken {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        [Parameter(Mandatory)][string] $Token,
+        [Parameter(Mandatory)][string] $Path
+    )
+
+    if ($PSCmdlet.ShouldProcess($Path, 'Write DAPR secrets file')) {
+        $directory = Split-Path -Parent $Path
+        if ($directory -and -not (Test-Path -LiteralPath $directory)) {
+            New-Item -ItemType Directory -Path $directory -Force | Out-Null
+        }
+
+        $content = [pscustomobject]@{ vaultToken = $Token } | ConvertTo-Json
+        Set-Content -LiteralPath $Path -Value $content -Encoding utf8
+    }
+}
+
+# Prints the credentials the operator must copy into .env after a first run.
+function Write-InitSummary {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string] $UnsealKey,
+        [Parameter(Mandatory)][string] $RootToken
+    )
+
+    $line = '=' * 60
+    Write-Host ''
+    Write-Host $line
+    Write-Host '  VAULT INITIALIZED'
+    Write-Host '  Add these to your .env file, then restart:'
+    Write-Host ''
+    Write-Host "  VAULT_UNSEAL_KEY=$UnsealKey"
+    Write-Host "  VAULT_ROOT_TOKEN=$RootToken"
+    Write-Host ''
+    Write-Host '  Verify secrets at http://localhost:8200'
+    Write-Host $line
+    Write-Host ''
+}
+
+# ── main ─────────────────────────────────────────────────────────────────────
+
+function Invoke-Main {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param()
+
+    Set-StrictMode -Version 3.0
+    $ErrorActionPreference = 'Stop'
+
+    Wait-ForVault -PollIntervalSec $PollIntervalSec
+
+    if (-not (Test-VaultInitialized)) {
+        Write-Host '=== First run: initializing Vault ==='
+        $init = Initialize-Vault
+        Invoke-VaultUnseal -Key $init.UnsealKey
+        Enable-SecretsEngine -Token $init.RootToken
+        Set-MongoSecret -Token $init.RootToken -Username $MongoUser -Password $MongoPassword
+        Write-DaprToken -Token $init.RootToken -Path $DaprSecretsPath
+        Write-InitSummary -UnsealKey $init.UnsealKey -RootToken $init.RootToken
+    }
+    else {
+        if (-not $UnsealKey) {
+            throw 'Vault is initialized but VAULT_UNSEAL_KEY is not set in .env'
+        }
+        Invoke-VaultUnseal -Key $UnsealKey
+        Write-DaprToken -Token $RootToken -Path $DaprSecretsPath
+        Write-Host 'Vault unsealed.'
+    }
+}
+
+# Run only when executed directly; stay inert when dot-sourced by the tests.
+if ($MyInvocation.InvocationName -ne '.') {
+    Invoke-Main
+}
