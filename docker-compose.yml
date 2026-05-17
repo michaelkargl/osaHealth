@@ -45,7 +45,7 @@ services:
       start_period: 5s
 
   vault-init:
-    image: mcr.microsoft.com/dotnet/sdk:11.0-preview
+    image: mcr.microsoft.com/powershell:7.4-ubuntu-22.04
     entrypoint: ["pwsh", "-File", "/vault/init/init.ps1", "-VaultAddr", "http://vault:8200", "-DaprSecretsPath", "/dapr/secrets.json", "-MongoUser", "${MONGO_ROOT_USER}", "-MongoPassword", "${MONGO_ROOT_PASSWORD}", "-UnsealKey", "${VAULT_UNSEAL_KEY:-}", "-RootToken", "${VAULT_ROOT_TOKEN:-}", "-PollIntervalSec", "2"]
     restart: "no"
     volumes:
