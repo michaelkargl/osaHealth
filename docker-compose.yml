@@ -80,8 +80,9 @@ services:
       context: ./src/osaHealth.Api
     ports:
       - 3500:3500
-    expose:
-      - "8080"
+      # 8080 is the app's Kestrel port; published so the Swagger UI at
+      # http://localhost:8080/swagger is reachable from the host.
+      - 8080:8080
     networks:
       - osa_network
     depends_on:
