@@ -5,6 +5,17 @@ networks:
 volumes:
   mongodb_data:
   vault_data:
+  loki_data:
+
+# Reusable logging config for containers whose logs should be collected by Fluentd.
+# fluentd-async keeps containers startable even if Fluentd is temporarily unavailable;
+# the Docker daemon buffers logs until the connection is established.
+x-fluentd-logging: &fluentd-logging
+  driver: fluentd
+  options:
+    fluentd-address: "localhost:24224"
+    fluentd-async: "true"
+    tag: "docker.{{.Name}}"
 
 services:
   mongodb:
@@ -21,6 +32,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging: *fluentd-logging
 
   vault:
     image: hashicorp/vault:1.17
@@ -43,6 +55,7 @@ services:
       timeout: 5s
       retries: 10
       start_period: 5s
+    logging: *fluentd-logging
 
   vault-init:
     image: mcr.microsoft.com/dotnet/sdk:11.0.100-preview.4
@@ -56,6 +69,7 @@ services:
         condition: service_healthy
     networks:
       - osa_network
+    logging: *fluentd-logging
 
   # Required by the DAPR runtime even though osaHealth does not use the actor pattern.
   # The DAPR sidecar will not start without a reachable placement service.
@@ -64,6 +78,7 @@ services:
     command: ["./placement", "--port", "50006"]
     networks:
       - osa_network
+    logging: *fluentd-logging
 
   # F# Oxpecker service. The DAPR sidecar (api-dapr) shares this
   # container's network namespace, so the published 3500 below is the
@@ -82,6 +97,7 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
+    logging: *fluentd-logging
 
   api-dapr:
     image: daprio/daprd:1.17.7-stablecomponents
@@ -107,7 +123,8 @@ services:
       vault-init:
         condition: service_completed_successfully
     network_mode: "service:api"
- 
+    logging: *fluentd-logging
+
   mongo-express:
     image: mongo-express:1
     restart: always
@@ -122,3 +139,66 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: ${MONGOEXPRESS_ROOT_PASSWORD}
     networks:
       - osa_network
+    logging: *fluentd-logging
+
+  zipkin:
+    image: openzipkin/zipkin:3.4
+    ports:
+      - "9411:9411"
+    networks:
+      - osa_network
+    logging: *fluentd-logging
+
+  loki:
+    image: grafana/loki:3.4.1
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - loki_data:/loki
+    networks:
+      - osa_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  fluentd:
+    build:
+      context: ./fluentd
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    volumes:
+      - ./fluentd/fluent.conf:/fluentd/etc/fluent.conf:ro
+    networks:
+      - osa_network
+    depends_on:
+      loki:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:24220/api/plugins.json || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  grafana:
+    image: grafana/grafana:11.5.2
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+    networks:
+      - osa_network
+    depends_on:
+      loki:
+        condition: service_healthy
