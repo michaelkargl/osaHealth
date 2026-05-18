@@ -12,6 +12,9 @@ common:
       chunks_directory: /loki/chunks
       rules_directory: /loki/rules
   replication_factor: 1
+  # inmemory ring is for internal component coordination only (single-node setup).
+  # Actual log data is stored on the filesystem (see storage above) and persisted
+  # across restarts via the loki_data Docker volume.
   ring:
     kvstore:
       store: inmemory
