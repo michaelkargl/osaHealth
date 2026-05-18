@@ -8,7 +8,7 @@ BeforeAll {
     # Invoke-Main (see the InvocationName guard at the bottom of init.ps1).
     # Dummy values satisfy the mandatory parameters; individual tests override as needed.
     . (Join-Path $PSScriptRoot 'init.ps1') `
-        -VaultAddr       'http://vault:8200' `
+        -VaultBaseUri    'http://vault:8200' `
         -DaprSecretsPath '/tmp/test-secrets.json' `
         -MongoUser       'testuser' `
         -MongoPassword   'testpass' `
@@ -19,29 +19,29 @@ BeforeAll {
 Describe 'Test-VaultRunning' {
     It 'returns $true when the seal-status endpoint responds' {
         Mock Invoke-VaultApi { [pscustomobject]@{ sealed = $true } }
-        Test-VaultRunning | Should -BeTrue
+        Test-VaultRunning -VaultBaseUri 'http://vault:8200' | Should -BeTrue
     }
 
     It 'returns $false when the endpoint is unreachable' {
         Mock Invoke-VaultApi { throw 'connection refused' }
-        Test-VaultRunning | Should -BeFalse
+        Test-VaultRunning -VaultBaseUri 'http://vault:8200' | Should -BeFalse
     }
 }
 
 Describe 'Test-VaultInitialized' {
     It 'returns $true when Vault reports it is initialized' {
         Mock Invoke-VaultApi { [pscustomobject]@{ initialized = $true } }
-        Test-VaultInitialized | Should -BeTrue
+        Test-VaultInitialized -VaultBaseUri 'http://vault:8200' | Should -BeTrue
     }
 
     It 'returns $false when Vault reports it is not initialized' {
         Mock Invoke-VaultApi { [pscustomobject]@{ initialized = $false } }
-        Test-VaultInitialized | Should -BeFalse
+        Test-VaultInitialized -VaultBaseUri 'http://vault:8200' | Should -BeFalse
     }
 
     It 'returns $false when the endpoint is unreachable' {
         Mock Invoke-VaultApi { throw 'connection refused' }
-        Test-VaultInitialized | Should -BeFalse
+        Test-VaultInitialized -VaultBaseUri 'http://vault:8200' | Should -BeFalse
     }
 }
 
@@ -51,7 +51,7 @@ Describe 'Wait-ForVault' {
         Mock Test-VaultRunning { $attempts.Value++; return ($attempts.Value -ge 3) }
         Mock Start-Sleep { }
 
-        Wait-ForVault -PollIntervalSec 0
+        Wait-ForVault -VaultBaseUri 'http://vault:8200' -PollIntervalSec 0
 
         Should -Invoke Test-VaultRunning -Times 3 -Exactly
     }
@@ -60,7 +60,7 @@ Describe 'Wait-ForVault' {
         Mock Test-VaultRunning { throw 'should not be reached in WhatIf mode' }
         $WhatIfPreference = $true
 
-        { Wait-ForVault } | Should -Not -Throw
+        { Wait-ForVault -VaultBaseUri 'http://vault:8200' } | Should -Not -Throw
 
         Should -Invoke Test-VaultRunning -Times 0 -Exactly
     }
@@ -72,7 +72,7 @@ Describe 'Initialize-Vault' {
             [pscustomobject]@{ keys_base64 = @('unseal-abc'); root_token = 'hvs.root123' }
         }
 
-        $result = Initialize-Vault
+        $result = Initialize-Vault -VaultBaseUri 'http://vault:8200'
 
         $result.UnsealKey | Should -Be 'unseal-abc'
         $result.RootToken | Should -Be 'hvs.root123'
@@ -81,13 +81,13 @@ Describe 'Initialize-Vault' {
 
     It 'throws when the response carries no key material' {
         Mock Invoke-VaultApi { [pscustomobject]@{ keys_base64 = @(); root_token = '' } }
-        { Initialize-Vault } | Should -Throw
+        { Initialize-Vault -VaultBaseUri 'http://vault:8200' } | Should -Throw
     }
 
     It 'does not call the API in -WhatIf mode' {
         Mock Invoke-VaultApi { throw 'API must not be called under WhatIf' }
 
-        $result = Initialize-Vault -WhatIf
+        $result = Initialize-Vault -VaultBaseUri 'http://vault:8200' -WhatIf
 
         Should -Invoke Invoke-VaultApi -Times 0 -Exactly
         $result.UnsealKey | Should -Not -BeNullOrEmpty
@@ -99,7 +99,7 @@ Describe 'Invoke-VaultUnseal' {
     It 'submits the unseal key to the API' {
         Mock Invoke-VaultApi { [pscustomobject]@{ sealed = $false } }
 
-        Invoke-VaultUnseal -Key 'unseal-abc'
+        Invoke-VaultUnseal -VaultBaseUri 'http://vault:8200' -Key 'unseal-abc'
 
         Should -Invoke Invoke-VaultApi -Times 1 -Exactly -ParameterFilter {
             $Path -eq 'v1/sys/unseal' -and $Method -eq 'Put'
@@ -108,12 +108,12 @@ Describe 'Invoke-VaultUnseal' {
 
     It 'throws when Vault is still sealed afterwards' {
         Mock Invoke-VaultApi { [pscustomobject]@{ sealed = $true } }
-        { Invoke-VaultUnseal -Key 'bad-key' } | Should -Throw
+        { Invoke-VaultUnseal -VaultBaseUri 'http://vault:8200' -Key 'bad-key' } | Should -Throw
     }
 
     It 'does not call the API in -WhatIf mode' {
         Mock Invoke-VaultApi { throw 'API must not be called under WhatIf' }
-        Invoke-VaultUnseal -Key 'unseal-abc' -WhatIf
+        Invoke-VaultUnseal -VaultBaseUri 'http://vault:8200' -Key 'unseal-abc' -WhatIf
         Should -Invoke Invoke-VaultApi -Times 0 -Exactly
     }
 }
@@ -122,7 +122,7 @@ Describe 'Enable-SecretsEngine' {
     It 'enables kv-v2 at the secret mount path' {
         Mock Invoke-VaultApi { }
 
-        Enable-SecretsEngine -Token 'hvs.root'
+        Enable-SecretsEngine -VaultBaseUri 'http://vault:8200' -Token 'hvs.root'
 
         Should -Invoke Invoke-VaultApi -Times 1 -Exactly -ParameterFilter {
             $Path -eq 'v1/sys/mounts/secret' -and $Method -eq 'Post'
@@ -131,7 +131,7 @@ Describe 'Enable-SecretsEngine' {
 
     It 'does not call the API in -WhatIf mode' {
         Mock Invoke-VaultApi { throw 'API must not be called under WhatIf' }
-        Enable-SecretsEngine -Token 'hvs.root' -WhatIf
+        Enable-SecretsEngine -VaultBaseUri 'http://vault:8200' -Token 'hvs.root' -WhatIf
         Should -Invoke Invoke-VaultApi -Times 0 -Exactly
     }
 }
@@ -140,7 +140,7 @@ Describe 'Set-VaultSecret' {
     It 'writes a secret to the kv-v2 secrets engine at the given path' {
         Mock Invoke-VaultApi { }
 
-        Set-VaultSecret -Token 'hvs.root' -Key 'mongodb' -Value @{ username = 'admin'; password = 's3cret' }
+        Set-VaultSecret -VaultBaseUri 'http://vault:8200' -Token 'hvs.root' -Key 'mongodb' -Value @{ username = 'admin'; password = 's3cret' }
 
         Should -Invoke Invoke-VaultApi -Times 1 -Exactly -ParameterFilter {
             $Path -eq 'v1/secret/data/mongodb' -and $Method -eq 'Post'
@@ -149,7 +149,7 @@ Describe 'Set-VaultSecret' {
 
     It 'does not call the API in -WhatIf mode' {
         Mock Invoke-VaultApi { throw 'API must not be called under WhatIf' }
-        Set-VaultSecret -Token 'hvs.root' -Key 'mongodb' -Value @{ username = 'admin'; password = 's3cret' } -WhatIf
+        Set-VaultSecret -VaultBaseUri 'http://vault:8200' -Token 'hvs.root' -Key 'mongodb' -Value @{ username = 'admin'; password = 's3cret' } -WhatIf
         Should -Invoke Invoke-VaultApi -Times 0 -Exactly
     }
 }
