@@ -1,5 +1,7 @@
 
-$StateStoreBaseUrl = 'http://localhost:3500/v1.0/state/statestore'
+# Port 13500 on the host maps to the DAPR sidecar's HTTP port 3500
+# (see docker-compose.yml: api publishes 13500:3500, api-dapr shares its netns).
+$StateStoreBaseUrl = 'http://localhost:13500/v1.0/state/statestore'
 $FgGray = @{ ForegroundColor = 'DarkGray' }
 $FgGreen = @{ ForegroundColor = 'Green' }
 $FgRed = @{ ForegroundColor = 'Red' }
