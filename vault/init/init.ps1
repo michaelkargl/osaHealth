@@ -459,6 +459,9 @@ function Invoke-Main {
         if (-not $UnsealKey) {
             throw 'Vault is initialized but VAULT_UNSEAL_KEY is not set in .env'
         }
+        if (-not $RootToken) {
+            throw 'Vault is initialized but VAULT_ROOT_TOKEN is not set in .env'
+        }
         Invoke-VaultUnseal -VaultBaseUri $VaultBaseUri -Key $UnsealKey
         Write-DaprToken -Token $RootToken -Path $DaprSecretsPath
         Write-Host 'Vault unsealed.'
