@@ -1,12 +1,25 @@
 {
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
   },
   "description": "Line diagram of random values emitted by the GET /random endpoint",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
+  "id": 2,
   "links": [],
   "panels": [
     {
@@ -20,16 +33,35 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "lineInterpolation": "stepAfter",
-            "lineWidth": 2,
-            "pointSize": 6,
-            "showPoints": "always",
-            "spanNulls": false
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            }
           },
-          "min": 0,
+          "mappings": [],
           "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
           "unit": "short"
         },
         "overrides": []
@@ -43,33 +75,44 @@
       "id": 1,
       "options": {
         "legend": {
+          "calcs": [],
           "displayMode": "list",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": false
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
+      "pluginVersion": "11.5.2",
       "targets": [
         {
           "datasource": {
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "max_over_time({container_name=~\".*api.*\"} | json | unwrap `log.RandomValue` | __error__=\"\" [$__interval])",
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "max_over_time({container_name=~\".*api.*\"} | json | unwrap log_State_RandomValue | __error__=\"\" [$__interval])",
           "legendFormat": "random value",
           "queryType": "range",
           "refId": "A"
         }
       ],
       "title": "Random Value Over Time",
-      "type": "timeseries"
+      "type": "histogram"
     }
   ],
+  "preload": false,
   "refresh": "10s",
-  "schemaVersion": 39,
-  "tags": ["osahealth", "random", "logging"],
+  "schemaVersion": 40,
+  "tags": [
+    "osahealth",
+    "random",
+    "logging"
+  ],
   "templating": {
     "list": []
   },
@@ -81,5 +124,6 @@
   "timezone": "browser",
   "title": "Random Values",
   "uid": "random-values",
-  "version": 1
+  "version": 5,
+  "weekStart": ""
 }
