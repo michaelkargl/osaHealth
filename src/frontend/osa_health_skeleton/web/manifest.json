@@ -1,0 +1,12 @@
+{
+    "name": "osaHealth",
+    "short_name": "osaHealth",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#009688",
+    "description": "osaHealth walking skeleton.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": []
+}
