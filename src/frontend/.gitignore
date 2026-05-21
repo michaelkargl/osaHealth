@@ -1,3 +1,6 @@
+# Override root-level .gitignore that excludes bin/ for .NET builds
+!bin/
+
 # Miscellaneous
 *.class
 *.log

@@ -31,4 +31,12 @@ class AppDatabase extends _$AppDatabase {
       (delete(notes)..where((n) => n.id.equals(id))).go();
 }
 
-AppDatabase openDatabase() => AppDatabase(driftDatabase(name: 'osa_health'));
+AppDatabase openDatabase() => AppDatabase(
+      driftDatabase(
+        name: 'osa_health',
+        web: DriftWebOptions(
+          sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+          driftWorker: Uri.parse('drift_worker.dart.js'),
+        ),
+      ),
+    );
