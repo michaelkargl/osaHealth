@@ -16,7 +16,8 @@
       "Bash(Write-Host \"Directories created\")",
       "PowerShell(New-Item *)",
       "PowerShell(docker compose exec *)",
-      "PowerShell(docker compose logs *)"
+      "PowerShell(docker compose logs *)",
+      "WebFetch(domain:hindsight.vectorize.io)"
     ]
   }
 }

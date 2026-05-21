@@ -202,3 +202,18 @@ services:
     depends_on:
       loki:
         condition: service_healthy
+  
+  hindsight:
+    image: ghcr.io/vectorize-io/hindsight:latest
+    restart: always
+    ports:
+      - 8888:8888
+      - 9999:9999
+    volumes:
+      - ${HINDSIGHT_API_DATA_VOLUME}:/home/hindsight/.pg0
+    environment:
+      HINDSIGHT_API_LLM_API_KEY: ${HINDSIGHT_API_LLM_API_KEY}
+      HINDSIGHT_API_LLM_PROVIDER: ${HINDSIGHT_API_LLM_PROVIDER}
+      HINDSIGHT_API_LLM_MODEL: ${HINDSIGHT_API_LLM_MODEL}
+    networks:
+      - osa_network
