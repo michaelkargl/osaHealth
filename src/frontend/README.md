@@ -2,6 +2,11 @@
 
 Flutter web skeleton app with a Drift (SQLite/WASM) notes demo.
 
+## Prerequisites
+
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) (3.x or later)
+- Run `flutter doctor` to verify your installation before proceeding
+
 ## Running the app
 
 ### 1. Install dependencies
@@ -10,25 +15,36 @@ Flutter web skeleton app with a Drift (SQLite/WASM) notes demo.
 flutter pub get
 ```
 
-### 2. Download the required web assets
+### 2. Copy required web assets
 
-Drift on web requires two files in `web/`. Check your `pubspec.lock` for the exact resolved versions of `drift` and `sqlite3`, then download the matching files:
+`drift_flutter` ships a setup script that copies `sqlite3.wasm` and `drift_worker.dart.js` into `web/`. Run it once per environment, and again whenever you upgrade `drift` or `sqlite3`:
 
-- **`sqlite3.wasm`** → [sqlite3.dart releases](https://github.com/simolus3/sqlite3.dart/releases)
-- **`drift_worker.dart.js`** → [drift releases](https://github.com/simolus3/drift/releases)
+```
+dart run drift_flutter:setup
+```
 
-Place both files in the `web/` directory:
+After this step you should see both files in `web/`:
 
 ```
 web/
-├── drift_worker.dart.js   ← downloaded from drift releases
-├── sqlite3.wasm           ← downloaded from sqlite3.dart releases
+├── drift_worker.dart.js
+├── sqlite3.wasm
 └── index.html
 ```
 
-See the [official Drift web setup docs](https://drift.simonbinder.eu/platforms/web/) for details.
+If `dart` is not on your PATH, use Flutter's bundled dart:
 
-### 3. Run
+```
+flutter pub run drift_flutter:setup
+```
+
+### 3. Regenerate Drift code (first time or after schema changes)
+
+```
+dart run build_runner build --delete-conflicting-outputs
+```
+
+### 4. Run
 
 ```
 flutter run -d chrome
@@ -42,12 +58,4 @@ flutter run -d edge
 
 ## Updating dependencies
 
-Repeat step 2 whenever you upgrade the `drift` or `sqlite3` package versions — the wasm and worker files are version-matched and must be updated together.
-
-## Regenerating Drift code
-
-After any schema changes, re-run the code generator:
-
-```
-dart run build_runner build --delete-conflicting-outputs
-```
+Repeat steps 1–2 whenever you upgrade `drift` or `sqlite3` — the wasm and worker files are version-matched and must be updated alongside the packages.
