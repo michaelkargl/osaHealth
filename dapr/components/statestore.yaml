@@ -26,3 +26,5 @@ spec:
       value: "majority"
     - name: readConcern
       value: "majority"
+    - name: queryIndexes
+      value: '[{"index":{"value.userId":1,"value.recordedAt":1},"name":"userId_recordedAt"}]'

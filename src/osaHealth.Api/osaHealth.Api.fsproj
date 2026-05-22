@@ -8,6 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Types.fs" />
+        <Compile Include="Config.fs" />
+        <Compile Include="Dapr.fs" />
         <Compile Include="Endpoints.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>

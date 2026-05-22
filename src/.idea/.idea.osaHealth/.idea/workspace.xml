@@ -8,9 +8,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/../CLAUDE.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osaHealth.Api/Config.fs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osaHealth.Api/Dapr.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../dapr/components/statestore.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../dapr/components/statestore.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/Program.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Program.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
     </list>
@@ -26,9 +28,15 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d88f483cd54064393aeea32f68a5d177e889ab9bf10d096ec63b84fd7a2fdf/Routing.fs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/osaHealth.Api/Config.fs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/osaHealth.Api/Dapr.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -39,7 +47,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    ".NET Project.osaHealth.Api.executor": "Run",
+    ".NET Project.osaHealth.Api.executor": "Debug",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -104,8 +112,25 @@
       <updated>1778933162253</updated>
       <workItem from="1778933163259" duration="1234000" />
       <workItem from="1779012836041" duration="2769000" />
-      <workItem from="1779461546963" duration="2916000" />
+      <workItem from="1779461546963" duration="10159000" />
     </task>
+    <task id="LOCAL-00001" summary="feat: implements dummy endpoints we need">
+      <option name="closed" value="true" />
+      <created>1779464496947</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1779464496947</updated>
+    </task>
+    <task id="LOCAL-00002" summary="feat: implements dummy endpoints we need&#10;chore: removes markdown.md">
+      <option name="closed" value="true" />
+      <created>1779464514669</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1779464514669</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -115,6 +140,9 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="feat: implements dummy endpoints we need" />
+    <MESSAGE value="feat: implements dummy endpoints we need&#10;chore: removes markdown.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: implements dummy endpoints we need&#10;chore: removes markdown.md" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -1,11 +1,16 @@
 module Endpoints
 
 open System
+open System.Net.Http
 open System.Threading.Tasks
+open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Logging
 open Oxpecker
 open Oxpecker.OpenApi
+open Types
+open osaHealth.Api
+
 
 module private Handlers =
     let rootGetHandler: EndpointHandler = text "Hello World!"
@@ -20,11 +25,52 @@ module private Handlers =
             logger.LogInformation("Random value {RandomValue}", value)
             ctx |> json {| randomValue = value |}
 
-    let recordingsPostHandler: EndpointHandler = text "TBD: List all recordings"
+    let recordingsPostHandler: EndpointHandler =
+        fun ctx ->
+            task {
+                let logger =
+                    ctx.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("osaHealth.Api")
 
-    let recordingsGetHandler (userId: string) (fromDateTime: string) (toDateTime: string) : EndpointHandler =
-        text $"TBD: Get {userId} recordings between {fromDateTime} and {toDateTime}"
+                let client = ctx.RequestServices.GetRequiredService<IHttpClientFactory>().CreateClient()
+                let! rawInput = ctx.Request.ReadFromJsonAsync<RecordingInput>()                
+                let recordingInput =
+                    match rawInput |> Option.ofObj with
+                    | Some input ->
+                        {
+                            Id = Guid.NewGuid().ToString()
+                            UserId = input.UserId
+                            RecordedAt = DateTimeOffset.Parse(input.RecordedAt).ToUnixTimeMilliseconds()
+                            Notes = input.Notes
+                        }
+                    | None -> failwith "INVALID_INPUT: Request body is required."
 
+                do! Dapr.saveRecording client recordingInput
+                logger.LogInformation(
+                    "Saved recording {RecordingId} for user {UserId}",
+                    recordingInput.Id,
+                    recordingInput.UserId)
+
+                return! ctx |> json recordingInput
+            }
+
+    let recordingsGetHandler (userId: string) (fromMs: int64) (toMs: int64) : EndpointHandler =
+        fun ctx ->
+            task {
+                let logger =
+                    ctx.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("osaHealth.Api")
+
+                let client = ctx.RequestServices.GetRequiredService<IHttpClientFactory>().CreateClient()
+                let! recordings = Dapr.queryRecordings client userId fromMs toMs
+               
+                logger.LogInformation(
+                    "Queried {Count} recordings for user {UserId}",
+                    recordings.Length,
+                    userId)
+
+                return! ctx |> json recordings
+            }
+
+// ── Endpoints ──────────────────────────────────────────────────────────────────
 
 let healthGetEndpoint =
     route "/health" Handlers.healthGetHandler
@@ -40,8 +86,7 @@ let healthGetEndpoint =
         )
     )
 
-let rootGetEndpoint =
-    route "/" Handlers.rootGetHandler
+let rootGetEndpoint = route "/" Handlers.rootGetHandler
 
 let randomGetEndpoint =
     route "/random" Handlers.randomGetHandler
@@ -62,8 +107,8 @@ let randomGetEndpoint =
 
 let recordingsPostEndpoint =
     route "/recordings" Handlers.recordingsPostHandler
-    |> addOpenApi (OpenApiConfig(responseBodies = [ ResponseBody(typeof<string>) ]))
+    |> addOpenApi (OpenApiConfig(responseBodies = [ ResponseBody(typeof<Recording>) ]))
 
 let recordingsGetEndpoint =
-    routef "/recordings/userid/{%s}/from/{%s}/to/{%s}" Handlers.recordingsGetHandler
-    |> addOpenApi (OpenApiConfig(responseBodies = [ ResponseBody(typeof<string>) ]))
+    routef "/recordings/userid/{%s}/from/{%d}/to/{%d}" Handlers.recordingsGetHandler
+    |> addOpenApi (OpenApiConfig(responseBodies = [ ResponseBody(typeof<Recording array>) ]))

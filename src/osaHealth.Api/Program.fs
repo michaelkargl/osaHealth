@@ -27,6 +27,7 @@ let main args =
     |> _.AddRouting()
     |> _.AddOxpecker()
     |> _.AddOpenApi()
+    |> _.AddHttpClient()
     |> ignore
 
     let app = builder.Build()
