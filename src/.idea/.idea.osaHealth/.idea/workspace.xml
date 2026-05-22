@@ -8,10 +8,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../scripts/Test-ServiceInvocation.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/../scripts/Test-ServiceInvocation.ps1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/../CLAUDE.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/Program.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Program.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
     </list>
@@ -25,6 +24,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -40,9 +42,10 @@
     ".NET Project.osaHealth.Api.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "agent/vivica-multica/b2d2658d",
+    "git-widget-placeholder": "demo/drift-sqlite-wasm",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -74,7 +77,10 @@
       </method>
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
-      <deployment type="dockerfile" />
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
       <method v="2" />
     </configuration>
     <configuration name="osaHealth.Api/Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
@@ -98,6 +104,7 @@
       <updated>1778933162253</updated>
       <workItem from="1778933163259" duration="1234000" />
       <workItem from="1779012836041" duration="2769000" />
+      <workItem from="1779461546963" duration="2916000" />
     </task>
     <servers />
   </component>
