@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Json.fs" />
         <Compile Include="Types.fs" />
         <Compile Include="Config.fs" />
         <Compile Include="Dapr.fs" />

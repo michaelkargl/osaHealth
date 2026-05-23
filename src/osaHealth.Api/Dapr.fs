@@ -5,50 +5,58 @@ open System.Net.Http.Json
 open System.Text
 open System.Text.Json
 open System.Threading.Tasks
-open Oxpecker
+open Microsoft.Extensions.Logging
 open Types
 
 let saveRecording (client: HttpClient) (recording: Recording) : Task =
-    task {  
+    task {
         let payload =
             [| {| key = recording.Id
                   value = recording |} |]
 
         let query = $"%s{Config.DaprBaseUrl}/v1.0/state/%s{Config.StoreName}"
         let! result = client.PostAsJsonAsync(query, payload)
-        
+
         if not result.IsSuccessStatusCode then
-            failwith "DAPR_SAVE_FAILED: DAPR save failed for user {UserId}: {Status} {Body}"
+            let! body = result.Content.ReadAsStringAsync()
+            failwith $"DAPR_SAVE_FAILED: {recording.UserId} status={int result.StatusCode} body={body}"
     }
 
-// The filter keys use dot-notation paths ("value.userId") which cannot be expressed
-// as F# anonymous-record field names, so the body is built with sprintf.
-// JsonSerializer.Serialize ensures values are properly quoted and escaped.
-// ReSharper disable once FSharpInterpolatedString
-let private buildQueryJson (userId: string) (fromMs: int64) (toMs: int64) : string =
-    sprintf
-        """{"filter":{"AND":[{"EQ":{"value.userId":%s}},{"GTE":{"value.recordedAt":%d}},{"LTE":{"value.recordedAt":%d}}]},"sort":[{"key":"value.recordedAt","order":"ASC"}]}"""
-        (JsonSerializer.Serialize(userId))
-        fromMs
-        toMs
+let private buildQueryJson (userId: string) (fromMs: float) (toMs: float) : string =
+    {|
+        filter = {|
+            AND =
+                [|
+                    {| EQ = {| userId = userId |} |} :> obj
+                    {| GTE = {| recordedAt = fromMs |} |} :> obj
+                    {| LTE = {| recordedAt = toMs |} |} :> obj
+                |]
+        |}
+    |}
+    |> JsonSerializer.Serialize
 
 let queryRecordings
     (client: HttpClient)
     (userId: string)
-    (fromMs: int64)
-    (toMs: int64)
+    (fromMs: float)
+    (toMs: float)
+    (logger: ILogger)
     : Task<Recording array> =
     task {
-        let content =
-            new StringContent(buildQueryJson userId fromMs toMs, Encoding.UTF8, "application/json")
+        let query = buildQueryJson userId fromMs toMs
+        let content = new StringContent(query, Encoding.UTF8, "application/json")
 
         let query = $"%s{Config.DaprBaseUrl}/v1.0-alpha1/state/%s{Config.StoreName}/query"
+        logger.LogDebug("Querying {Query}", query)
         let! response = client.PostAsync(query, content)
-        let! resultPlain = response.Content.ReadAsStringAsync()
-        let result = resultPlain |> Json.JsonSerializer.Deserialize
+
+        let! resultText = response.Content.ReadAsStringAsync()
+        logger.LogDebug("Received response: {ResponseText}", resultText)
+
+        let! result = resultText |> Json.tryDeserializeAsync
 
         return
-            match result |> Option.ofObj with
-            | Some response -> response.Results |> Array.map _.Data
-            | None -> [||]
+            match result with
+            | Ok value -> value.Results |> Array.map _.Data
+            | Error _ -> [||]
     }

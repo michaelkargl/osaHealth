@@ -39,7 +39,7 @@ module private Handlers =
                         {
                             Id = Guid.NewGuid().ToString()
                             UserId = input.UserId
-                            RecordedAt = DateTimeOffset.Parse(input.RecordedAt).ToUnixTimeMilliseconds()
+                            RecordedAt = input.RecordedAt
                             Notes = input.Notes
                         }
                     | None -> failwith "INVALID_INPUT: Request body is required."
@@ -53,14 +53,14 @@ module private Handlers =
                 return! ctx |> json recordingInput
             }
 
-    let recordingsGetHandler (userId: string) (fromMs: int64) (toMs: int64) : EndpointHandler =
+    let recordingsGetHandler (userId: string) (fromMs: float) (toMs: float) : EndpointHandler =
         fun ctx ->
             task {
                 let logger =
                     ctx.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("osaHealth.Api")
 
                 let client = ctx.RequestServices.GetRequiredService<IHttpClientFactory>().CreateClient()
-                let! recordings = Dapr.queryRecordings client userId fromMs toMs
+                let! recordings = Dapr.queryRecordings client userId fromMs toMs logger
                
                 logger.LogInformation(
                     "Queried {Count} recordings for user {UserId}",
@@ -69,8 +69,6 @@ module private Handlers =
 
                 return! ctx |> json recordings
             }
-
-// ── Endpoints ──────────────────────────────────────────────────────────────────
 
 let healthGetEndpoint =
     route "/health" Handlers.healthGetHandler
@@ -107,8 +105,12 @@ let randomGetEndpoint =
 
 let recordingsPostEndpoint =
     route "/recordings" Handlers.recordingsPostHandler
-    |> addOpenApi (OpenApiConfig(responseBodies = [ ResponseBody(typeof<Recording>) ]))
+    |> addOpenApi (
+        OpenApiConfig(
+            requestBody = RequestBody(typeof<RecordingInput>)
+        )
+    )
 
 let recordingsGetEndpoint =
-    routef "/recordings/userid/{%s}/from/{%d}/to/{%d}" Handlers.recordingsGetHandler
+    routef "/recordings/userid/{%s}/from/{%f}/to/{%f}" Handlers.recordingsGetHandler
     |> addOpenApi (OpenApiConfig(responseBodies = [ ResponseBody(typeof<Recording array>) ]))

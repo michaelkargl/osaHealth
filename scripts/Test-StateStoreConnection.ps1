@@ -1,43 +1,75 @@
+[CmdletBinding()]
+param ()
 
-# Port 13500 on the host maps to the DAPR sidecar's HTTP port 3500
-# (see docker-compose.yml: api publishes 13500:3500, api-dapr shares its netns).
-$StateStoreBaseUrl = 'http://localhost:13500/v1.0/state/statestore'
-$FgGray = @{ ForegroundColor = 'DarkGray' }
+$FgGray  = @{ ForegroundColor = 'DarkGray' }
 $FgGreen = @{ ForegroundColor = 'Green' }
-$FgRed = @{ ForegroundColor = 'Red' }
+$FgRed   = @{ ForegroundColor = 'Red' }
 
-$Expected = @{
-    key = 'test'
-    value = 'test123'
+function Set-PulseReading {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)] [string] $UserId,
+        [Parameter(Mandatory)] [int]    $Bpm,
+        [Parameter(Mandatory)] [Int64]  $RecordedAt
+    )
+
+    $Key   = "$UserId,$RecordedAt"
+    $Value = [PSCustomObject]@{ UserId = $UserId; Bpm = $Bpm; RecordedAt = $RecordedAt }
+    $Entry = @{ key = $Key; value = $Value }
+    $Body  = "[ $($Entry | ConvertTo-Json -Compress -Depth 100) ]"
+
+    Write-Host @FgGray "Persisting [$Key]: $Body"
+    $Body | Invoke-RestMethod `
+        -Method Post `
+        -Uri 'http://localhost:13500/v1.0/state/statestore' `
+        -ContentType "application/json" `
+        -Headers @{ 'dapr-app-id' = 'osa-api' }
 }
 
-$Body = @"
-[
-    $($Expected | ConvertTo-Json -Compress)
-]
-"@
+function Get-PulseReadings {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)] [string] $UserId,
+        [Parameter(Mandatory)] [int] $PulseGreaterEqual
+    )
 
-Write-Host @FgGray "Persisting: $Body"
-$Body | Invoke-RestMethod `
-    -Method Post `
-    -Uri "$StateStoreBaseUrl/" `
-    -ContentType "application/json"
+    $Query = @{
+        filter = @{
+            AND = @(
+                @{ EQ  = @{ "UserId" = $UserId } }
+                @{ GTE = @{ "Bpm"    = $PulseGreaterEqual } }
+            )
+        }
+    } | ConvertTo-Json -Depth 10 -Compress
 
-Write-Host @FgGray "Retrieving value of $($Expected.key)"
-$Actual = Invoke-RestMethod `
-          -Method Get `
-          -Uri "$StateStoreBaseUrl/$($Expected.key)" `
-          -ContentType "application/json"
+    Write-Host @FgGray "Querying: $Query"
+    Invoke-RestMethod `
+        -Method Post `
+        -Uri 'http://localhost:13500/v1.0-alpha1/state/statestore/query' `
+        -ContentType "application/json" `
+        -Headers @{ 'dapr-app-id' = 'osa-api' } `
+        -Body $Query
+}
 
+# --- seed some readings ---
+$UserId = [guid]::NewGuid()
+$Now    = [datetime]::UtcNow
 
-Write-Host
-if ( $Actual -eq $Expected.value ) {
-    Write-Host @FgGreen ("-"*50)
-    Write-Host @FgGreen "✅ Value successfully persisted"
-    Write-Host @FgGreen ("-"*50)
+Set-PulseReading -UserId $UserId -Bpm 75 -RecordedAt ($Now.AddMinutes(-1).ToFileTimeUtc())
+Set-PulseReading -UserId $UserId -Bpm 72 -RecordedAt ($Now.AddMinutes(-2).ToFileTimeUtc())
+Set-PulseReading -UserId $UserId -Bpm 80 -RecordedAt  $Now.ToFileTimeUtc()
+
+# --- query them back ---
+$Result = Get-PulseReadings -UserId $UserId -PulseGreaterEqual 75
+Write-Host @FgGray "Found $($Result.results.Count) item(s): $($Result.results | ConvertTo-Json -Depth 5)"
+
+if ($Result.results.Count -eq 2) {
+    Write-Host @FgGreen ("-" * 50)
+    Write-Host @FgGreen "All 3 pulse readings persisted and queried successfully"
+    Write-Host @FgGreen ("-" * 50)
 } else {
-    Write-Host @FgRed ("-"*50)
-    Write-Host @FgRed "❌ Expected Value '$($Expected.value)' but got '$($Actual)'"
-    Write-Host @FgRed ("-"*50)
+    Write-Host @FgRed ("-" * 50)
+    Write-Host @FgRed "Expected 3 results but found $($Result.results.Count)"
+    Write-Host @FgRed ("-" * 50)
 }
 Write-Host

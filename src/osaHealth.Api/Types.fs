@@ -7,7 +7,7 @@ open System.Text.Json.Serialization
 [<CLIMutable>]
 type RecordingInput = {
     [<JsonPropertyName("userId")>] UserId: string
-    [<JsonPropertyName("recordedAt")>] RecordedAt: string // ISO 8601 UTC
+    [<JsonPropertyName("recordedAt")>] RecordedAt: float
     [<JsonPropertyName("notes")>] Notes: string
 }
 
@@ -15,7 +15,7 @@ type RecordingInput = {
 type Recording = {
     [<JsonPropertyName("id")>] Id: string
     [<JsonPropertyName("userId")>] UserId: string
-    [<JsonPropertyName("recordedAt")>] RecordedAt: int64 // Unix ms UTC
+    [<JsonPropertyName("recordedAt")>] RecordedAt: float
     [<JsonPropertyName("notes")>] Notes: string
 }
 
@@ -28,7 +28,6 @@ type ApiError = {
 
 // ── DAPR state query response ──────────────────────────────────────────────────
 
-// v1.0-alpha1/state/{store}/query response shape
 [<CLIMutable>]
 type DaprQueryItem = {
     [<JsonPropertyName("key")>] Key: string
