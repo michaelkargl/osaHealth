@@ -3,32 +3,63 @@ import 'package:drift_flutter/drift_flutter.dart';
 
 part 'app_database.g.dart';
 
-class Notes extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get content => text()();
-  DateTimeColumn get createdAt => dateTime()();
+class Recordings extends Table {
+  TextColumn get id => text()();
+  TextColumn get userId => text()();
+  TextColumn get date => text()(); // ISO 8601 UTC: "2026-05-26T09:00:00Z"
+  IntColumn get systolic => integer()();
+  IntColumn get diastolic => integer()();
+  DateTimeColumn get syncedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Notes])
+@DriftDatabase(tables: [Recordings])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
-  Stream<List<Note>> watchAllNotes() => (select(notes)
-        ..orderBy([(n) => OrderingTerm.desc(n.createdAt)]))
-      .watch();
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          await m.recreateAllViews();
+          await customStatement('DROP TABLE IF EXISTS notes');
+          await m.createAll();
+        },
+      );
 
-  Future<void> addNote(String content) => into(notes).insert(
-        NotesCompanion.insert(
-          content: content,
-          createdAt: DateTime.now(),
+  Stream<List<Recording>> watchAllRecordings() =>
+      (select(recordings)
+            ..orderBy([(r) => OrderingTerm.desc(r.date)]))
+          .watch();
+
+  Future<void> addRecording({
+    required String id,
+    required String userId,
+    required String date,
+    required int systolic,
+    required int diastolic,
+  }) =>
+      into(recordings).insert(
+        RecordingsCompanion.insert(
+          id: id,
+          userId: userId,
+          date: date,
+          systolic: systolic,
+          diastolic: diastolic,
         ),
       );
 
-  Future<void> deleteNote(int id) =>
-      (delete(notes)..where((n) => n.id.equals(id))).go();
+  Future<List<Recording>> getUnsyncedRecordings() =>
+      (select(recordings)..where((r) => r.syncedAt.isNull())).get();
+
+  Future<void> markSynced(String id) =>
+      (update(recordings)..where((r) => r.id.equals(id)))
+          .write(RecordingsCompanion(syncedAt: Value(DateTime.now().toUtc())));
 }
 
 AppDatabase openDatabase() => AppDatabase(
