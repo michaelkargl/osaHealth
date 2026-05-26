@@ -11,9 +11,9 @@ osaHealth is small enough today that architectural decisions live in chat, ticke
 
 We have already started accumulating decision-shaped open questions in the issue tracker:
 
-- [OSA-38](https://github.com/michaelkargl/osaHealth) — Flutter state management (Riverpod vs Bloc)
-- [OSA-42](https://github.com/michaelkargl/osaHealth) — Backend API contract for the Flutter client
-- [OSA-46](https://github.com/michaelkargl/osaHealth) — Coding guidelines in `/docs`
+- OSA-38 — Flutter state management (Riverpod vs Bloc)
+- OSA-42 — Backend API contract for the Flutter client
+- OSA-46 — Coding guidelines in `/docs`
 
 Without a shared place for the rationale, those issues will resolve into ticket-comment prose that decays the moment the ticket is closed.
 
@@ -22,7 +22,7 @@ Without a shared place for the rationale, those issues will resolve into ticket-
 We will record significant architectural decisions as Architecture Decision Records (ADRs) under `docs/adr/`, following the lightweight Nygard format.
 
 - One ADR per decision.
-- Files are numbered sequentially: `NNNN-short-kebab-title.md` (e.g. `0002-flutter-state-management.md`).
+- Files are numbered in **blocks of 5**: `0001`, `0005`, `0010`, `0015`, … (e.g. `0005-flutter-state-management.md`). The gap between numbers is deliberate — when an ADR is later superseded, the replacement claims the next free number *adjacent to the original* (e.g. ADR-0006 supersedes ADR-0005), so successor records sit close to their origin instead of drifting to the end of the directory. Use the next available slot in the block if 4 supersessions are not enough; this is a soft convention, not a hard limit.
 - New ADRs start from `docs/adr/0000-template.md`.
 - ADRs are immutable once accepted: corrections happen in a new ADR that supersedes the old one (set `Status: Superseded by ADR-XXXX` on the original).
 - ADRs are reviewed via normal pull requests — the PR discussion is part of the record.
@@ -47,13 +47,13 @@ A decision is "significant" if at least one of these holds: it is hard to revers
 
 **Easier:** future contributors can read `docs/adr/` and reconstruct *why* the system looks the way it does, not only *what* it looks like. Reversing or revising a decision becomes a concrete artefact (a new ADR) instead of a tribal-knowledge event.
 
-**Harder:** every non-trivial architectural change now carries a small documentation tax — usually 15–30 minutes to draft the ADR. That is the point; if a decision is not worth 30 minutes of writing, it probably is not significant enough to need an ADR.
+**Harder:** every non-trivial architectural change now carries a documentation tax — realistically around an hour of writing once the options have been properly weighed, sometimes more if the decision spans subsystems. That is the point; if a decision is not worth an hour of writing, it probably is not significant enough to need an ADR.
 
 **Follow-up work this ADR creates:**
 
-- ADR-0002: Flutter state management (resolves [OSA-38](https://github.com/michaelkargl/osaHealth))
-- ADR-0003: Backend ↔ Flutter client API contract (resolves [OSA-42](https://github.com/michaelkargl/osaHealth))
-- Link `docs/adr/` from the top-level `README.md` once ADR-0002 is accepted.
+- ADR-0005: Flutter state management (resolves OSA-38)
+- ADR-0010: Backend ↔ Flutter client API contract (resolves OSA-42)
+- Link `docs/adr/` from the top-level `README.md` once ADR-0005 is accepted.
 
 ## Reversal conditions
 

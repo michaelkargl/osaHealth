@@ -15,7 +15,7 @@ If a choice fails all four, it probably belongs in a code comment or a PR descri
 
 ## How to add one
 
-1. Copy `0000-template.md` to the next free number: `NNNN-short-kebab-title.md`.
+1. Copy `0000-template.md` to the next free number: `NNNN-short-kebab-title.md`. New ADRs claim the next free **block-of-5** slot (`0005`, `0010`, `0015`, …); the intermediate numbers are reserved so that a future ADR superseding this one can sit next to it (e.g. `0006` supersedes `0005`). See [ADR-0001](0001-record-architecture-decisions.md) for the rationale.
 2. Fill out **Context**, **Decision**, **Options considered** (with one paragraph per losing option *and why it lost*), **Consequences**, and **Reversal conditions**.
 3. Open a pull request. The PR discussion is part of the record — keep it.
 4. On merge, the ADR is **Accepted**. ADRs are immutable after that: corrections happen in a new ADR that supersedes the old one.
