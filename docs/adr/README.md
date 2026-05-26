@@ -25,5 +25,6 @@ If a choice fails all four, it probably belongs in a code comment or a PR descri
 | # | Title | Status |
 |---|-------|--------|
 | [0001](0001-record-architecture-decisions.md) | Record architecture decisions | Accepted |
+| [0005](0005-flutter-state-management.md) | Flutter state management — Bloc | Proposed |
 
 See [ADR-0001](0001-record-architecture-decisions.md) for the rationale behind this practice.
