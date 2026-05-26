@@ -5,6 +5,115 @@
 - **Deciders:** Saoirse Lindqvist (Flutter), Remy Okafor (Architecture review)
 - **Tags:** frontend, flutter, architecture, sync
 
+---
+
+## Background: What is state management?
+
+*This section is for readers who are new to Flutter or to this decision. Skip ahead to [Context](#context) if you are already familiar with Bloc and Riverpod.*
+
+**State** is any data that can change while the app is running — the list of recordings a user has made, whether a sync is in progress, whether a conflict needs resolving. **State management** is the set of rules and tools that decide:
+
+1. *Where* that data lives (one place? many?)
+2. *How* the UI learns about changes (it asks? it listens? it reacts?)
+3. *How* changes are triggered (directly? through events? through functions?)
+
+In Flutter there is no single built-in answer, which is why the community has built several libraries. This ADR is about choosing one for osaHealth.
+
+---
+
+### The two options, briefly
+
+#### Bloc — "state machine with named events"
+
+Bloc treats the UI like a command terminal. The widget *sends an event* (e.g. "SyncRequested"), and the Bloc *emits a new state* (e.g. "SyncInProgress", then "SyncSuccess"). The UI only ever renders the current state — it never writes state directly.
+
+Think of it like a vending machine: you press a button (event), the machine processes it and shows a new display (state). You never reach inside and move the gears yourself.
+
+```dart
+// --- 1. Define what can happen (events) ---
+abstract class RecordingEvent {}
+class SyncRequested extends RecordingEvent {}
+
+// --- 2. Define all possible states (sealed = compiler checks you handle all of them) ---
+sealed class RecordingState {}
+class Idle                      extends RecordingState {}
+class SyncInProgress            extends RecordingState {}
+class SyncSuccess               extends RecordingState {}
+class SyncConflict              extends RecordingState {
+  final List<ConflictedRecord> conflicts;
+  SyncConflict(this.conflicts);
+}
+
+// --- 3. Wire events to state transitions ---
+class RecordingBloc extends Bloc<RecordingEvent, RecordingState> {
+  RecordingBloc() : super(Idle()) {
+    on<SyncRequested>((event, emit) async {
+      emit(SyncInProgress());
+      final result = await api.syncAll();
+      if (result.hasConflicts) {
+        emit(SyncConflict(result.conflicts));
+      } else {
+        emit(SyncSuccess());
+      }
+    });
+  }
+}
+
+// --- 4. React in the UI ---
+BlocBuilder<RecordingBloc, RecordingState>(
+  builder: (context, state) => switch (state) {
+    Idle()           => SyncButton(),
+    SyncInProgress() => LoadingSpinner(),
+    SyncSuccess()    => SuccessBanner(),
+    SyncConflict()   => ConflictScreen(state.conflicts),
+    // The compiler will warn you if you forget a case.
+  },
+)
+```
+
+The `flutter_bloc` package is the Flutter integration layer on top of the `bloc` package. `bloc` contains the pure Dart state-machine logic; `flutter_bloc` adds the widgets (`BlocBuilder`, `BlocProvider`, `BlocListener`) that connect a Bloc to the Flutter widget tree. **You need both.** Without `flutter_bloc` you would have to wire Blocs to widgets manually using raw `StreamBuilder`s — possible, but more work with no benefit.
+
+#### Riverpod — "reactive graph of providers"
+
+Riverpod treats state as a graph of interconnected *providers*. Each provider owns one piece of state. Widgets *watch* providers and automatically rebuild when the state changes — no explicit events required.
+
+Think of it like a spreadsheet: cells (providers) reference each other, and when one cell updates, everything that depends on it recalculates automatically.
+
+```dart
+// --- 1. Define a provider that holds and updates data ---
+final recordingsProvider =
+    AsyncNotifierProvider<RecordingsNotifier, List<Recording>>(
+  RecordingsNotifier.new,
+);
+
+class RecordingsNotifier extends AsyncNotifier<List<Recording>> {
+  @override
+  Future<List<Recording>> build() => database.loadAll();
+
+  Future<void> sync() async {
+    state = const AsyncLoading();
+    await api.syncAll();
+    state = AsyncData(await database.loadAll());
+  }
+}
+
+// --- 2. Watch in the widget ---
+Consumer(
+  builder: (context, ref, _) {
+    final recordings = ref.watch(recordingsProvider);
+    return recordings.when(
+      loading: () => LoadingSpinner(),
+      data:    (list) => RecordingList(list),
+      error:   (e, _) => ErrorMessage(e.toString()),
+    );
+  },
+)
+```
+
+Riverpod is concise and powerful for apps where state naturally composes from smaller pieces. The limitation in osaHealth's case is explained in [Options considered](#options-considered).
+
+---
+
 ## Context
 
 The walking skeleton is up. Before the first real feature screen is built, we need to lock the state management approach — it shapes how every screen is structured, tested, and maintained, and undoing it mid-stream is costly.
