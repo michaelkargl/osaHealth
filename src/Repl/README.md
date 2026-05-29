@@ -28,16 +28,17 @@ All images are pinned to exact versions — `mongo:8.0.6-noble`,
 so this stack is reproducible years later.
 
 The scripts default to `http://localhost:3500` (the daprd sidecar exposed by
-the compose stack above). Override with the `--dapr-endpoint` (or `-e`) flag
-if you are running against a different Dapr instance:
+the compose stack above) and state store name `statestore`. Override with
+`--dapr-endpoint` (`-e`) and `--store-name` (`-s`) if you are running against
+a different Dapr instance or a differently named state store:
 
 ```bash
 dotnet fsi 01-filter-basics.fsx
 dotnet fsi 02-pagination-token.fsx
 dotnet fsi 03-stability-under-insert.fsx
 
-# Or against a custom endpoint:
-dotnet fsi 01-filter-basics.fsx -- --dapr-endpoint http://localhost:3600
+# Or against a custom endpoint and store:
+dotnet fsi 01-filter-basics.fsx -- --dapr-endpoint http://localhost:3600 --store-name my-store
 ```
 
 ## Scripts
