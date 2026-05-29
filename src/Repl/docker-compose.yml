@@ -1,0 +1,45 @@
+# Dapr Query API Spike — minimal reproduction environment
+# Start:  docker compose -f src/Repl/docker-compose.yml up -d
+# Stop:   docker compose -f src/Repl/docker-compose.yml down -v
+#
+# All images are pinned to exact versions so this stack is re-runnable years later.
+
+volumes:
+  repl_mongo_data:
+
+services:
+  repl-mongo:
+    image: mongo:8.0.6-noble
+    volumes:
+      - repl_mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  repl-placement:
+    image: daprio/placement:1.17.7-linux-amd64
+    command: ["./placement", "--port", "50006"]
+    restart: unless-stopped
+
+  repl-daprd:
+    image: daprio/daprd:1.17.7-stablecomponents
+    command: [
+      "./daprd",
+      "--app-id", "osa-repl",
+      "--dapr-http-port", "3500",
+      "--placement-host-address", "repl-placement:50006",
+      "--components-path", "/components"
+    ]
+    volumes:
+      - ./components:/components:ro
+    ports:
+      - "3500:3500"
+    depends_on:
+      repl-mongo:
+        condition: service_healthy
+      repl-placement:
+        condition: service_started
+    restart: unless-stopped

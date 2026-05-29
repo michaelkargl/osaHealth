@@ -10,21 +10,34 @@ concurrent inserts.
 
 ## Prerequisites
 
-```bash
-# Start the stack (daprd + MongoDB)
-docker compose up -d mongodb dapr-placement api api-dapr
+A minimal Docker Compose stack is included alongside the scripts:
 
-# Or with the full suite:
-docker compose up -d
+```bash
+# From the repo root:
+docker compose -f src/Repl/docker-compose.yml up -d
+
+# Wait for healthy (mongosh ping succeeds, daprd listens on 3500):
+docker compose -f src/Repl/docker-compose.yml ps
+
+# Tear down when done:
+docker compose -f src/Repl/docker-compose.yml down -v
 ```
 
-The scripts default to `http://localhost:3500` (the api-dapr sidecar).
-Override with the `--dapr-endpoint` (or `-e`) flag:
+All images are pinned to exact versions — `mongo:8.0.6-noble`,
+`daprio/placement:1.17.7-linux-amd64`, `daprio/daprd:1.17.7-stablecomponents` —
+so this stack is reproducible years later.
+
+The scripts default to `http://localhost:3500` (the daprd sidecar exposed by
+the compose stack above). Override with the `--dapr-endpoint` (or `-e`) flag
+if you are running against a different Dapr instance:
 
 ```bash
+dotnet fsi 01-filter-basics.fsx
+dotnet fsi 02-pagination-token.fsx
+dotnet fsi 03-stability-under-insert.fsx
+
+# Or against a custom endpoint:
 dotnet fsi 01-filter-basics.fsx -- --dapr-endpoint http://localhost:3600
-dotnet fsi 02-pagination-token.fsx -- --dapr-endpoint http://localhost:3600
-dotnet fsi 03-stability-under-insert.fsx -- --dapr-endpoint http://localhost:3600
 ```
 
 ## Scripts
