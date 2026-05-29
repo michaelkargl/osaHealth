@@ -3,71 +3,87 @@
 // Reproduces a duplicate row when a record sorting before the current page
 // is inserted mid-pagination. This is the disqualifier for the sync loop.
 //
-// Run: dotnet fsi 03-stability-under-insert.fsx
+// Run: dotnet fsi 03-stability-under-insert.fsx [--dapr-endpoint http://localhost:3500]
 // Prerequisites: Dapr sidecar + MongoDB reachable, statestore component loaded.
+
+#r "nuget: Argu"
 
 open System
 open System.Net.Http
 open System.Text
 open System.Text.Json
+open Argu
 
-let BASE = Environment.GetEnvironmentVariable("DAPR_HTTP_ENDPOINT")
-           |> Option.ofObj
-           |> Option.defaultValue "http://localhost:3500"
-let STORE = "statestore"
+type CliArguments =
+    | [<AltCommandLine("-e")>] DaprEndpoint of dapr_endpoint: string
 
-let http = new HttpClient(BaseAddress = Uri(BASE))
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | DaprEndpoint _ -> "Dapr HTTP endpoint. Default: http://localhost:3500"
 
-let json (o: obj) = JsonSerializer.Serialize(o)
+let argumentParser = ArgumentParser.Create<CliArguments>(programName = "dotnet fsi 03-stability-under-insert.fsx")
+let cliArguments = argumentParser.Parse(fsi.CommandLineArgs)
 
-let post (path: string) (body: string) = task {
-    let! resp = http.PostAsync(path, new StringContent(body, Encoding.UTF8, "application/json"))
-    let! txt = resp.Content.ReadAsStringAsync()
-    return resp.StatusCode, txt.Trim()
+let daprHttpEndpoint = cliArguments.GetResult(DaprEndpoint, defaultValue = "http://localhost:3500")
+let storeName = "statestore"
+
+let httpClient = new HttpClient(BaseAddress = Uri(daprHttpEndpoint))
+
+// ── Json helpers ──
+module Json =
+    let serialize (value: obj) = JsonSerializer.Serialize(value)
+
+let postQueryAsync (path: string) (body: string) = task {
+    let content = new StringContent(body, Encoding.UTF8, "application/json")
+    let! response = httpClient.PostAsync(path, content)
+    let! responseText = response.Content.ReadAsStringAsync()
+    return response.StatusCode, responseText.Trim()
 }
 
 // We use 6 recordings + limit=3 so:
 //   Page 1 → rec-01, rec-02, rec-03
 //   Page 2 → rec-04, rec-05, rec-06  (when no concurrent writes)
-let seed = task {
-    let recs = [|
-        for i in 0..5 do
-            {| key = $"rec-%02d{i + 1}"
+let seedRecordings = task {
+    let recordings = [|
+        for index in 0..5 do
+            {| key = $"rec-%02d{index + 1}"
                value = {|
                    userId = "user-A"
-                   updated_ms = 1700000000000L + int64 (i * 1000)
+                   updated_ms = 1700000000000L + int64 (index * 1000)
                    deleted = false
                |} |}
     |]
-    let! status, body = post $"/v1.0/state/{STORE}" (json recs)
-    printfn "Seed 6 records: HTTP %A  %s\n" status (if body = "" then "(ok)" else body)
+    let! response = postQueryAsync $"/v1.0/state/{storeName}" (Json.serialize recordings)
+    printfn "Seed 6 records: HTTP %A  %s\n" (fst response) (if snd response = "" then "(ok)" else snd response)
 }
 
 // ── Stability test ──
-let test = task {
+let stabilityTest = task {
     printfn "=== Stability under mid-pagination insert ===\n"
 
     // Page 1
-    let q1 = {|
+    let pageOneQuery = {|
         filter = {| EQ = {| userId = "user-A" |} |}
         sort = [| {| key = "updated_ms"; order = "ASC" |} |]
         page = {| limit = 3 |}
     |}
-    let! status1, body1 = post $"/v1.0-alpha1/state/{STORE}/query" (json q1)
-    let doc1 = JsonDocument.Parse(if body1 = "" then "{}" else body1)
-    let keys1 = [| for r in doc1.RootElement.GetProperty("results").EnumerateArray() -> r.GetProperty("key").GetString() |]
-    let token1 =
-        let mutable el = Unchecked.defaultof<JsonElement>
-        if doc1.RootElement.TryGetProperty("token", &el) then
-            let t = el.GetString(); if isNull t then "" else t
+    let! pageOneStatus, pageOneBody = postQueryAsync $"/v1.0-alpha1/state/{storeName}/query" (Json.serialize pageOneQuery)
+    let pageOneDocument = JsonDocument.Parse(if pageOneBody = "" then "{}" else pageOneBody)
+    let pageOneKeys = [| for result in pageOneDocument.RootElement.GetProperty("results").EnumerateArray() -> result.GetProperty("key").GetString() |]
+    let pageOneToken =
+        let mutable tokenElement = Unchecked.defaultof<JsonElement>
+        if pageOneDocument.RootElement.TryGetProperty("token", &tokenElement) then
+            let tokenValue = tokenElement.GetString()
+            if isNull tokenValue then "" else tokenValue
         else ""
 
     printfn "EXPECTED: stable keyset — page 1 returns rec-01, rec-02, rec-03"
-    printfn "  page 1: keys=[%s]  token=\"%s\"\n" (String.Join(", ", keys1)) token1
+    printfn "  page 1: keys=[%s]  token=\"%s\"\n" (String.Join(", ", pageOneKeys)) pageOneToken
 
     // Insert a NEW recording whose updated_ms sorts at position 0 (before rec-01).
     printfn "INSERT:  rec-INSERT with updated_ms=1699999999000 (before rec-01)\n"
-    let! _ = post $"/v1.0/state/{STORE}" (json [|
+    let! _ = postQueryAsync $"/v1.0/state/{storeName}" (Json.serialize [|
         {| key = "rec-INSERT"
            value = {|
                userId = "user-A"
@@ -77,32 +93,32 @@ let test = task {
     |])
 
     // Resume from page-1 token
-    let q2 = {|
+    let pageTwoQuery = {|
         filter = {| EQ = {| userId = "user-A" |} |}
         sort = [| {| key = "updated_ms"; order = "ASC" |} |]
-        page = {| limit = 3; token = token1 |}
+        page = {| limit = 3; token = pageOneToken |}
     |}
-    let! status2, body2 = post $"/v1.0-alpha1/state/{STORE}/query" (json q2)
-    let doc2 = JsonDocument.Parse(if body2 = "" then "{}" else body2)
-    let keys2 = [| for r in doc2.RootElement.GetProperty("results").EnumerateArray() -> r.GetProperty("key").GetString() |]
+    let! pageTwoStatus, pageTwoBody = postQueryAsync $"/v1.0-alpha1/state/{storeName}/query" (Json.serialize pageTwoQuery)
+    let pageTwoDocument = JsonDocument.Parse(if pageTwoBody = "" then "{}" else pageTwoBody)
+    let pageTwoKeys = [| for result in pageTwoDocument.RootElement.GetProperty("results").EnumerateArray() -> result.GetProperty("key").GetString() |]
 
     printfn "EXPECTED: page 2 returns rec-04, rec-05, rec-06 (no offset shift)"
-    printfn "  page 2: keys=[%s]" (String.Join(", ", keys2))
-    let all = Array.append keys1 keys2
-    let dup = all |> Array.groupBy id |> Array.filter (fun (_, g) -> Seq.length g > 1) |> Array.map fst
-    let missing = [| "rec-INSERT" |] |> Array.filter (fun k -> not (Array.contains k all))
+    printfn "  page 2: keys=[%s]" (String.Join(", ", pageTwoKeys))
+    let allSeenKeys = Array.append pageOneKeys pageTwoKeys
+    let duplicateKeys = allSeenKeys |> Array.groupBy id |> Array.filter (fun (_, occurrences) -> Seq.length occurrences > 1) |> Array.map fst
+    let insertedNotSeen = [| "rec-INSERT" |] |> Array.filter (fun key -> not (Array.contains key allSeenKeys))
     printfn ""
     printfn "RESULT:   duplicates=[%s]  inserted-observed=%b"
-        (if dup.Length = 0 then "none" else String.Join(", ", dup))
-        (Array.contains "rec-INSERT" all)
+        (if duplicateKeys.Length = 0 then "none" else String.Join(", ", duplicateKeys))
+        (Array.contains "rec-INSERT" allSeenKeys)
     printfn ""
-    if dup.Length > 0 then
+    if duplicateKeys.Length > 0 then
         printfn "FAIL: duplicate row delivered — offset pagination is unstable under insert."
     else
         printfn "(No duplicates — offset was stable for this particular timing.)"
 }
 
-task { do! seed; do! test } |> _.Wait()
+task { do! seedRecordings; do! stabilityTest } |> _.Wait()
 
 printfn "Done. Key takeaway: offset-based pagination skips or duplicates rows when"
 printfn "the result set changes between pages. A sync loop needs a keyset cursor."

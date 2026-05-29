@@ -19,10 +19,12 @@ docker compose up -d
 ```
 
 The scripts default to `http://localhost:3500` (the api-dapr sidecar).
-Override with `DAPR_HTTP_ENDPOINT`:
+Override with the `--dapr-endpoint` (or `-e`) flag:
 
 ```bash
-DAPR_HTTP_ENDPOINT=http://localhost:3600 dotnet fsi 01-filter-basics.fsx
+dotnet fsi 01-filter-basics.fsx -- --dapr-endpoint http://localhost:3600
+dotnet fsi 02-pagination-token.fsx -- --dapr-endpoint http://localhost:3600
+dotnet fsi 03-stability-under-insert.fsx -- --dapr-endpoint http://localhost:3600
 ```
 
 ## Scripts
