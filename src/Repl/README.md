@@ -8,6 +8,16 @@ recordings sync loop.
 not an opaque keyset cursor, and offset pagination is unstable under
 concurrent inserts.
 
+## Structure
+
+- **`Framework.fsx`** — shared CLI argument parsing, JSON helpers, HTTP
+  client, and the `Dapr` module (`Dapr.query` / `Dapr.writeState`). All
+  three scripts `#load` this file.
+- **`01-filter-basics.fsx`** — filter & sort behaviour
+- **`02-pagination-token.fsx`** — token = skip-offset demonstration
+- **`03-stability-under-insert.fsx`** — offset instability under concurrent
+  writes (the disqualifier for the sync loop)
+
 ## Prerequisites
 
 A minimal Docker Compose stack is included alongside the scripts:
@@ -29,10 +39,10 @@ so this stack is reproducible years later.
 
 The scripts default to `http://localhost:3500` (the daprd sidecar exposed by
 the compose stack above) and state store name `statestore`. Override with
-`--dapr-endpoint` (`-e`) and `--store-name` (`-s`) if you are running against
-a different Dapr instance or a differently named state store:
+`--dapr-endpoint` (`-e`) and `--store-name` (`-s`):
 
 ```bash
+# Run from src/Repl/
 dotnet fsi 01-filter-basics.fsx
 dotnet fsi 02-pagination-token.fsx
 dotnet fsi 03-stability-under-insert.fsx

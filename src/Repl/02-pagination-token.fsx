@@ -6,44 +6,10 @@
 // Run: dotnet fsi 02-pagination-token.fsx [--dapr-endpoint http://localhost:3500] [--store-name statestore]
 // Prerequisites: Dapr sidecar + MongoDB reachable, statestore component loaded.
 
-#r "nuget: Argu"
+#load "Framework.fsx"
 
 open System
-open System.Net.Http
-open System.Text
 open System.Text.Json
-open Argu
-
-type CliArguments =
-    | [<AltCommandLine("-e")>] DaprEndpoint of dapr_endpoint: string
-    | [<AltCommandLine("-s")>] StoreName of store_name: string
-
-    interface IArgParserTemplate with
-        member this.Usage =
-            match this with
-            | DaprEndpoint _ -> "Dapr HTTP endpoint. Default: http://localhost:3500"
-            | StoreName _ -> "Dapr state store name. Default: statestore"
-
-let argumentParser = ArgumentParser.Create<CliArguments>(programName = "dotnet fsi 02-pagination-token.fsx")
-let cliArguments = argumentParser.Parse(fsi.CommandLineArgs)
-
-let daprHttpEndpoint = cliArguments.GetResult(DaprEndpoint, defaultValue = "http://localhost:3500")
-let storeName = cliArguments.GetResult(StoreName, defaultValue = "statestore")
-
-// ── Json helpers ──
-module Json =
-    let serialize (value: obj) = JsonSerializer.Serialize(value)
-
-// ── Dapr HTTP API ──
-module Api =
-    let httpClient = new HttpClient(BaseAddress = Uri(daprHttpEndpoint))
-
-    let postQueryAsync (path: string) (body: string) = task {
-        let content = new StringContent(body, Encoding.UTF8, "application/json")
-        let! response = httpClient.PostAsync(path, content)
-        let! responseText = response.Content.ReadAsStringAsync()
-        return response.StatusCode, responseText.Trim()
-    }
 
 let decodePaginationToken (token: string) =
     if String.IsNullOrEmpty token then "(empty)"
@@ -67,8 +33,8 @@ module Tests =
                        deleted = false
                    |} |}
         |]
-        let! response = Json.serialize recordings |> Api.postQueryAsync $"/v1.0/state/{storeName}"
-        printfn "Seed 12 records: HTTP %A  %s\n" (fst response) (if snd response = "" then "(ok)" else snd response)
+        let! (statusCode, body) = recordings |> Dapr.writeState
+        printfn "Seed 12 records: HTTP %A  %s\n" statusCode (if body = "" then "(ok)" else body)
     }
 
     // ── Paginate through the full set with limit=4 ──
@@ -88,12 +54,11 @@ module Tests =
             let queryBody = {|
                 filter = {| EQ = {| userId = "user-A" |} |}
                 sort = [| {| key = "updated_ms"; order = "ASC" |} |]
-                page = {| limit = 4
-                          token = paginationToken |}
+                page = {| limit = 4; token = paginationToken |}
             |}
-            let! statusCode, body = Json.serialize queryBody |> Api.postQueryAsync $"/v1.0-alpha1/state/{storeName}/query"
+            let! (statusCode, body) = queryBody |> Dapr.query
 
-            if statusCode <> System.Net.HttpStatusCode.OK then
+            if statusCode <> Net.HttpStatusCode.OK then
                 printfn "page %d: HTTP %A — %s" page statusCode body
                 isComplete <- true
             else
