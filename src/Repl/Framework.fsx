@@ -17,6 +17,12 @@ open FSharp.UMX
 [<Measure>]
 type HttpResponse
 
+
+module String =
+    let defaultIfNullOrWhiteSpace (defaultStr: string) (str: string) : string =
+        if String.IsNullOrWhiteSpace str then defaultStr else str
+
+
 // ── JSON helpers ──
 module Json =
     let serialize (value: obj) = JsonSerializer.Serialize(value)
@@ -29,6 +35,25 @@ module Json =
             )
         with _ ->
             jsonString
+
+    let tryGetJsonElement (prop: string) (document: JsonDocument) : JsonElement option =
+        let mutable tokenElement = Unchecked.defaultof<JsonElement>
+
+        if document.RootElement.TryGetProperty(prop, &tokenElement) then
+            Some tokenElement
+        else
+            None
+
+    let getJsonElement (prop: string) (document: JsonDocument) : JsonElement =
+        document |> tryGetJsonElement prop |> _.Value
+    
+    let tryGetStringValue (prop: string) (document: JsonDocument) : string option =
+        match tryGetJsonElement prop document with
+        | Some element -> Some (element.GetString())
+        | _ -> None
+
+    let getStringValue (prop: string) (document: JsonDocument): string =
+        document |> tryGetStringValue prop |> _.Value
 
 // ── Dapr HTTP API ──
 module Api =
@@ -62,7 +87,7 @@ module Api =
 
     let displayResponse (label: string) (statusCode: HttpStatusCode, body: string<HttpResponse>) : unit =
         let body = body |> UMX.untag
-        
+
         printfn "--- %s ---" label
         printfn "HTTP %A" statusCode
 

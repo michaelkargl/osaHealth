@@ -4,94 +4,182 @@
 // keyset cursor. Also shows the "empty token = caught up" gotcha.
 //
 // Run: dotnet fsi 02-pagination-token.fsx [--dapr-endpoint http://localhost:3500] [--store-name statestore]
-// Prerequisites: Dapr sidecar + MongoDB reachable, statestore component loaded.
+// Prerequisites: docker-compose up (daprd + MongoDB), or a standalone
+// daprd sidecar with a MongoDB state store component named "statestore".
 
+#r "nuget: Argu"
+#r "nuget: FSharp.UMX"
 #load "Framework.fsx"
 
 open System
+open System.Net
 open System.Text.Json
+open System.Threading.Tasks
+open Argu
+open Framework
+open FSharp.UMX
 
-let decodePaginationToken (token: string) =
-    if String.IsNullOrEmpty token then "(empty)"
-    else
-        let mutable parsedInteger = 0
-        if Int32.TryParse(token, &parsedInteger) then $"raw=\"%s{token}\"  asInt=%d{parsedInteger}  ← skip-offset"
-        else $"raw=\"%s{token}\" (non-numeric)"
+type CliArguments =
+    | DaprEndpoint of daprEndpoint: string
+    | StoreName of storeName: string
 
-// ── Test cases ──
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | DaprEndpoint _ -> "Dapr HTTP endpoint. Default: http://localhost:3500"
+            | StoreName _ -> "Dapr state store name. Default: statestore"
+
+let argumentParser =
+    ArgumentParser.Create<CliArguments>(programName = "dotnet fsi <script>.fsx")
+
+let cliArguments = argumentParser.Parse(fsi.CommandLineArgs |> Array.tail)
+
+let daprHttpEndpoint =
+    cliArguments.GetResult(DaprEndpoint, defaultValue = "http://localhost:3500")
+    |> UMX.tag
+
+let storeName =
+    cliArguments.GetResult(StoreName, defaultValue = "statestore") |> UMX.tag
+
+module Dapr =
+    let writeState: obj -> Task<HttpStatusCode * string<HttpResponse>> =
+        Dapr.writeState daprHttpEndpoint storeName
+
+    let query: obj -> Task<HttpStatusCode * string<HttpResponse>> =
+        Dapr.query daprHttpEndpoint storeName
+
+    let queryByUserIdPaged (userId: string) (pageSize: int) (paginationToken: string) =
+        // query the next <pageSize> elements from the position of the <paginationToken>
+        let queryBody =
+            {| filter = {| EQ = {| userId = userId |} |}
+               sort = [| {| key = "updated_ms"; order = "ASC" |} |]
+               page =
+                {| limit = pageSize
+                   token = paginationToken |} |}
+
+        queryBody |> Dapr.query daprHttpEndpoint storeName
+
+    let decodePaginationToken (token: string) : string =
+        if String.IsNullOrEmpty token then
+            "(empty)"
+        else
+            let mutable parsedInteger = 0
+
+            if Int32.TryParse(token, &parsedInteger) then
+                $"raw=\"%s{token}\"  asInt=%d{parsedInteger}  ← skip-offset"
+            else
+                $"raw=\"%s{token}\" (non-numeric)"
+
+    let getPageKeys (json: JsonDocument) : string array =
+        // { "results": [{"key": "rec-A-09", "data": { "userId": "user-A" }} ] }
+        let enumerator = json |> Json.getJsonElement "results" |> _.EnumerateArray()
+        [| for result in enumerator -> result.GetProperty("key").GetString() |]
+        
+    let getPageToken (json: JsonDocument): string =
+        // { "results": [{}, {}], "token":"12" }
+        match json |> Json.tryGetStringValue "token" with
+        | Some value -> value
+        | None -> ""
+
+let sectionSeparator = String.replicate 72 "═"
+
+let printSection (n: int) (title: string) (description: string) : unit =
+    printfn "\n%s" sectionSeparator
+    printfn "  TEST %d — %s" n title
+    printfn "%s" sectionSeparator
+    printfn "%s\n" description
+
+
+
 module Tests =
 
-    // Seed 12 user-A recordings (total > page size so pagination is forced).
-    let seedRecordings = task {
-        let recordings = [|
-            for index in 0..11 do
-                {| key = $"rec-A-%02d{index + 1}"
-                   value = {|
-                       userId = "user-A"
-                       date_epoch = 20260501 + index
-                       updated_ms = 1700000000000L + int64 index
-                       deleted = false
-                   |} |}
-        |]
-        let! (statusCode, body) = recordings |> Dapr.writeState
-        printfn "Seed 12 records: HTTP %A  %s\n" statusCode (if body = "" then "(ok)" else body)
-    }
+    let seedRecordings () : Task<unit> =
+        task {
+            printfn "\n%s" sectionSeparator
+            printfn "  SEED — writing 12 test records to the state store"
+            printfn "%s" sectionSeparator
+            printfn "Writes rec-A-01 through rec-A-12 for user-A."
+            printfn "Fields: userId (string), date_epoch (int yyyymmdd), updated_ms (int epoch-ms), deleted (bool).\n"
 
-    // ── Paginate through the full set with limit=4 ──
-    // Expected: opaque keyset token; last data page returns empty token.
-    // Actual:   token = skip offset (4, 8, 12); last data page still has a
-    //           non-empty token; the empty token only arrives on a TRAILING
-    //           zero-result page.
-    let paginateAllRecordings = task {
-        printfn "=== Paginating user-A recordings, limit=4, sorted by (updated_ms) ==="
-        let mutable paginationToken = ""
-        let mutable page = 0
-        let mutable seenKeys = []
-        let mutable isComplete = false
+            let recordings =
+                [| for index in 0..11 do
+                       {| key = $"rec-A-%02d{index + 1}"
+                          value =
+                           {| userId = "user-A"
+                              date_epoch = 20260501 + index
+                              updated_ms = 1700000000000L + int64 index
+                              deleted = false |} |} |]
 
-        while not isComplete do
-            page <- page + 1
-            let queryBody = {|
-                filter = {| EQ = {| userId = "user-A" |} |}
-                sort = [| {| key = "updated_ms"; order = "ASC" |} |]
-                page = {| limit = 4; token = paginationToken |}
-            |}
-            let! (statusCode, body) = queryBody |> Dapr.query
+            let! statusCode, response = Dapr.writeState recordings
+            let response = response |> UMX.untag
+            printfn "Seed: HTTP %A  %s\n" statusCode (if response = "" then "(ok)" else response)
+        }
 
-            if statusCode <> Net.HttpStatusCode.OK then
-                printfn "page %d: HTTP %A — %s" page statusCode body
-                isComplete <- true
-            else
-                let responseDocument = JsonDocument.Parse(if body = "" then "{}" else body)
-                let results = responseDocument.RootElement.GetProperty("results")
-                let pageKeys = [| for result in results.EnumerateArray() -> result.GetProperty("key").GetString() |]
-                let currentToken =
-                    let mutable tokenElement = Unchecked.defaultof<JsonElement>
-                    if responseDocument.RootElement.TryGetProperty("token", &tokenElement) then
-                        let tokenValue = tokenElement.GetString()
-                        if isNull tokenValue then "" else tokenValue
-                    else ""
+    let paginateAllRecordings (userId: string) (pageSize: int) : Task<unit> =
+        task {
+            printSection
+                1
+                $"Paginate all %s{userId} recordings in blocks of %i{pageSize}"
+                """Query: { EQ: { userId: "user-A" } }, sort=[updated_ms ASC].
+Expected: opaque keyset token; empty token on last data page means "nothing more to read".
+          Keyset means: Uses the value to remember the position instead of relying on an offset.
+                        Instead of "give me rows 5-8" => "give me the next n rows where updated_ms > lastrow)
+          Opaque means: The server encodes the value into a blob the client can't and shouldn't inspect or construct itself.
+                        It might look like "eyJ1cGRhdGVkX21zIjoxNzAwMDAwMDAzMDAwfQ==" and the client treats it as black box. 
+Actual:   token = skip offset (4, 8, 12); last data page returns a non-empty token;
+          empty token only arrives on a trailing zero-result page.
+Takeaway: use results.length < limit as the real done-signal, not empty token."""
 
-                printfn "page %d: keys=[%s]" page (String.Join(", ", pageKeys))
-                printfn "         token=%s" (decodePaginationToken currentToken)
-                if pageKeys.Length = 0 then
-                    printfn "         ← zero-result page — NOW empty token means done\n"
-                else
-                    printfn "         ← still has data; empty token only on zero-result page\n"
+            let mutable paginationToken = ""
+            let mutable page = 0
+            let mutable seenKeys = []
+            let mutable isComplete = false
 
-                seenKeys <- seenKeys @ (List.ofArray pageKeys)
-                paginationToken <- currentToken
+            while not isComplete do
+                page <- page + 1
 
-                if String.IsNullOrEmpty currentToken then isComplete <- true
-                elif page >= 20 then
-                    printfn "SAFETY STOP"
+                let! statusCode, response = Dapr.queryByUserIdPaged userId pageSize paginationToken
+                let response = response |> UMX.untag |> String.defaultIfNullOrWhiteSpace "{}"
+
+                if statusCode <> HttpStatusCode.OK then
+                    printfn $"page %d{page}: HTTP %A{statusCode} — %s{response}"
                     isComplete <- true
+                else
+                    let responseDocument = JsonDocument.Parse(response)
+                    let pageKeys = responseDocument |> Dapr.getPageKeys                    
+                    let currentToken = responseDocument |> Dapr.getPageToken
+                        
+                    printfn "page %d: keys=[%s]" page (String.Join(", ", pageKeys))
+                    printfn $"        token=%s{Dapr.decodePaginationToken currentToken}"
+                    printfn $"        raw=%s{response}"
 
-        printfn "Total seen: %d  unique: %d" (List.length seenKeys) (List.distinct seenKeys |> List.length)
-    }
+                    if pageKeys.Length = 0 then
+                        printfn "         ← zero-result page — NOW empty token means done\n"
+                    else
+                        printfn "         ← still has data; empty token only on zero-result page\n"
 
-task { do! Tests.seedRecordings; do! Tests.paginateAllRecordings } |> _.Wait()
+                    seenKeys <- seenKeys @ (List.ofArray pageKeys)
+                    paginationToken <- currentToken
 
-printfn "Done. Key takeaway: the token is a skip(N) offset, not a keyset cursor."
-printfn "A client that treats empty-token as 'caught up' pays one extra round-trip."
+                    if String.IsNullOrEmpty currentToken then
+                        isComplete <- true
+                    elif page >= 20 then
+                        printfn "SAFETY STOP"
+                        isComplete <- true
+
+            printfn $"Total seen: %d{List.length seenKeys}  unique: %d{List.distinct seenKeys |> List.length}"
+        }
+
+task {
+    do! Tests.seedRecordings ()
+    do! Tests.paginateAllRecordings "user-A" 4
+}
+|> _.Wait()
+
+printfn $"\n%s{sectionSeparator}"
+printfn "  SUMMARY"
+printfn $"%s{sectionSeparator}"
+printfn "The pagination token is a skip(N) offset, not a keyset cursor."
+printfn "A client treating empty-token as 'caught up' pays one extra round-trip."
 printfn "Use results.length < limit as the real done-signal."
+printfn $"%s{sectionSeparator}\n"
