@@ -50,7 +50,7 @@ module Api =
         printfn "--- %s ---" label
         printfn "HTTP %A" statusCode
         if body = "" then printfn "(empty body)\n"
-        else printfn "%s\n" (Json.prettyPrint body)
+        else body |> Json.prettyPrint |> printfn "%s\n"
 
 // ── Dapr state & query operations ──
 module Dapr =
