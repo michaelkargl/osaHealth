@@ -7,13 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Repl/01-filter-basics.fsx" beforeDir="false" afterPath="$PROJECT_DIR$/Repl/dapr-query-api/01-filter-basics.fsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Repl/02-pagination-token.fsx" beforeDir="false" afterPath="$PROJECT_DIR$/Repl/dapr-query-api/02-pagination-token.fsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Repl/03-stability-under-insert.fsx" beforeDir="false" afterPath="$PROJECT_DIR$/Repl/dapr-query-api/03-stability-under-insert.fsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Repl/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Repl/dapr-query-api/docker-compose.yml" afterDir="false" />
-    </list>
+    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -105,7 +99,7 @@
       <updated>1778933162253</updated>
       <workItem from="1778933163259" duration="1234000" />
       <workItem from="1779012836041" duration="2769000" />
-      <workItem from="1780124044261" duration="15501000" />
+      <workItem from="1780124044261" duration="15603000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -139,7 +133,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780138809350</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="chore: moves dapr-eval scripts into a dedicated folder">
+      <option name="closed" value="true" />
+      <created>1780140176883</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1780140176883</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -152,7 +154,8 @@
     <MESSAGE value="chore: refactors 01-filter-basics to be more verbose" />
     <MESSAGE value="feat: refactors 02-pagination-token fsx to be cleaner" />
     <MESSAGE value="chore: refactors 03-stability-under-insert.fsx" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: refactors 03-stability-under-insert.fsx" />
+    <MESSAGE value="chore: moves dapr-eval scripts into a dedicated folder" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: moves dapr-eval scripts into a dedicated folder" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
