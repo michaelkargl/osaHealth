@@ -48,38 +48,10 @@ module Dapr =
     let query: obj -> Task<HttpStatusCode * string<HttpResponse>> =
         Dapr.query daprHttpEndpoint storeName
 
-    let queryByUserIdPaged (userId: string) (pageSize: int) (paginationToken: string) =
-        // query the next <pageSize> elements from the position of the <paginationToken>
-        let queryBody =
-            {| filter = {| EQ = {| userId = userId |} |}
-               sort = [| {| key = "updated_ms"; order = "ASC" |} |]
-               page =
-                {| limit = pageSize
-                   token = paginationToken |} |}
-
-        queryBody |> Dapr.query daprHttpEndpoint storeName
-
-    let decodePaginationToken (token: string) : string =
-        if String.IsNullOrEmpty token then
-            "(empty)"
-        else
-            let mutable parsedInteger = 0
-
-            if Int32.TryParse(token, &parsedInteger) then
-                $"raw=\"%s{token}\"  asInt=%d{parsedInteger}  ← skip-offset"
-            else
-                $"raw=\"%s{token}\" (non-numeric)"
-
-    let getPageKeys (json: JsonDocument) : string array =
-        // { "results": [{"key": "rec-A-09", "data": { "userId": "user-A" }} ] }
-        let enumerator = json |> Json.getJsonElement "results" |> _.EnumerateArray()
-        [| for result in enumerator -> result.GetProperty("key").GetString() |]
-        
-    let getPageToken (json: JsonDocument): string =
-        // { "results": [{}, {}], "token":"12" }
-        match json |> Json.tryGetStringValue "token" with
-        | Some value -> value
-        | None -> ""
+    let queryUserPage       = Dapr.queryUserPage       daprHttpEndpoint storeName
+    let decodePaginationToken = Dapr.decodePaginationToken
+    let getPageKeys           = Dapr.getPageKeys
+    let getPageToken          = Dapr.getPageToken
 
 let sectionSeparator = String.replicate 72 "═"
 
@@ -135,10 +107,11 @@ Takeaway: use results.length < limit as the real done-signal, not empty token.""
             let mutable seenKeys = []
             let mutable isComplete = false
 
+            // iterate the pages
             while not isComplete do
                 page <- page + 1
 
-                let! statusCode, response = Dapr.queryByUserIdPaged userId pageSize paginationToken
+                let! statusCode, response = Dapr.queryUserPage userId pageSize paginationToken
                 let response = response |> UMX.untag |> String.defaultIfNullOrWhiteSpace "{}"
 
                 if statusCode <> HttpStatusCode.OK then

@@ -126,3 +126,35 @@ module Dapr =
         : Task<HttpStatusCode * string<HttpResponse>> =
         let path = buildStatePath storeName
         Json.serialize items |> UMX.tag |> Api.postQueryAsync endpoint path
+
+    let queryUserPage
+        (endpoint: string<HttpEndpoint>)
+        (storeName: string<StoreName>)
+        (userId: string)
+        (pageSize: int)
+        (paginationToken: string)
+        : Task<HttpStatusCode * string<HttpResponse>> =
+        {| filter = {| EQ = {| userId = userId |} |}
+           sort = [| {| key = "updated_ms"; order = "ASC" |} |]
+           page = {| limit = pageSize; token = paginationToken |} |}
+        |> query endpoint storeName
+
+    let decodePaginationToken (token: string) : string =
+        if String.IsNullOrEmpty token then "(empty)"
+        else
+            let mutable parsedInteger = 0
+            if Int32.TryParse(token, &parsedInteger) then
+                $"raw=\"%s{token}\"  asInt=%d{parsedInteger}  ← skip-offset"
+            else
+                $"raw=\"%s{token}\" (non-numeric)"
+
+    let getPageKeys (json: JsonDocument) : string array =
+        // { "results": [{"key": "rec-A-01", "data": { ... }}] }
+        let enumerator = json |> Json.getJsonElement "results" |> _.EnumerateArray()
+        [| for result in enumerator -> result.GetProperty("key").GetString() |]
+
+    let getPageToken (json: JsonDocument) : string =
+        // { "results": [...], "token": "4" }  — absent on the trailing empty page
+        match json |> Json.tryGetStringValue "token" with
+        | Some value -> value
+        | None -> ""
