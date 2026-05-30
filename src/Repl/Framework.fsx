@@ -4,61 +4,100 @@
 //
 // Load with: #load "Framework.fsx"
 
-#r "nuget: Argu"
+#r "nuget: FSharp.UMX"
 
 open System
+open System.Net
+open System.Threading.Tasks
 open System.Net.Http
 open System.Text
 open System.Text.Json
-open Argu
+open FSharp.UMX
 
-type CliArguments =
-    | [<AltCommandLine("-e")>] DaprEndpoint of dapr_endpoint: string
-    | [<AltCommandLine("-s")>] StoreName of store_name: string
-
-    interface IArgParserTemplate with
-        member this.Usage =
-            match this with
-            | DaprEndpoint _ -> "Dapr HTTP endpoint. Default: http://localhost:3500"
-            | StoreName _ -> "Dapr state store name. Default: statestore"
-
-let argumentParser = ArgumentParser.Create<CliArguments>(programName = "dotnet fsi <script>.fsx")
-let cliArguments = argumentParser.Parse(fsi.CommandLineArgs)
-
-let daprHttpEndpoint = cliArguments.GetResult(DaprEndpoint, defaultValue = "http://localhost:3500")
-let storeName = cliArguments.GetResult(StoreName, defaultValue = "statestore")
+[<Measure>]
+type HttpResponse
 
 // ── JSON helpers ──
 module Json =
     let serialize (value: obj) = JsonSerializer.Serialize(value)
+
     let prettyPrint (jsonString: string) =
-        try JsonSerializer.Serialize(JsonDocument.Parse(jsonString).RootElement, JsonSerializerOptions(WriteIndented = true))
-        with _ -> jsonString
+        try
+            JsonSerializer.Serialize(
+                JsonDocument.Parse(jsonString).RootElement,
+                JsonSerializerOptions(WriteIndented = true)
+            )
+        with _ ->
+            jsonString
 
 // ── Dapr HTTP API ──
 module Api =
-    let httpClient = new HttpClient(BaseAddress = Uri(daprHttpEndpoint))
+    [<Measure>]
+    type HttpEndpoint
 
-    let postQueryAsync (path: string) (body: string) = task {
-        let content = new StringContent(body, Encoding.UTF8, "application/json")
-        let! response = httpClient.PostAsync(path, content)
-        let! responseText = response.Content.ReadAsStringAsync()
-        return response.StatusCode, responseText.Trim()
-    }
+    [<Measure>]
+    type HttpPath
 
-    let displayResponse (label: string) (statusCode, body) =
+    [<Measure>]
+    type HttpBody
+
+    let buildHttpClient (endpoint: string<HttpEndpoint>) =
+        new HttpClient(BaseAddress = Uri(endpoint |> UMX.untag))
+
+    let postQueryAsync
+        (endpoint: string<HttpEndpoint>)
+        (path: string<HttpPath>)
+        (body: string<HttpBody>)
+        : Task<HttpStatusCode * string<HttpResponse>> =
+        task {
+            let body = body |> UMX.untag
+            let path = path |> UMX.untag
+
+            let client = buildHttpClient endpoint
+            let content = new StringContent(body, Encoding.UTF8, "application/json")
+            let! response = client.PostAsync(path, content)
+            let! responseText = response.Content.ReadAsStringAsync()
+            return response.StatusCode, (responseText.Trim() |> UMX.tag)
+        }
+
+    let displayResponse (label: string) (statusCode: HttpStatusCode, body: string<HttpResponse>) : unit =
+        let body = body |> UMX.untag
+        
         printfn "--- %s ---" label
         printfn "HTTP %A" statusCode
-        if body = "" then printfn "(empty body)\n"
-        else body |> Json.prettyPrint |> printfn "%s\n"
+
+        if body = "" then
+            printfn "(empty body)\n"
+        else
+            body |> Json.prettyPrint |> printfn "%s\n"
 
 // ── Dapr state & query operations ──
+open Api
+
 module Dapr =
-    let private queryEndpoint = $"/v1.0-alpha1/state/{storeName}/query"
-    let private stateEndpoint = $"/v1.0/state/{storeName}"
+    [<Measure>]
+    type StoreName
 
-    let query (queryBody: obj) =
-        Json.serialize queryBody |> Api.postQueryAsync queryEndpoint
+    let private buildQueryPath (storeName: string<StoreName>) : string<HttpPath> =
+        $"/v1.0-alpha1/state/{storeName}/query" |> UMX.tag
 
-    let writeState (items: obj) =
-        Json.serialize items |> Api.postQueryAsync stateEndpoint
+    let private buildStatePath (storeName: string<StoreName>) : string<HttpPath> = $"/v1.0/state/{storeName}" |> UMX.tag
+
+    let query
+        (endpoint: string<HttpEndpoint>)
+        (storeName: string<StoreName>)
+        (queryBody: obj)
+        : Task<HttpStatusCode * string<HttpResponse>> =
+        task {
+            let path = buildQueryPath storeName
+            let! statusCode, response = Json.serialize queryBody |> UMX.tag |> Api.postQueryAsync endpoint path
+            return (statusCode, response)
+        }
+
+    let writeState
+        (endpoint: string<HttpEndpoint>)
+        (storeName: string<StoreName>)
+        (items: obj)
+        : Task<HttpStatusCode * string<HttpResponse>> =
+        let path = buildStatePath storeName
+        Json.serialize items |> UMX.tag |> Api.postQueryAsync endpoint path
