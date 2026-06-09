@@ -34,8 +34,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && ln -s /usr/local/share/powershell/pwsh /usr/local/bin/pwsh \
     && rm -rf /var/lib/apt/lists/*
 
-# Setting invariant globalization mode avoids an ICU dependency for the .NET tools;
-# the LSP servers installed here have no need for culture-sensitive string handling.
+# serena:latest is Alpine-based and does not ship libicu. Setting invariant mode
+# avoids the ICU dependency; fsautocomplete (an LSP server) has no need for
+# culture-sensitive string handling so there is no functional loss.
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 RUN dotnet tool install --global fsautocomplete
 
