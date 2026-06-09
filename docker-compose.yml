@@ -126,6 +126,7 @@ services:
     logging: *fluentd-logging
 
   mongo-express:
+    profiles: ["dev"]
     image: mongo-express:1
     restart: always
     ports:
@@ -204,6 +205,7 @@ services:
         condition: service_healthy
   
   hindsight:
+    profiles: ["dev"]
     image: ghcr.io/vectorize-io/hindsight:latest
     restart: always
     ports:
@@ -219,6 +221,7 @@ services:
       - osa_network
 
   serena:
+    profiles: ["dev"]
     build:
       context: ./infrastructure/serena
       dockerfile: Dockerfile
