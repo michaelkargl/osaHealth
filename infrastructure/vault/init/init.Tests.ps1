@@ -1,6 +1,6 @@
-# Pester tests for vault/init/init.ps1
+# Pester tests for infrastructure/vault/init/init.ps1
 #
-# Run with:  Invoke-Pester -Path ./vault/init -Output Detailed
+# Run with:  Invoke-Pester -Path ./infrastructure/vault/init -Output Detailed
 # Requires Pester 5+.
 
 BeforeAll {

@@ -21,7 +21,12 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "PowerShell(docker run *)",
       "Bash(git -C C:/Users/kami/workspace/github-space/osaHealth ls-files src/)",
-      "Bash(grep \"\\\\.fs$\")"
+      "Bash(grep \"\\\\.fs$\")",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__get_current_config",
+      "mcp__serena__initial_instructions",
+      "mcp__serena__list_memories",
+      "mcp__serena__activate_project"
     ]
   }
 }

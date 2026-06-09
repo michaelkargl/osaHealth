@@ -1,6 +1,6 @@
 # Local secrets — never commit
 .env
-dapr/secrets.json
+infrastructure/dapr/secrets.json
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/dotnetcore,node,fsharp,flutter,powershell
@@ -248,6 +248,6 @@ dist
 !.serena/project.yml
 !.serena/memories
 
-serena/config
-!serena/config/serena_config.yml
+infrastructure/serena/config
+!infrastructure/serena/config/serena_config.yml
 

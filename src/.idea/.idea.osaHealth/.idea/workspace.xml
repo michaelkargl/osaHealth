@@ -9,16 +9,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../.mcp.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.claude/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.claude/settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.claude/settings.local.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../serena/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/../serena/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../serena/compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../serena/compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../serena/config/serena_config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../serena/config/serena_config.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Program.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Program.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,6 +27,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a0bb57407e64e473814b6906c6e2a4cd6622c898e843bb759436eacf23a/FactAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d88f483cd54064393aeea32f68a5d177e889ab9bf10d096ec63b84fd7a2fdf/Routing.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../.claude/settings.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../.claude/settings.local.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../.mcp.json" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
@@ -164,7 +156,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781002473376</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="feat: adds support for Serena MCP">
+      <option name="closed" value="true" />
+      <created>1781003152272</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1781003152272</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -190,7 +190,8 @@
     <MESSAGE value="chore: refactors 03-stability-under-insert.fsx" />
     <MESSAGE value="chore: moves dapr-eval scripts into a dedicated folder" />
     <MESSAGE value="docs: Removes backlog.md from CLAUDE.md" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs: Removes backlog.md from CLAUDE.md" />
+    <MESSAGE value="feat: adds support for Serena MCP" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: adds support for Serena MCP" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
