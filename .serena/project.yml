@@ -34,6 +34,13 @@ project_name: osaHealth
 languages:
 - fsharp
 - dart
+- typescript
+- html
+- json
+- scss
+- yaml
+- powershell
+- markdown
 
 # list of additional paths to ignore in this project.
 # Same syntax as gitignore, so you can use * and **.
