@@ -40,7 +40,7 @@ services:
     entrypoint: ["vault", "server", "-config=/vault/config/config.hcl"]
     volumes:
       - vault_data:/vault/data
-      - ./vault/config:/vault/config:ro
+      - ./infrastructure/vault/config:/vault/config:ro
     ports:
       - 8200:8200
     cap_add:
@@ -62,8 +62,8 @@ services:
     entrypoint: ["pwsh", "-File", "/vault/init/init.ps1", "-VaultBaseUri", "http://vault:8200", "-DaprSecretsPath", "/dapr/secrets.json", "-MongoUser", "${MONGO_ROOT_USER}", "-MongoPassword", "${MONGO_ROOT_PASSWORD}", "-UnsealKey", "${VAULT_UNSEAL_KEY:-}", "-RootToken", "${VAULT_ROOT_TOKEN:-}", "-PollIntervalSec", "2"]
     restart: "no"
     volumes:
-      - ./vault/init:/vault/init:ro
-      - ./dapr:/dapr
+      - ./infrastructure/vault/init:/vault/init:ro
+      - ./infrastructure/dapr:/dapr
     depends_on:
       vault:
         condition: service_healthy
@@ -111,8 +111,8 @@ services:
       "--log-as-json"
     ]
     volumes:
-      - ./dapr/components:/components
-      - ./dapr/secrets.json:/secrets/secrets.json:ro
+      - ./infrastructure/dapr/components:/components
+      - ./infrastructure/dapr/secrets.json:/secrets/secrets.json:ro
     depends_on:
       api:
         condition: service_started
@@ -126,6 +126,7 @@ services:
     logging: *fluentd-logging
 
   mongo-express:
+    profiles: ["dev"]
     image: mongo-express:1
     restart: always
     ports:
@@ -155,7 +156,7 @@ services:
       - "3100:3100"
     command: -config.file=/etc/loki/loki-config.yaml
     volumes:
-      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - ./infrastructure/loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
       - loki_data:/loki
     networks:
       - osa_network
@@ -168,12 +169,12 @@ services:
 
   fluentd:
     build:
-      context: ./fluentd
+      context: ./infrastructure/fluentd
     ports:
       - "24224:24224"
       - "24224:24224/udp"
     volumes:
-      - ./fluentd/fluent.conf:/fluentd/etc/fluent.conf:ro
+      - ./infrastructure/fluentd/fluent.conf:/fluentd/etc/fluent.conf:ro
     networks:
       - osa_network
     depends_on:
@@ -191,7 +192,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infrastructure/grafana/provisioning:/etc/grafana/provisioning:ro
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
@@ -204,6 +205,7 @@ services:
         condition: service_healthy
   
   hindsight:
+    profiles: ["dev"]
     image: ghcr.io/vectorize-io/hindsight:latest
     restart: always
     ports:
@@ -217,3 +219,31 @@ services:
       HINDSIGHT_API_LLM_MODEL: ${HINDSIGHT_API_LLM_MODEL}
     networks:
       - osa_network
+
+  serena:
+    profiles: ["dev"]
+    build:
+      context: ./infrastructure/serena
+      dockerfile: Dockerfile
+    image: serena-fsharp:latest
+    volumes:
+      # Mount osaHealth workspace so Serena can activate it as a project
+      - ./:/workspace/osaHealth
+      # Persist Serena config and session logs across container restarts
+      - ./infrastructure/serena/config:/workspaces/serena/config
+    ports:
+      - "${SERENA_PORT:-9121}:9121"
+      - "${SERENA_DASHBOARD_PORT:-24282}:24282"
+    environment:
+      - SERENA_DOCKER=1
+    command:
+      - serena
+      - start-mcp-server
+      - --transport
+      - sse
+      - --port
+      - "9121"
+      - --host
+      - 0.0.0.0
+      - --context
+      - claude-code

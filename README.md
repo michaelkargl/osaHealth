@@ -92,20 +92,20 @@ Manage application secrets at <http://localhost:8200>
 
 ### Vault initialization
 
-The `vault-init` container runs [`vault/init/init.ps1`](./vault/init/init.ps1), a PowerShell
+The `vault-init` container runs [`infrastructure/vault/init/init.ps1`](./infrastructure/vault/init/init.ps1), a PowerShell
 script that initializes/unseals Vault over its HTTP API. It needs neither the `vault`
 CLI nor a POSIX shell, so the team can read and maintain it like the rest of the codebase.
 
 Preview what an invocation would do without touching Vault:
 
 ```pwsh
-pwsh -File ./vault/init/init.ps1 -WhatIf
+pwsh -File ./infrastructure/vault/init/init.ps1 -WhatIf
 ```
 
-The script is covered by Pester tests ([`vault/init/init.Tests.ps1`](./vault/init/init.Tests.ps1)):
+The script is covered by Pester tests ([`infrastructure/vault/init/init.Tests.ps1`](./infrastructure/vault/init/init.Tests.ps1)):
 
 ```pwsh
-Invoke-Pester -Path ./vault/init -Output Detailed
+Invoke-Pester -Path ./infrastructure/vault/init -Output Detailed
 ```
 
 [docker-compose.yml]: ./docker-compose.yml
