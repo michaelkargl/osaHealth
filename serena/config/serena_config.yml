@@ -1,0 +1,5 @@
+# Required settings for running Serena inside Docker.
+# See: https://github.com/oraios/serena/blob/main/DOCKER.md
+gui_log_window: False
+web_dashboard_listen_address: 0.0.0.0
+web_dashboard_open_on_launch: False
