@@ -1,0 +1,27 @@
+services:
+  serena-fsharp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: serena-fsharp:latest
+    volumes:
+      # Mount osaHealth workspace so Serena can activate it as a project
+      - ..:/workspace/osaHealth
+      # Persist Serena config and session logs across container restarts
+      - ./config:/workspaces/serena/config
+    ports:
+      - "${SERENA_PORT:-9121}:9121"
+      - "${SERENA_DASHBOARD_PORT:-24282}:24282"
+    environment:
+      - SERENA_DOCKER=1
+    command:
+      - serena
+      - start-mcp-server
+      - --transport
+      - sse
+      - --port
+      - "9121"
+      - --host
+      - 0.0.0.0
+      - --context
+      - claude-code
