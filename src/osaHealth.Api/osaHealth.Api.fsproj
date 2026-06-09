@@ -15,7 +15,6 @@
         <PackageReference Include="Oxpecker" Version="2.0.1" />
         <PackageReference Include="Oxpecker.OpenApi" Version="2.1.2" />
         <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
-        <PackageReference Update="FSharp.Core" Version="11.0.101-preview4.26230.115" />
     </ItemGroup>
 
 </Project>

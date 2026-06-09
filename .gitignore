@@ -241,3 +241,13 @@ dist
 *.dll
 
 # End of https://www.toptal.com/developers/gitignore/api/dotnetcore,node,fsharp,flutter,powershell
+
+### Serena
+
+.serena/**
+!.serena/project.yml
+!.serena/memories
+
+serena/config
+!serena/config/serena_config.yml
+
