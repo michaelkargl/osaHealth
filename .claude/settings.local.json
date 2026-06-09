@@ -17,7 +17,11 @@
       "PowerShell(New-Item *)",
       "PowerShell(docker compose exec *)",
       "PowerShell(docker compose logs *)",
-      "WebFetch(domain:hindsight.vectorize.io)"
+      "WebFetch(domain:hindsight.vectorize.io)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "PowerShell(docker run *)",
+      "Bash(git -C C:/Users/kami/workspace/github-space/osaHealth ls-files src/)",
+      "Bash(grep \"\\\\.fs$\")"
     ]
   }
 }
