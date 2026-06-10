@@ -252,3 +252,6 @@ dist
 infrastructure/serena/config
 !infrastructure/serena/config/serena_config.yml
 
+### Claude
+
+.claude/*.local.json
