@@ -206,7 +206,7 @@ services:
   
   hindsight:
     profiles: ["dev"]
-    image: ghcr.io/vectorize-io/hindsight:latest
+    image: ghcr.io/vectorize-io/hindsight:0.8.1
     restart: always
     ports:
       - 8888:8888
