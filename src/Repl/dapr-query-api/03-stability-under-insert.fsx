@@ -9,14 +9,16 @@
 
 #r "nuget: Argu"
 #r "nuget: FSharp.UMX"
-#load "Framework.fsx"
+
+// Requires: dotnet build ../../osaHealth.Framework/osaHealth.Framework.fsproj
+#r @"../../osaHealth.Framework/bin/Debug/net11.0/osaHealth.Framework.dll"
 
 open System
 open System.Net
 open System.Text.Json
 open System.Threading.Tasks
 open Argu
-open Framework
+open osaHealth.Framework
 open FSharp.UMX
 
 type CliArguments =
@@ -87,7 +89,7 @@ module Tests =
         }
 
     let private parseResponse (response: string) : JsonDocument =
-        response |> String.defaultIfNullOrWhiteSpace "{}" |> JsonDocument.Parse
+        response |> StringUtil.defaultIfNullOrWhiteSpace "{}" |> JsonDocument.Parse
 
     let private findDuplicates (keys: string array) : string array =
         keys

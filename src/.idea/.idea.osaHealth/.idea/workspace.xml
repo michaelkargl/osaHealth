@@ -9,11 +9,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/osaHealth.Framework/Json.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Repl/dapr-query-api/Framework.fsx" beforeDir="false" afterPath="$PROJECT_DIR$/Repl/dapr-query-api/Framework.fsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.slnx" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.slnx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Repl/dapr-query-api/01-filter-basics.fsx" beforeDir="false" afterPath="$PROJECT_DIR$/Repl/dapr-query-api/01-filter-basics.fsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Repl/dapr-query-api/02-pagination-token.fsx" beforeDir="false" afterPath="$PROJECT_DIR$/Repl/dapr-query-api/02-pagination-token.fsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Repl/dapr-query-api/03-stability-under-insert.fsx" beforeDir="false" afterPath="$PROJECT_DIR$/Repl/dapr-query-api/03-stability-under-insert.fsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Repl/dapr-query-api/Framework.fsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Repl/dapr-query-api/infrastructure/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Repl/dapr-query-api/infrastructure/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/osaHealth.Framework.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/osaHealth.Framework.fsproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,6 +36,9 @@
     <setting file="file://$PROJECT_DIR$/osaHealth.Framework/Library.fs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="Toolset" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -57,7 +62,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -143,6 +148,7 @@
       <workItem from="1780912962499" duration="3364000" />
       <workItem from="1780983563646" duration="676000" />
       <workItem from="1780984266392" duration="5820000" />
+      <workItem from="1781095466497" duration="4929000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -184,7 +190,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780140176883</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Merge remote-tracking branch 'origin/main' into spike/osa15-query-api-repl&#10;&#10;# Conflicts:&#10;#&#9;src/.idea/.idea.osaHealth/.idea/indexLayout.xml&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml&#10;#&#9;src/Repl/dapr-query-api/Framework.fsx&#10;#&#9;src/osaHealth.Api/osaHealth.Api.fsproj">
+      <option name="closed" value="true" />
+      <created>1781087587248</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1781087587248</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -192,13 +206,38 @@
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="spike/osa15-query-api-repl" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="chore: refactors 01-filter-basics to be more verbose" />
     <MESSAGE value="feat: refactors 02-pagination-token fsx to be cleaner" />
     <MESSAGE value="chore: refactors 03-stability-under-insert.fsx" />
     <MESSAGE value="chore: moves dapr-eval scripts into a dedicated folder" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: moves dapr-eval scripts into a dedicated folder" />
+    <MESSAGE value="feat: Adds Framework.Tests project" />
+    <MESSAGE value="Merge remote-tracking branch 'origin/main' into spike/osa15-query-api-repl&#10;&#10;# Conflicts:&#10;#&#9;src/.idea/.idea.osaHealth/.idea/indexLayout.xml&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml&#10;#&#9;src/Repl/dapr-query-api/Framework.fsx&#10;#&#9;src/osaHealth.Api/osaHealth.Api.fsproj" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merge remote-tracking branch 'origin/main' into spike/osa15-query-api-repl&#10;&#10;# Conflicts:&#10;#&#9;src/.idea/.idea.osaHealth/.idea/indexLayout.xml&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml&#10;#&#9;src/Repl/dapr-query-api/Framework.fsx&#10;#&#9;src/osaHealth.Api/osaHealth.Api.fsproj" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

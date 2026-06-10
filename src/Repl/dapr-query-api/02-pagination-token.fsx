@@ -9,14 +9,16 @@
 
 #r "nuget: Argu"
 #r "nuget: FSharp.UMX"
-#load "Framework.fsx"
+
+// Requires: dotnet build ../../osaHealth.Framework/osaHealth.Framework.fsproj
+#r @"../../osaHealth.Framework/bin/Debug/net11.0/osaHealth.Framework.dll"
 
 open System
 open System.Net
 open System.Text.Json
 open System.Threading.Tasks
 open Argu
-open Framework
+open osaHealth.Framework
 open FSharp.UMX
 
 type CliArguments =
@@ -112,7 +114,7 @@ Takeaway: use results.length < limit as the real done-signal, not empty token.""
                 page <- page + 1
 
                 let! statusCode, response = Dapr.queryUserPage userId pageSize paginationToken
-                let response = response |> UMX.untag |> String.defaultIfNullOrWhiteSpace "{}"
+                let response = response |> UMX.untag |> StringUtil.defaultIfNullOrWhiteSpace "{}"
 
                 if statusCode <> HttpStatusCode.OK then
                     printfn $"page %d{page}: HTTP %A{statusCode} — %s{response}"
