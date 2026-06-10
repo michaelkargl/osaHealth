@@ -213,6 +213,7 @@ services:
       - 9999:9999
     volumes:
       - ${HINDSIGHT_API_DATA_VOLUME}:/home/hindsight/.pg0
+      - ./infrastructure/hindsight:/scripts/hindsight:ro
     environment:
       HINDSIGHT_API_LLM_API_KEY: ${HINDSIGHT_API_LLM_API_KEY}
       HINDSIGHT_API_LLM_PROVIDER: ${HINDSIGHT_API_LLM_PROVIDER}
