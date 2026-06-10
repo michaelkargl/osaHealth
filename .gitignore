@@ -1,6 +1,6 @@
 # Local secrets — never commit
 .env
-dapr/secrets.json
+infrastructure/dapr/secrets.json
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/dotnetcore,node,fsharp,flutter,powershell
@@ -92,6 +92,7 @@ bin
 !.paket/paket.bootstrapper.exe
 .ionide/
 .fake
+**/.idea/
 
 ### Node ###
 # Logs
@@ -241,3 +242,16 @@ dist
 *.dll
 
 # End of https://www.toptal.com/developers/gitignore/api/dotnetcore,node,fsharp,flutter,powershell
+
+### Serena
+
+.serena/**
+!.serena/project.yml
+!.serena/memories
+
+infrastructure/serena/config
+!infrastructure/serena/config/serena_config.yml
+
+### Claude
+
+.claude/*.local.json

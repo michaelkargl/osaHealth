@@ -11,6 +11,7 @@ open System.Net
 open System.Threading.Tasks
 open System.Net.Http
 open System.Text
+open System.Text.Json
 open FSharp.UMX
 
 [<Measure>]

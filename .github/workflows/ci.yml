@@ -19,7 +19,7 @@ jobs:
 
       - name: Run Pester Tests
         shell: pwsh
-        run: Invoke-Pester -Path ./vault/init -Output Detailed -CI
+        run: Invoke-Pester -Path ./infrastructure/vault/init -Output Detailed -CI
 
   docker-compose-build:
     name: Docker Compose Build
