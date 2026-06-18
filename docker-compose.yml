@@ -25,6 +25,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
     volumes:
       - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
     networks:
       - osa_network
     healthcheck:
@@ -128,7 +130,7 @@ services:
   mongo-express:
     profiles: ["dev"]
     image: mongo-express:1
-    restart: always
+    restart: unless-stopped
     ports:
       - 8081:8081
     depends_on:
@@ -207,7 +209,7 @@ services:
   hindsight:
     profiles: ["dev"]
     image: ghcr.io/vectorize-io/hindsight:0.8.1
-    restart: always
+    restart: unless-stopped
     ports:
       - 8888:8888
       - 9999:9999
@@ -227,6 +229,7 @@ services:
       context: ./infrastructure/serena
       dockerfile: Dockerfile
     image: serena-fsharp:latest
+    restart: unless-stopped
     volumes:
       # Mount osaHealth workspace so Serena can activate it as a project
       - ./:/workspace/osaHealth

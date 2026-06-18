@@ -1,6 +1,7 @@
 # Local secrets — never commit
 .env
 infrastructure/dapr/secrets.json
+**/Properties/launchSettings.json
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/dotnetcore,node,fsharp,flutter,powershell

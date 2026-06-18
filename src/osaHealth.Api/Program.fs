@@ -1,30 +1,38 @@
-open System
 open System.Text.Json
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Logging
+open MongoDB.Bson
+open MongoDB.Bson.Serialization
+open MongoDB.Bson.Serialization.Serializers
+open MongoDB.Driver
 open Oxpecker
 open Oxpecker.OpenApi
+open osaHealth.Api
+open osaHealth.Api.EnvVars
+open osaHealth.Api.Models
+open osaHealth.Repository.Entities
+open osaHealth.Repositories
+
+module DI = osaHealth.Api.DependencyInjection
 
 module OpenApi =
     let registerOpenApi (app: WebApplication) : WebApplication =
-        // Serves the OpenAPI spec file
         app.UseSwaggerUI(_.SwaggerEndpoint("/openapi/v1.json", "osaHealth API v1"))
         |> ignore
-        // Serves the Swagger UI
-        app.MapOpenApi() |> ignore
 
+        app.MapOpenApi() |> ignore
         app
 
-let randomHandler : EndpointHandler =
-    fun ctx ->
-        let logger = ctx.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("osaHealth.Api")
-        let value = Random.Shared.Next(1, 101)
-        logger.LogInformation("Random value {RandomValue}", value)
-        ctx |> json {| randomValue = value |}
+module Persistence =
+    let buildMongoClient (envVars: EnvVars): MongoClient =
+        new MongoClient(envVars.ConnectionString)
 
-let endpoints =
+    let getMongoDbCollection<'TCollection> (envVars: EnvVars) (collectionName: string) (mongoClient: MongoClient) =
+        mongoClient.GetDatabase(envVars.DatabaseName).GetCollection<'TCollection>(collectionName)
+
+let endpoints (recordingsCollection: IMongoCollection<Recording>) =
     [ route "/" <| text "Hello World!"
 
       GET
@@ -41,15 +49,31 @@ let endpoints =
                 )
             )
 
-            route "/random" randomHandler
+            route "/random" Endpoints.randomHandler
             |> addOpenApi (
                 OpenApiConfig(
-                    responseBodies = [ ResponseBody(typeof<{| randomValue : int |}>) ],
+                    responseBodies = [ ResponseBody(typeof<{| randomValue: int |}>) ],
                     configureOperation =
                         fun operation _ _ ->
                             operation.OperationId <- "GetRandom"
                             operation.Summary <- "Generate a random number"
-                            operation.Description <- "Returns a random integer (1-100) and emits it as a structured log entry."
+
+                            operation.Description <-
+                                "Returns a random integer (1-100) and emits it as a structured log entry."
+
+                            Task.CompletedTask
+                )
+            ) ]
+
+      POST
+          [ route "/recordings" (DI.Api.insertRecording recordingsCollection)
+            |> addOpenApi (
+                OpenApiConfig(
+                    requestBody = RequestBody(typeof<RecordingInput>),
+                    configureOperation =
+                        fun operation _ _ ->
+                            operation.OperationId <- "UpsertRecording"
+                            operation.Summary <- "Upsert a recording"
                             Task.CompletedTask
                 )
             ) ] ]
@@ -60,8 +84,7 @@ let main args =
 
     builder.Logging
         .ClearProviders()
-        .AddJsonConsole(fun opts ->
-            opts.JsonWriterOptions <- JsonWriterOptions(Indented = false))
+        .AddJsonConsole(fun opts -> opts.JsonWriterOptions <- JsonWriterOptions(Indented = false))
     |> ignore
 
     builder.Services
@@ -70,15 +93,23 @@ let main args =
     |> _.AddOpenApi()
     |> ignore
 
+    // Ensure this is called before MongoDB setup
+    BsonSerializer.RegisterSerializer(GuidSerializer(GuidRepresentation.Standard))
+
+    let envVars = EnvVars.create ()
+
+    let recordingsCollection =
+        Persistence.buildMongoClient envVars
+        |> Persistence.getMongoDbCollection<Recording> envVars CollectionName
+
     let app = builder.Build()
+
     app
-        // SwaggerUI is registered before routing so it serves its assets at /swagger
-        // without being short-circuited by the Oxpecker not-found handler.
-        |> OpenApi.registerOpenApi
-        |> _.UseRouting()
-        |> _.Use(Default.exceptionMiddleware)
-        |> _.UseOxpecker(endpoints)
-        |> _.Run(Default.notFoundHandler)
+    |> OpenApi.registerOpenApi
+    |> _.UseRouting()
+    |> _.Use(Default.exceptionMiddleware)
+    |> _.UseOxpecker(endpoints recordingsCollection)
+    |> _.Run(Default.notFoundHandler)
 
     app.Run()
-    0 // Exit code
+    0
