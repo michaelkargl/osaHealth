@@ -10,16 +10,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/osaHealth.Api/Functions.fs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osaHealth.Api/Models.fs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osaHealth.Repository/Entities.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osaHealth.Api/CommandHandlers.fs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osaHealth.Api/Commands.fs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osaHealth.Domain/Measures.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/DependencyInjection.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/DependencyInjection.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Models.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Models.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/Program.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Program.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/osaHealth.Framework.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/osaHealth.Framework.fsproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Entities.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Entities.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/osaHealth.Repository.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/osaHealth.Repository.fsproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.slnx" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.slnx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -34,13 +36,17 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/.claude/settings.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/232956db165afead2376c6ff5691e0f8d83964a243164c4346d4bd8e4427aaa7/AsyncTaskMethodBuilderT.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a0bb57407e64e473814b6906c6e2a4cd6622c898e843bb759436eacf23a/FactAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b046c966f166d12263bfa9a0f88fb04f7245ea1851c5e95fec02b96632d2df1/IMongoCollection.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d88f483cd54064393aeea32f68a5d177e889ab9bf10d096ec63b84fd7a2fdf/Routing.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f549490aa3b6c2871619466d156d8feb0faf01877129e4d82bf1467dbde9047/ReplaceOneResult.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/osaHealth.Api/AppEnv.fs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/osaHealth.Api/AppEnv.fs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/osaHealth.Api/CommandHandlers.fs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/osaHealth.Api/Commands.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Api/Models.fs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/osaHealth.Domain/Measures.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Framework/Json.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Framework/Library.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Repository/Entities.fs" root0="FORCE_HIGHLIGHTING" />
@@ -173,7 +179,7 @@
       <workItem from="1781713409978" duration="840000" />
       <workItem from="1781714284482" duration="6125000" />
       <workItem from="1781800771685" duration="899000" />
-      <workItem from="1781801740568" duration="3029000" />
+      <workItem from="1781801740568" duration="10034000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -223,7 +229,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781087587248</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="feat: adds successful Recordings persistence">
+      <option name="closed" value="true" />
+      <created>1781805000798</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1781805000798</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -262,7 +276,8 @@
     <MESSAGE value="chore: moves dapr-eval scripts into a dedicated folder" />
     <MESSAGE value="feat: Adds Framework.Tests project" />
     <MESSAGE value="Merge remote-tracking branch 'origin/main' into spike/osa15-query-api-repl&#10;&#10;# Conflicts:&#10;#&#9;src/.idea/.idea.osaHealth/.idea/indexLayout.xml&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml&#10;#&#9;src/Repl/dapr-query-api/Framework.fsx&#10;#&#9;src/osaHealth.Api/osaHealth.Api.fsproj" />
-    <option name="LAST_COMMIT_MESSAGE" value="Merge remote-tracking branch 'origin/main' into spike/osa15-query-api-repl&#10;&#10;# Conflicts:&#10;#&#9;src/.idea/.idea.osaHealth/.idea/indexLayout.xml&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml&#10;#&#9;src/Repl/dapr-query-api/Framework.fsx&#10;#&#9;src/osaHealth.Api/osaHealth.Api.fsproj" />
+    <MESSAGE value="feat: adds successful Recordings persistence" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: adds successful Recordings persistence" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

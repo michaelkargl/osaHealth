@@ -32,7 +32,7 @@ module Persistence =
     let getMongoDbCollection<'TCollection> (envVars: EnvVars) (collectionName: string) (mongoClient: MongoClient) =
         mongoClient.GetDatabase(envVars.DatabaseName).GetCollection<'TCollection>(collectionName)
 
-let endpoints (recordingsCollection: IMongoCollection<Recording>) =
+let endpoints (recordingsCollection: IMongoCollection<RecordingEntity>) =
     [ route "/" <| text "Hello World!"
 
       GET
@@ -69,7 +69,7 @@ let endpoints (recordingsCollection: IMongoCollection<Recording>) =
           [ route "/recordings" (DI.Api.insertRecording recordingsCollection)
             |> addOpenApi (
                 OpenApiConfig(
-                    requestBody = RequestBody(typeof<RecordingInput>),
+                    requestBody = RequestBody(typeof<RecordingDto>),
                     configureOperation =
                         fun operation _ _ ->
                             operation.OperationId <- "UpsertRecording"
@@ -100,7 +100,7 @@ let main args =
 
     let recordingsCollection =
         Persistence.buildMongoClient envVars
-        |> Persistence.getMongoDbCollection<Recording> envVars CollectionName
+        |> Persistence.getMongoDbCollection<RecordingEntity> envVars CollectionName
 
     let app = builder.Build()
 

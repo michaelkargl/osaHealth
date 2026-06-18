@@ -1,8 +1,8 @@
-module osaHealth.Api.Models
+module osaHealth.Api.Commands
 
 open System
 
-type RecordingDto =
+type UpsertRecordingCommand =
     { Id: Guid
       UserId: string
       DateEpoch: DateTime

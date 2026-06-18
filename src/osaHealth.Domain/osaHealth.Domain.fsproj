@@ -6,18 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Measures.fs" />
         <Compile Include="Entities.fs" />
-        <Compile Include="Mapping.fs" />
-        <Compile Include="Respositories.fs" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="FSharp.UMX" Version="1.1.0" />
-      <PackageReference Include="MongoDB.Driver" Version="3.9.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\osaHealth.Domain\osaHealth.Domain.fsproj" />
     </ItemGroup>
 
 </Project>
