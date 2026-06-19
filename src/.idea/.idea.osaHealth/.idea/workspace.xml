@@ -10,19 +10,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/osaHealth.Api/CommandHandlers.fs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osaHealth.Api/Commands.fs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osaHealth.Domain/Measures.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../docs/coding-guidelines-fsharp.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/coding-guidelines-fsharp.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../docs/glossary.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/glossary.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/indexLayout.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/DependencyInjection.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/DependencyInjection.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Models.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Models.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Program.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Program.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Functions.fs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Mappings.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Mappings.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Entities.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Entities.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/osaHealth.Repository.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/osaHealth.Repository.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.slnx" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.slnx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Mapping.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Mapping.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +77,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -179,7 +176,8 @@
       <workItem from="1781713409978" duration="840000" />
       <workItem from="1781714284482" duration="6125000" />
       <workItem from="1781800771685" duration="899000" />
-      <workItem from="1781801740568" duration="10034000" />
+      <workItem from="1781801740568" duration="10139000" />
+      <workItem from="1781859257672" duration="19786000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -237,7 +235,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781805000798</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="feat: separates the layers by mapping between them">
+      <option name="closed" value="true" />
+      <created>1781811858070</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1781811858070</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -277,7 +283,8 @@
     <MESSAGE value="feat: Adds Framework.Tests project" />
     <MESSAGE value="Merge remote-tracking branch 'origin/main' into spike/osa15-query-api-repl&#10;&#10;# Conflicts:&#10;#&#9;src/.idea/.idea.osaHealth/.idea/indexLayout.xml&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml&#10;#&#9;src/Repl/dapr-query-api/Framework.fsx&#10;#&#9;src/osaHealth.Api/osaHealth.Api.fsproj" />
     <MESSAGE value="feat: adds successful Recordings persistence" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: adds successful Recordings persistence" />
+    <MESSAGE value="feat: separates the layers by mapping between themn" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: separates the layers by mapping between themn" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
