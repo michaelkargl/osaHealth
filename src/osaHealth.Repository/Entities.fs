@@ -18,10 +18,3 @@ type RecordingEntity =
       [<BsonElement("deleted")>]
       Deleted: bool }
 
-module RecordingEntity =
-    let toDomain (entity: RecordingEntity) : Recording =
-        { Id = entity.Id
-          UserId = entity.UserId
-          DateEpoch = entity.DateEpoch
-          UpdatedAt = entity.UpdatedAt
-          Deleted = entity.Deleted }

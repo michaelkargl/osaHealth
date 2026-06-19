@@ -4,6 +4,18 @@
 
 No classes, no inheritance, no interfaces. All dependencies are explicit function parameters. No hidden state, no static initialization with side effects.
 
+## Domain layer — pure functions only
+
+Domain functions must be [pure](glossary.md#pure-function).
+
+The consequences are:
+- **Reproducibility** — a failing customer request can be reconstructed as a deterministic unit test from its inputs alone
+- **Retryability** — domain logic can be safely retried on failure without accumulating side effects
+- **Testability** — no mocks required; pass inputs, assert outputs
+
+**I/O belongs into the** `infrastructure` layer (HTTP, MongoDB).  
+**Time access is** injected as a `now: unit -> DateTime` parameter.
+
 ## Layer boundaries
 
 | Layer | Examples | Rule |
@@ -14,7 +26,22 @@ No classes, no inheritance, no interfaces. All dependencies are explicit functio
 
 The mapping from unbranded → branded happens exactly once: in the command handler, when constructing a domain entity.
 
+## Mapping and data transformation
+
+Each layer boundary has exactly one function that crosses it. No transformation logic leaks into the layer it serves.
+
+| Boundary | Example | Location |
+|---|---|---|
+| HTTP → Application | `Recording.createCommand` | `Api.Mappings` |
+| Application → Domain | UMX tagging (inline) | `CommandHandlers` |
+| Domain → Infrastructure | `Recording.toEntity` | `Repository.Mapping` |
+| Infrastructure → Domain | `RecordingEntity.toDomain` | `Repository.Mapping` |
+
+Both directions live in `Repository.Mapping` — one module (`Recording`) owns both conversions for a given entity.
+
 ## FSharp.UMX — when to use and when not to
+
+See [UMX Measure Types](glossary.md#umx-measure-types) in the glossary.
 
 UMX works on **any primitive** — `Guid`, `string`, `int64`, `float`, etc. The rule is not about the type; it is about coexistence:
 
@@ -55,11 +82,61 @@ type UpsertRecordingCommand = { Id: Guid<RecordingId>; ... }
 
 ## Error handling
 
-Use `Result<'T, 'E>` for expected errors. `failwith` is justified only for:
-- True programmer errors / unreachable branches
-- Persistence-layer DTO → domain failures that signal data corruption (include all IDs and the raw error in the message)
+### Expected errors — `Result<'T, 'E>`
 
-Never use exceptions for control flow. Catch exceptions only at system boundaries.
+Use `Result<'T, 'E>` for any error a caller is expected to handle. Never use exceptions for control flow.
+
+Validation returns `Result<unit, ValidationError list>` — `unit` because validation checks constraints without transforming data; a list so all field errors are collected and returned together rather than short-circuiting at the first failure.
+
+```fsharp
+type ValidationError =
+    | NullOrEmpty of fieldName: string
+    | ConstraintViolation of fieldName: string * reason: string
+```
+
+Collect errors with a list comprehension, then pattern-match on whether any were produced:
+
+```fsharp
+let validate (dto: RecordingDto) : Result<unit, ValidationError list> =
+    let errors = [
+        if String.IsNullOrWhiteSpace dto.UserId then NullOrEmpty "UserId"
+        if dto.UpdatedAt < dto.DateEpoch then ConstraintViolation("UpdatedAt", "must be >= DateEpoch")
+    ]
+    match errors with
+    | [] -> Ok ()
+    | errs -> Error errs
+```
+
+### Programmer errors — `failwith`
+
+`failwith` is justified for two cases only:
+
+- **Unreachable branches** — a match arm that cannot be reached given invariants the type system cannot express
+- **Unrecoverable errors** — situations where the program cannot meaningfully continue and operator intervention is required (missing required configuration, corrupted persisted data with no recovery path); include enough context to diagnose the failure
+
+```fsharp
+// ✅ unrecoverable — operator must fix configuration
+failwith $"Required environment variable '{name}' is not set."
+
+// ✅ unrecoverable — persisted data is in a state the code cannot handle
+failwith $"Failed to convert recording {entity.Id} to domain: {ex.Message}"
+
+// ❌ wrong — recoverable error expressed as an exception
+failwith "UserId is required"  // use ValidationError instead
+```
+
+### System boundaries — exceptions
+
+In pure domain code, exceptions should not happen — there are no external factors (network, disk, database) that could cause one. If an exception surfaces in the domain, it is a bug. Every expected failure — a missing field, a constraint violation — is expressed as a `Result` value, where it appears in the return type and the caller is forced to handle it.
+
+Infrastructure is where external factors live. Network calls fail. Databases go down. Disks fill up. That is why Infrastructure is the only layer that catches exceptions — it is the only layer where they can legitimately occur.
+
+- **HTTP layer** — Oxpecker's `Default.exceptionMiddleware` handles unhandled exceptions globally
+- **Configuration** — `failwith` for missing required environment variables; this is a programmer error, not a runtime one
+
+Do not throw or catch exceptions inside domain or application service code. Return a `Result` instead.
+
+> See also: [Error](glossary.md#error) vs [Exception](glossary.md#exception) in the glossary.
 
 ## Open statement ordering
 

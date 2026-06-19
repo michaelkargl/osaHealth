@@ -12,7 +12,7 @@ let CollectionName = "recordings"
 module Recordings =
     let upsert (collection: IMongoCollection<RecordingEntity>) (recording: Recording) : Task<unit> =
         task {
-            let entity = Mapping.Recordings.toEntity recording
+            let entity = Mapping.Recording.toEntity recording
             let filter = Builders<RecordingEntity>.Filter.Eq("_id", entity.Id)
             let options = ReplaceOptions(IsUpsert = true)
             let! _ = collection.ReplaceOneAsync(filter, entity, options)
