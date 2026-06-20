@@ -14,10 +14,11 @@
         <Compile Include="Queries.fs" />
         <Compile Include="CommandHandlers.fs" />
         <Compile Include="QueryHandlers.fs" />
-        <Compile Include="Mappings.fs" />
+        <Compile Include="Mapping.fs" />
         <Compile Include="Endpoints.fs" />
-        <Compile Include="EnvVars.fs" />
         <Compile Include="DependencyInjection.fs" />
+        <Compile Include="Router.fs" />
+        <Compile Include="EnvVars.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 

@@ -19,7 +19,7 @@ module Recordings =
             ()
         }
     
-    let findAll (collection: IMongoCollection<RecordingEntity>): Task<Recording list> =
+    let listAll (collection: IMongoCollection<RecordingEntity>): Task<Recording list> =
         task {
             let! entities = collection.Find(Builders<RecordingEntity>.Filter.Empty).ToListAsync()
             return entities |> Seq.map Mapping.RecordingEntity.toDomain |> Seq.toList

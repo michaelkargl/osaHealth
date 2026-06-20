@@ -7,9 +7,11 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Logging
 open Oxpecker
 open osaHealth.Api.Commands
+open osaHealth.Api.Queries
 open osaHealth.Api.Mappings
 open osaHealth.Api.Models
 open osaHealth.Api.Validation
+open osaHealth.Domain.Entities
 
 let randomHandler: EndpointHandler =
     fun (ctx: HttpContext) ->
@@ -26,7 +28,7 @@ let insertRecordingHandler (handleCommand: UpsertRecordingCommand -> Task<unit>)
             let! input = ctx.BindJson<RecordingDto>()
 
             match validateInsertRecordingRequest input with
-            | Ok () -> do! input |> Recording.createCommand |> handleCommand
+            | Ok() -> do! input |> Recording.createCommand |> handleCommand
             | Error errors ->
                 let messages =
                     errors
@@ -38,3 +40,11 @@ let insertRecordingHandler (handleCommand: UpsertRecordingCommand -> Task<unit>)
                 return! ctx.WriteJson {| errors = messages |}
         }
         :> Task)
+
+let listRecordingsHandler (handleQuery: ListRecordingsQuery -> Task<Recording list>) : EndpointHandler =
+    fun (ctx: HttpContext) ->
+        (task {
+            let! records = handleQuery ()
+            return! records |> List.map Recording.toDto |> ctx.WriteJson
+        })
+        :> Task
