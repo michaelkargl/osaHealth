@@ -1,6 +1,6 @@
 module osaHealth.Repository.Mapping
 
-open osaHealth.Domain
+open osaHealth.Domain.Entities
 open osaHealth.Repository.Entities
 
 

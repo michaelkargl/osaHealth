@@ -39,6 +39,19 @@ Each layer boundary has exactly one function that crosses it. No transformation 
 
 Both directions live in `Repository.Mapping` — one module (`Recording`) owns both conversions for a given entity.
 
+## Dependency wiring — `DependencyInjection.fs`
+
+`DependencyInjection.fs` contains only wiring. No logic, no validation, no mapping — it composes functions by partial application and hands the result to the endpoint.
+
+```fsharp
+let insertRecording (collection: IMongoCollection<RecordingEntity>) : EndpointHandler =
+    let persist = Recordings.upsert collection
+    let handle = CommandHandlers.Recordings.upsert persist
+    Endpoints.insertRecordingHandler handle
+```
+
+Each line partially applies a dependency into the next layer. That is the entire job of this file.
+
 ## FSharp.UMX — when to use and when not to
 
 See [UMX Measure Types](glossary.md#umx-measure-types) in the glossary.

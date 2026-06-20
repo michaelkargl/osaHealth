@@ -1,4 +1,4 @@
-﻿namespace osaHealth.Domain
+﻿module osaHealth.Domain.Entities
 
 open System
 open Measures

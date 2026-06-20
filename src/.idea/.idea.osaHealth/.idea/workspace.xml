@@ -10,10 +10,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/osaHealth.Api/Queries.fs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../docs/coding-guidelines-fsharp.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/coding-guidelines-fsharp.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../docs/glossary.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/glossary.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Entities.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Entities.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/CommandHandlers.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/CommandHandlers.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/DependencyInjection.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/DependencyInjection.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Domain/Entities.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Domain/Entities.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Mapping.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Mapping.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +44,8 @@
     <setting file="file://$PROJECT_DIR$/osaHealth.Api/CommandHandlers.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Api/Commands.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Api/Models.fs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/osaHealth.Api/Queries.fs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Domain/Measures.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Framework/Json.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Framework/Library.fs" root0="FORCE_HIGHLIGHTING" />
@@ -71,7 +80,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -171,7 +180,9 @@
       <workItem from="1781714284482" duration="6125000" />
       <workItem from="1781800771685" duration="899000" />
       <workItem from="1781801740568" duration="10139000" />
-      <workItem from="1781859257672" duration="21555000" />
+      <workItem from="1781859257672" duration="23048000" />
+      <workItem from="1781933861694" duration="2911000" />
+      <workItem from="1781953644851" duration="5508000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -253,7 +264,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781888729693</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="docs: adds more documentation">
+      <option name="closed" value="true" />
+      <created>1781890560323</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1781890560323</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

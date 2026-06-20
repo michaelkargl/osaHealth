@@ -2,7 +2,7 @@
 
 open System.Threading.Tasks
 open MongoDB.Driver
-open osaHealth.Domain
+open osaHealth.Domain.Entities
 open osaHealth.Repository.Entities
 open osaHealth.Repository
 
@@ -17,4 +17,10 @@ module Recordings =
             let options = ReplaceOptions(IsUpsert = true)
             let! _ = collection.ReplaceOneAsync(filter, entity, options)
             ()
+        }
+    
+    let findAll (collection: IMongoCollection<RecordingEntity>): Task<Recording list> =
+        task {
+            let! entities = collection.Find(Builders<RecordingEntity>.Filter.Empty).ToListAsync()
+            return entities |> Seq.map Mapping.RecordingEntity.toDomain |> Seq.toList
         }
