@@ -144,12 +144,88 @@ In pure domain code, exceptions should not happen — there are no external fact
 
 Infrastructure is where external factors live. Network calls fail. Databases go down. Disks fill up. That is why Infrastructure is the only layer that catches exceptions — it is the only layer where they can legitimately occur.
 
-- **HTTP layer** — Oxpecker's `Default.exceptionMiddleware` handles unhandled exceptions globally
+- **HTTP layer** — a custom `UseExceptionHandler` middleware catches unhandled exceptions and returns `ApiErrorsDto` with status 500; the actual exception is logged server-side and never included in the response
 - **Configuration** — `failwith` for missing required environment variables; this is a programmer error, not a runtime one
 
 Do not throw or catch exceptions inside domain or application service code. Return a `Result` instead.
 
 > See also: [Error](glossary.md#error) vs [Exception](glossary.md#exception) in the glossary.
+
+## Computation expressions
+
+A computation expression (CE) is a block of code that the compiler desugars into a chain of function calls. The block reads as the happy path — the CE handles the plumbing (awaiting tasks, short-circuiting on errors) so the code inside doesn't have to.
+
+Two CEs are used in this codebase:
+
+| CE | Source | Purpose |
+|---|---|---|
+| `task { }` | `FSharp.Core` | Wrap async operations |
+| `result { }` | `FsToolkit.ErrorHandling` | Chain `Result` values, short-circuit on `Error` |
+
+### `task { }` — async
+
+```fsharp
+task {
+    let! recordings = findAll recordingId limit   // await Task<Recording list>, bind result
+    do! persist recording                          // await Task<unit>, discard result
+    return Ok { Items = recordings }              // wrap in completed Task<Result<...>>
+}
+```
+
+| Keyword | Input type | What it does |
+|---|---|---|
+| `let! x = e` | `Task<'T>` | Awaits `e`, binds result to `x` |
+| `do! e` | `Task` | Awaits `e`, discards result |
+| `return v` | `'T` | Wraps `v` in a completed `Task<'T>` |
+| `return! e` | `Task<'T>` | Returns the task directly (no extra wrapping) |
+
+### `result { }` — error short-circuit
+
+```fsharp
+result {
+    let! limit = ctx |> HttpContext.getRequiredIntParam "limit"   // Ok → bind; Error → stop
+    let cursor = ctx |> HttpContext.tryGetQueryParam "cursor"     // plain let, not a Result
+    return (cursor, limit)                                         // wraps in Ok
+}
+```
+
+`let!` is the key operator: if the right-hand side is `Ok x`, execution continues with `x` bound. If it is `Error e`, the entire CE immediately evaluates to `Error e` — no further lines run.
+
+> "Bound" just means "assigned to a name" — the same as a regular `let`. The difference is that `let!` unwraps the `Ok` before assigning, so `x` is the inner value, not `Ok x`.
+
+| Keyword | Input type | What it does |
+|---|---|---|
+| `let! x = e` | `Result<'T, 'E>` | `Ok v` → bind `v` to `x`; `Error e` → short-circuit |
+| `do! e` | `Result<unit, 'E>` | Same as `let!` but discards the `Ok` value |
+| `return v` | `'T` | Wraps `v` in `Ok v` |
+
+The error type `'E` must be consistent across all `let!` bindings in a single `result { }` block.
+
+### Why `result { }` is not in FSharp.Core
+
+`task { }` ships with F# because async is a language-level concern. `result { }` does not — the standard library provides `Result<'T, 'E>` as a type but no CE to chain it. `FsToolkit.ErrorHandling` provides the CE; it is the established community standard for this pattern.
+
+### Anti-patterns
+
+```fsharp
+// ❌ generic bound name — what is 'result'?
+let! result = validateInput dto
+
+// ✅ name the Ok value, not the wrapper
+do! validateInput dto              // Result<unit, _>
+let! recording = findById id       // Result<Recording, _>
+
+// ❌ let! () = is a verbose pattern match on unit — do! already expresses this
+let! () = validateInput dto
+```
+
+```fsharp
+// ❌ .Result blocks the thread inside a task { } — defeats the purpose
+let data = someTask.Result
+
+// ✅ await with let!
+let! data = someTask
+```
 
 ## Open statement ordering
 
