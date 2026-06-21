@@ -19,4 +19,3 @@ module RecordingEntity =
           DateEpoch = entity.DateEpoch
           UpdatedAt = entity.UpdatedAt
           Deleted = entity.Deleted }
-

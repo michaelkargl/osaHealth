@@ -5,3 +5,6 @@ type RecordingId
 
 [<Measure>]
 type UserId
+
+[<Measure>]
+type Base64

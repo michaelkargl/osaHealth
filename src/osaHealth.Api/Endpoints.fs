@@ -11,7 +11,6 @@ open osaHealth.Api.Queries
 open osaHealth.Api.Mappings
 open osaHealth.Api.Models
 open osaHealth.Api.Validation
-open osaHealth.Domain.Entities
 
 let randomHandler: EndpointHandler =
     fun (ctx: HttpContext) ->
@@ -28,7 +27,7 @@ let insertRecordingHandler (handleCommand: UpsertRecordingCommand -> Task<unit>)
             let! input = ctx.BindJson<RecordingDto>()
 
             match validateInsertRecordingRequest input with
-            | Ok() -> do! input |> Recording.createCommand |> handleCommand
+            | Ok() -> do! input |> Recording.toCommand |> handleCommand
             | Error errors ->
                 let messages =
                     errors
@@ -41,10 +40,37 @@ let insertRecordingHandler (handleCommand: UpsertRecordingCommand -> Task<unit>)
         }
         :> Task)
 
-let listRecordingsHandler (handleQuery: ListRecordingsQuery -> Task<Recording list>) : EndpointHandler =
+let listRecordingsHandler
+    (handleQuery: CursorPagedQuery -> Task<ListRecordingsCursorPagedQueryResult>)
+    : EndpointHandler =
     fun (ctx: HttpContext) ->
         (task {
-            let! records = handleQuery ()
-            return! records |> List.map Recording.toDto |> ctx.WriteJson
+            let cursor =
+                match ctx.Request.Query.TryGetValue("cursor") with
+                | true, value -> Some(value.ToString())
+                | false, _ -> None
+
+            let limitResult =
+                match ctx.Request.Query.TryGetValue("limit") with
+                | true, value ->
+                    match Int32.TryParse(value.ToString()) with
+                    | true, num -> Ok num
+                    | false, _ -> Error $"Expected limit parameter to be a valid number but received: {value}"
+                | false, _ -> Error "Parameter 'limit' is required but not provided."
+
+            // TODO: standardize and document error handling
+            // TODO: add input validation
+            // TODO: create framework functions for these
+            match limitResult with
+            | Error msg ->
+                ctx.SetStatusCode 400
+                return! ctx.WriteJson {| error = msg |}
+            | Ok limit ->
+                let! result =
+                    { Cursor = cursor; Limit = limit }
+                    |> handleQuery
+                    |> ListRecordingsCursorPagedQueryResult.toDtoAsync
+
+                return! ctx.WriteJson result
         })
         :> Task

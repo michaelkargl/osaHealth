@@ -1,3 +1,19 @@
 module osaHealth.Api.Queries
 
-type ListRecordingsQuery = unit
+open osaHealth.Domain.Entities
+
+type CursorPagedQuery =
+    {
+        Cursor: string option
+        Limit: int
+    }
+
+type CursorPage<'TItem> =
+    {
+        Items: 'TItem list
+        Cursor: string option
+    }
+
+
+type ListRecordingsCursorPagedQuery = CursorPagedQuery
+type ListRecordingsCursorPagedQueryResult = CursorPage<Recording>

@@ -1,6 +1,8 @@
 module osaHealth.Api.Router
 
+open System.Collections.Generic
 open System.Threading.Tasks
+open Microsoft.OpenApi
 open MongoDB.Driver
 open Oxpecker
 open Oxpecker.OpenApi
@@ -49,6 +51,31 @@ let endpoints (recordingsCollection: IMongoCollection<RecordingEntity>) =
                         fun operation _ _ ->
                             operation.OperationId <- "ListRecordings"
                             operation.Summary <- "Lists all recordings"
+
+                            let parameters: IList<IOpenApiParameter> = List()
+                            
+                            parameters.Add(
+                                OpenApiParameter(
+                                    Name = "cursor",
+                                    In = ParameterLocation.Query,
+                                    Description = "Opaque pagination cursor returned by the previous page",
+                                    Required = false,
+                                    Schema = OpenApiSchema(Type = JsonSchemaType.String)
+                                )
+                            )
+
+                            parameters.Add(
+                                OpenApiParameter(
+                                    Name = "limit",
+                                    In = ParameterLocation.Query,
+                                    Description = "Maximum number of recordings to return",
+                                    Required = true,
+                                    Schema = OpenApiSchema(Type = JsonSchemaType.Number)
+                                )
+                            )
+                            
+                            operation.Parameters <- parameters
+
                             Task.CompletedTask
                 )
             ) ]

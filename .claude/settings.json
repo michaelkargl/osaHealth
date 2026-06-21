@@ -4,5 +4,14 @@
       "type": "sse",
       "url": "http://localhost:9121/sse"
     }
+  },
+  "permissions": {
+    "allow": [
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__initial_instructions",
+      "mcp__serena__activate_project",
+      "mcp__serena__find_symbol",
+      "mcp__serena__get_diagnostics_for_file"
+    ]
   }
 }

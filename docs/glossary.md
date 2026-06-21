@@ -25,6 +25,29 @@ Known smells:
 
 - [Fat DTO](#fat-dto) — a DTO serving multiple consumers, accumulating null fields per caller
 
+### Cursor
+
+A marker that identifies a specific position in a result set. When paginating, the server issues a cursor
+after each page; the client sends it back on the next request to say "continue from here." The name comes
+from the same root as a text cursor — a pointer to a current position.
+
+```
+Result set:  [ 1 ][ 2 ][ 3 ][ 4 ][ 5 ][ 6 ][ 7 ][ 8 ]
+                            ↑
+                         cursor
+                   (last record seen)
+```
+
+*Note: SQL cursors (Oracle, MSSQL) are stateful — the database holds the position between fetches and the
+cursor must be closed when done. API pagination cursors are the inverse: the position is encoded in the
+token and carried by the caller. The server holds nothing.*
+
+See also: [Cursor Pagination](#cursor-pagination), [Keyset Pagination](#keyset-pagination).
+
+### Cursor Pagination
+
+See [Keyset Pagination](#keyset-pagination).
+
 ---
 
 ## D
@@ -61,6 +84,21 @@ boundaries ([Infrastructure Layer](onion-architecture.md#infrastructure-layer)).
 ---
 
 ## O
+
+### Offset Pagination
+
+A pagination strategy where the client requests results by position: *skip the first N records, return the next M*.
+Simple to implement and easy to reason about, but degrades at scale.
+
+As the offset grows, the database scans and discards an increasing number of rows before returning results. At page 1000
+with a page size of 20, the database skips 19,980 rows on every request.
+
+Offset pagination also suffers from **page drift**: if a record is inserted or deleted between two requests, the page
+boundaries shift and the client may see a duplicate or skip a record entirely.
+
+Appropriate for small, stable datasets or when jumping to a specific page number is a product requirement.
+
+See also: [Keyset Pagination](#keyset-pagination), [Pagination](#pagination).
 
 ### Onion Architecture
 
@@ -144,6 +182,52 @@ URL. This must hold for every request without exception.
 
 ---
 
+## K
+
+### Keyset Pagination
+
+A pagination strategy where the client tracks position using an opaque cursor — an encoded pointer to the last record
+seen — rather than a numeric page or row offset.
+
+On each request, the **API** (server) decodes the cursor to a record identifier, queries for records that
+come *after* that identifier (`_id > lastId`), and encodes the last returned record's ID as the next cursor.
+When no cursor is provided, the first page is returned.
+
+The cursor works like a bookmark: the **caller** (client — a mobile app, web frontend, or another service)
+receives it, stores it, and sends it back on the next request without interpreting it. The API is the only
+one who knows what it encodes (opaque cursor). This leaves the API free to change the cursor format without
+breaking callers.
+
+```
+Records:   [ 1 ][ 2 ][ 3 ][ 4 ][ 5 ][ 6 ][ 7 ][ 8 ]
+           └─── page 1 ───┘
+                           ↑ cursor = "abc..."
+
+           GET /recordings?after=abc...
+
+Records:   [ 1 ][ 2 ][ 3 ][ 4 ][ 5 ][ 6 ][ 7 ][ 8 ]
+                           └─── page 2 ───┘
+                                           ↑ cursor = "xyz..."
+```
+
+Each page returns a fresh cursor pointing to the last record on that page. The caller always uses the most
+recent one; earlier cursors are discarded. The cursor is stateless — the API stores nothing between
+requests. The cursor *is* the position, encoded as a string the caller hands back. When there are no more
+records, the API returns `null` for the next cursor. The caller stops paginating — no cleanup required on
+either side.
+
+| Characteristic | Keyset | [Offset Pagination](#offset-pagination) |
+|---|---|---|
+| Query cost as depth grows | O(1) — filtered by index | O(n) — database skips rows |
+| Page drift | None — anchor is a stable record | Present — inserts/deletes shift page contents |
+| Random access | No — cursor is forward-only | Yes — jump to any page number |
+
+Use keyset pagination when the dataset is large, the sort key is stable, and clients page forward sequentially.
+
+See also: [Offset Pagination](#offset-pagination), [Pagination](#pagination).
+
+---
+
 ## M
 
 ### Measure Types
@@ -153,6 +237,16 @@ See [Phantom Types](#phantom-types).
 ---
 
 ## P
+
+### Pagination
+
+The practice of splitting a large result set into smaller, sequentially accessible chunks. Pagination prevents unbounded
+queries and keeps response sizes predictable.
+
+Known pagination techniques:
+
+- [Keyset Pagination](#keyset-pagination) — cursor-based
+- [Offset Pagination](#offset-pagination) — page number or row offset
 
 ### Phantom Types
 
