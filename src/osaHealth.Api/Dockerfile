@@ -1,12 +1,12 @@
 # Build stage — restore and publish the Oxpecker F# service.
-FROM mcr.microsoft.com/dotnet/sdk:11.0.100-preview.4 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 COPY . .
 RUN dotnet publish osaHealth.Api/osaHealth.Api.fsproj -c Release -o /app
 
 # Runtime stage — minimal ASP.NET Core image.
-FROM mcr.microsoft.com/dotnet/aspnet:11.0.0-preview.4 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 COPY --from=build /app .
 
