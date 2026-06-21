@@ -8,13 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="ErrorHandling.fs" />
         <Compile Include="Models.fs" />
-        <Compile Include="Validation.fs" />
         <Compile Include="Commands.fs" />
         <Compile Include="Queries.fs" />
+        <Compile Include="Validation.fs" />
         <Compile Include="CommandHandlers.fs" />
         <Compile Include="QueryHandlers.fs" />
         <Compile Include="Mapping.fs" />
+        <Compile Include="Framework\Http.fs" />
         <Compile Include="Endpoints.fs" />
         <Compile Include="DependencyInjection.fs" />
         <Compile Include="Router.fs" />
@@ -32,6 +34,7 @@
              but Oxpecker 2.0.1 requires assembly 10.0.0.0. Update overrides the SDK implicit
              reference without creating a duplicate that NuGet silently loses. -->
         <PackageReference Update="FSharp.Core" Version="10.1.301" />
+        <PackageReference Include="FsToolkit.ErrorHandling" Version="5.2.0" />
         <PackageReference Include="Oxpecker" Version="2.0.1" />
         <PackageReference Include="Oxpecker.OpenApi" Version="2.1.2" />
         <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />

@@ -3,6 +3,7 @@ module osaHealth.Api.Mappings
 open System.Threading.Tasks
 open FSharp.UMX
 open osaHealth.Api.Commands
+open osaHealth.Api.ErrorHandling
 open osaHealth.Api.Models
 open osaHealth.Api.Queries
 open osaHealth.Domain.Entities

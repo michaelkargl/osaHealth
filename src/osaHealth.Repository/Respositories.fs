@@ -16,6 +16,7 @@ module Recordings =
     let upsert (collection: IMongoCollection<RecordingEntity>) (recording: Recording) : Task<unit> =
         task {
             let entity = Recording.toEntity recording
+             // TODO: replace "_id" magic string with a typed field reference (BsonFields module)
             let filter = Builders<RecordingEntity>.Filter.Eq("_id", entity.Id)
             let options = ReplaceOptions(IsUpsert = true)
             let! _ = collection.ReplaceOneAsync(filter, entity, options)
@@ -33,7 +34,8 @@ module Recordings =
                 | Some recordingId -> Builders<RecordingEntity>.Filter.Gt(_.Id, recordingId)
                 | None -> Builders<RecordingEntity>.Filter.Empty
 
-            // TODO: can we get rid of this magic string here somehow?
+             // TODO: replace "_id" magic string with a typed field reference (BsonFields module)
+             // TODO: switch cursor field from _id to compound (updatedAt, _id) for chronological pagination stability
             let sort = Builders<RecordingEntity>.Sort.Ascending("_id")
 
             let! entities = collection.Find(filter).Sort(sort).Limit(limit).ToListAsync()
