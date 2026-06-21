@@ -11,9 +11,9 @@
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/../docs/coding-guidelines-fsharp.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/coding-guidelines-fsharp.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/AppEnv.fs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Mapping.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Mapping.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,7 +34,6 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d88f483cd54064393aeea32f68a5d177e889ab9bf10d096ec63b84fd7a2fdf/Routing.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f549490aa3b6c2871619466d156d8feb0faf01877129e4d82bf1467dbde9047/ReplaceOneResult.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../.claude/settings.json" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/osaHealth.Api/AppEnv.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Api/CommandHandlers.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Api/Commands.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Api/ErrorHandling.fs" root0="FORCE_HIGHLIGHTING" />
@@ -184,7 +183,7 @@
       <workItem from="1782027892052" duration="6898000" />
       <workItem from="1782034866869" duration="23948000" />
       <workItem from="1782062592473" duration="3407000" />
-      <workItem from="1782066104983" duration="3557000" />
+      <workItem from="1782066104983" duration="4202000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -314,7 +313,23 @@
       <option name="project" value="LOCAL" />
       <updated>1782068351905</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="feat: adds exception handling">
+      <option name="closed" value="true" />
+      <created>1782069693786</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1782069693786</updated>
+    </task>
+    <task id="LOCAL-00018" summary="docs: documents computational expressions">
+      <option name="closed" value="true" />
+      <created>1782069705636</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1782069705636</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -362,7 +377,8 @@
     <MESSAGE value="feat: implements cursor token pagination" />
     <MESSAGE value="feat: adds error handling" />
     <MESSAGE value="feat: adds exception handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: adds exception handling" />
+    <MESSAGE value="docs: documents computational expressions" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: documents computational expressions" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

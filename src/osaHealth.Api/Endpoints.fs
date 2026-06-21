@@ -5,7 +5,6 @@ open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Logging
-open FSharp.Core
 open Oxpecker
 open FsToolkit.ErrorHandling
 open osaHealth.Api.Commands

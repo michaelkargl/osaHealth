@@ -46,8 +46,8 @@ Both directions live in `Repository.Mapping` — one module (`Recording`) owns b
 ```fsharp
 let insertRecording (collection: IMongoCollection<RecordingEntity>) : EndpointHandler =
     let persist = Recordings.upsert collection
-    let handle = CommandHandlers.Recordings.upsert persist
-    Endpoints.insertRecordingHandler handle
+    let handleCommand = CommandHandlers.handleUpsertRecordingCommand persist
+    Endpoints.insertRecordingHandler handleCommand
 ```
 
 Each line partially applies a dependency into the next layer. That is the entire job of this file.
@@ -99,24 +99,18 @@ type UpsertRecordingCommand = { Id: Guid<RecordingId>; ... }
 
 Use `Result<'T, 'E>` for any error a caller is expected to handle. Never use exceptions for control flow.
 
-Validation returns `Result<unit, ValidationError list>` — `unit` because validation checks constraints without transforming data; a list so all field errors are collected and returned together rather than short-circuiting at the first failure.
-
-```fsharp
-type ValidationError =
-    | NullOrEmpty of fieldName: string
-    | ConstraintViolation of fieldName: string * reason: string
-```
+Validation returns `Result<unit, ApiError list>` — `unit` because validation checks constraints without transforming data; a list so all field errors are collected and returned together rather than short-circuiting at the first failure.
 
 Collect errors with a list comprehension, then pattern-match on whether any were produced:
 
 ```fsharp
-let validate (dto: RecordingDto) : Result<unit, ValidationError list> =
+let validateInsertRecordingRequest (dto: RecordingDto) : Result<unit, ApiError list> =
     let errors = [
-        if String.IsNullOrWhiteSpace dto.UserId then NullOrEmpty "UserId"
-        if dto.UpdatedAt < dto.DateEpoch then ConstraintViolation("UpdatedAt", "must be >= DateEpoch")
+        if String.IsNullOrWhiteSpace dto.UserId then ApiError.FieldMissingOrEmpty "UserId"
+        if dto.UpdatedAt < dto.DateEpoch then ApiError.ConstraintViolation("UpdatedAt", "must be >= DateEpoch")
     ]
     match errors with
-    | [] -> Ok ()
+    | [] -> Ok()
     | errs -> Error errs
 ```
 
