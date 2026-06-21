@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:11.0.100-preview.4 AS build
 WORKDIR /src
 
 COPY . .
-RUN dotnet publish osaHealth.Api.fsproj -c Release -o /app
+RUN dotnet publish osaHealth.Api/osaHealth.Api.fsproj -c Release -o /app
 
 # Runtime stage — minimal ASP.NET Core image.
 FROM mcr.microsoft.com/dotnet/aspnet:11.0.0-preview.4 AS runtime

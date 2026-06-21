@@ -88,7 +88,8 @@ services:
   # which must match the sidecar's --app-port.
   api:
     build:
-      context: ./src/osaHealth.Api
+      context: ./src
+      dockerfile: ./osaHealth.Api/Dockerfile
     ports:
       - 13500:3500
       # 8080 is the app's Kestrel port; published so the Swagger UI at
