@@ -36,7 +36,7 @@ services:
     volumes:
       - ./components:/components:ro
     ports:
-      - "3500:3500"
+      - "13500:3500"
     depends_on:
       repl-mongo:
         condition: service_healthy

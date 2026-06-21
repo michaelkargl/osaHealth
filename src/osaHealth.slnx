@@ -1,3 +1,7 @@
 <Solution>
   <Project Path="osaHealth.Api/osaHealth.Api.fsproj" />
+  <Project Path="osaHealth.Domain/osaHealth.Domain.fsproj" />
+  <Project Path="osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj" />
+  <Project Path="osaHealth.Framework/osaHealth.Framework.fsproj" />
+  <Project Path="osaHealth.Repository/osaHealth.Repository.fsproj" />
 </Solution>

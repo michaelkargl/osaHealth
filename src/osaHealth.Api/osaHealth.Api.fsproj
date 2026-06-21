@@ -1,17 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net11.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <Nullable>enable</Nullable>
         <LangVersion>latestmajor</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="ErrorHandling.fs" />
+        <Compile Include="Framework\Http.fs" />
+        <Compile Include="Models.fs" />
+        <Compile Include="Commands.fs" />
+        <Compile Include="Queries.fs" />
+        <Compile Include="Validation.fs" />
+        <Compile Include="CommandHandlers.fs" />
+        <Compile Include="QueryHandlers.fs" />
+        <Compile Include="Mapping.fs" />
+        <Compile Include="Endpoints.fs" />
+        <Compile Include="DependencyInjection.fs" />
+        <Compile Include="Router.fs" />
+        <Compile Include="EnvVars.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\osaHealth.Domain\osaHealth.Domain.fsproj" />
+        <ProjectReference Include="..\osaHealth.Repository\osaHealth.Repository.fsproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Pin via Update (not Include): FSharp.UMX (transitive) resolves FSharp.Core to 9.0.0.0,
+             but Oxpecker 2.0.1 requires assembly 10.0.0.0. Update overrides the SDK implicit
+             reference without creating a duplicate that NuGet silently loses. -->
+        <PackageReference Update="FSharp.Core" Version="10.1.301" />
+        <PackageReference Include="FsToolkit.ErrorHandling" Version="5.2.0" />
         <PackageReference Include="Oxpecker" Version="2.0.1" />
         <PackageReference Include="Oxpecker.OpenApi" Version="2.1.2" />
         <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />

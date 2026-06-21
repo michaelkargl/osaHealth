@@ -8,12 +8,15 @@
 
 #r "nuget: Argu"
 #r "nuget: FSharp.UMX"
-#load "Framework.fsx"
+
+// Requires: dotnet build ../../osaHealth.Framework/osaHealth.Framework.fsproj
+#r @"../../osaHealth.Framework/bin/Debug/net11.0/osaHealth.Framework.dll"
 
 open System.Net
 open System.Threading.Tasks
 open Argu
-open Framework
+open osaHealth.Framework
+open osaHealth.Framework.Api
 open FSharp.UMX
 
 type CliArguments =
