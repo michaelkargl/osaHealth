@@ -2,11 +2,24 @@ module osaHealth.Api.Framework.Http
 
 open System
 open System.Threading.Tasks
+open Microsoft.AspNetCore.Diagnostics
 open Microsoft.AspNetCore.Http
+open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.Logging
 open Oxpecker
 open osaHealth.Api.ErrorHandling
 
 module HttpContext =
+
+    let tryGetRaisedException (ctx: HttpContext) : exn option =
+        let feature = ctx.Features.Get<IExceptionHandlerFeature>()
+
+        match feature with
+        | null -> None
+        | f -> Some f.Error
+
+    let getLogger (scope: string) (ctx: HttpContext) : ILogger =
+        ctx.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger(scope)
 
     let tryGetQueryParam (key: string) (ctx: HttpContext) : string option =
         ctx.Request.Query.TryGetValue(key)

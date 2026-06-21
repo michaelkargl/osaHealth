@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <Compile Include="ErrorHandling.fs" />
+        <Compile Include="Framework\Http.fs" />
         <Compile Include="Models.fs" />
         <Compile Include="Commands.fs" />
         <Compile Include="Queries.fs" />
@@ -16,7 +17,6 @@
         <Compile Include="CommandHandlers.fs" />
         <Compile Include="QueryHandlers.fs" />
         <Compile Include="Mapping.fs" />
-        <Compile Include="Framework\Http.fs" />
         <Compile Include="Endpoints.fs" />
         <Compile Include="DependencyInjection.fs" />
         <Compile Include="Router.fs" />

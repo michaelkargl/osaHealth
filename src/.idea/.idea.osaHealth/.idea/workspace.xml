@@ -10,17 +10,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/osaHealth.Api/ErrorHandling.fs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osaHealth.Api/Framework/Http.fs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osaHealth.Domain/ErrorHandling.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../docs/coding-guidelines-fsharp.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/coding-guidelines-fsharp.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/CommandHandlers.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/CommandHandlers.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Mapping.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Mapping.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Validation.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Validation.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Domain/osaHealth.Domain.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Domain/osaHealth.Domain.fsproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -192,6 +184,7 @@
       <workItem from="1782027892052" duration="6898000" />
       <workItem from="1782034866869" duration="23948000" />
       <workItem from="1782062592473" duration="3407000" />
+      <workItem from="1782066104983" duration="3557000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -305,7 +298,23 @@
       <option name="project" value="LOCAL" />
       <updated>1782050203659</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="feat: adds error handling">
+      <option name="closed" value="true" />
+      <created>1782066130488</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1782066130488</updated>
+    </task>
+    <task id="LOCAL-00016" summary="feat: adds exception handling">
+      <option name="closed" value="true" />
+      <created>1782068351905</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1782068351905</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -351,7 +360,9 @@
     <MESSAGE value="feat: adds unfinished query handling" />
     <MESSAGE value="feat: implements listAll endpoint (without cursor)" />
     <MESSAGE value="feat: implements cursor token pagination" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: implements cursor token pagination" />
+    <MESSAGE value="feat: adds error handling" />
+    <MESSAGE value="feat: adds exception handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: adds exception handling" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

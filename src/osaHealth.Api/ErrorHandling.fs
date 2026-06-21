@@ -2,6 +2,7 @@ module osaHealth.Api.ErrorHandling
 
 open osaHealth.Domain.ErrorHandling
 
+
 type ApiError =
     | FieldMissingOrEmpty of fieldName: string
     | ConstraintViolation of fieldName: string * reason: string
@@ -43,11 +44,10 @@ module DomainError =
         | DomainError.NotFound(entity, id) -> ApiError.NotFound(entity, id)
         | DomainError.Conflict reason -> ApiError.ConstraintViolation("", reason)
         | DomainError.InvalidState reason -> ApiError.ConstraintViolation("", reason)
-    
-    let toApiErrors (error: DomainError): ApiError list =
-        [ (toApiError error) ]
-        
-    let toHttpResponse (error: DomainError): int * ApiError list =
+
+    let toApiErrors (error: DomainError) : ApiError list = [ (toApiError error) ]
+
+    let toHttpResponse (error: DomainError) : int * ApiError list =
         match error with
         | DomainError.NotFound _ -> 404, toApiErrors error
         | DomainError.Conflict _ -> 409, toApiErrors error

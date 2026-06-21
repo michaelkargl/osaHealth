@@ -1,6 +1,5 @@
 ﻿module osaHealth.Repositories
 
-open System
 open System.Threading.Tasks
 open MongoDB.Driver
 open FSharp.UMX
@@ -16,8 +15,7 @@ module Recordings =
     let upsert (collection: IMongoCollection<RecordingEntity>) (recording: Recording) : Task<unit> =
         task {
             let entity = Recording.toEntity recording
-             // TODO: replace "_id" magic string with a typed field reference (BsonFields module)
-            let filter = Builders<RecordingEntity>.Filter.Eq("_id", entity.Id)
+            let filter = Builders<RecordingEntity>.Filter.Eq(_.Id, entity.Id)
             let options = ReplaceOptions(IsUpsert = true)
             let! _ = collection.ReplaceOneAsync(filter, entity, options)
             ()
