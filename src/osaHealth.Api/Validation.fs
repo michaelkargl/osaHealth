@@ -15,12 +15,21 @@ let validateInsertRecordingRequest (dto: RecordingDto) : Result<unit, ApiError l
     | [] -> Ok()
     | errs -> Error errs
 
-let validateListRecordingsQuery (cursor: string option) (limit: int): Result<unit, ApiError list> =
-    let errors = [
-        if limit < 1 then ApiError.ConstraintViolation("limit", "must be > 0")
-        if cursor |> Option.exists String.IsNullOrWhiteSpace then ApiError.FieldMissingOrEmpty "cursor"
-    ]
-    
+let validateListRecordingsRequest
+    (userId: string)
+    (from: DateTime option)
+    (``to``: DateTime option)
+    (cursor: string option)
+    (limit: int)
+    : Result<unit, ApiError list> =
+    let errors =
+        [ if String.IsNullOrWhiteSpace userId then ApiError.FieldMissingOrEmpty "userid"
+          if limit < 1 then ApiError.ConstraintViolation("limit", "must be > 0")
+          if cursor |> Option.exists String.IsNullOrWhiteSpace then ApiError.FieldMissingOrEmpty "cursor"
+          match from, ``to`` with
+          | Some f, Some t when f > t -> ApiError.ConstraintViolation("from", "must be <= to")
+          | _ -> () ]
+
     match errors with
     | [] -> Ok()
-    | e -> Error e
+    | errs -> Error errs

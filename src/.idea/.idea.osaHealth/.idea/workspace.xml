@@ -9,7 +9,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="" />
+    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../docs/glossary.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/glossary.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../infrastructure/hindsight/public/Invoke-HindsightConsolidation.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/../infrastructure/hindsight/public/Invoke-HindsightConsolidation.ps1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/indexLayout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/DependencyInjection.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/DependencyInjection.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Mapping.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Mapping.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Models.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Models.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Queries.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Queries.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Validation.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Validation.fs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -54,27 +66,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.osaHealth.Api.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Project.osaHealth.Api.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Project.osaHealth.Framework.Tests.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;b0a507d4-ebb4-4d5d-8f26-bf2953c7f540.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;spike/osa15-query-api-repl&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.osaHealth.Api.executor": "Run",
+    ".NET Project.osaHealth.Api.executor": "Run",
+    ".NET Project.osaHealth.Framework.Tests.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "b0a507d4-ebb4-4d5d-8f26-bf2953c7f540.executor": "Debug",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Launch Settings Profile.osaHealth.Api">
     <configuration name="osaHealth.Framework.Tests" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="$PROJECT_DIR$/osaHealth.Framework.Tests/bin/Debug/net10.0/osaHealth.Framework.Tests.dll" />

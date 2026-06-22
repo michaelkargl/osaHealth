@@ -13,5 +13,5 @@ module Api =
 
     let listRecordings (collection: IMongoCollection<RecordingEntity>) : EndpointHandler =
         let listAll = Repositories.Recordings.listAll collection
-        let handleQuery = QueryHandlers.handleRecordingCursorPagedQuery listAll
+        let handleQuery = QueryHandlers.handleListRecordingsQuery listAll
         Api.Endpoints.listRecordingsHandler handleQuery

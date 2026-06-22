@@ -25,14 +25,14 @@ module Recording =
 
     let toDtoList (recordings: Recording list) : RecordingDto list = recordings |> List.map toDto
 
-module ListRecordingsCursorPagedQueryResult =
-    let toDto (result: ListRecordingsCursorPagedQueryResult) : ListRecordingsCursorPagedQueryResultDto =
-        { Cursor = result.Cursor
+module ListRecordingsQueryResult =
+    let toDto (result: ListRecordingsQueryResult) : ListRecordingsQueryResultDto =
+        { NextCursor = result.NextCursor
           Items = result.Items |> Recording.toDtoList }
 
     let toDtoAsync
-        (resultTask: Task<ListRecordingsCursorPagedQueryResult>)
-        : Task<ListRecordingsCursorPagedQueryResultDto> =
+        (resultTask: Task<ListRecordingsQueryResult>)
+        : Task<ListRecordingsQueryResultDto> =
         task {
             let! result = resultTask
             return result |> toDto

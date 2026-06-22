@@ -9,10 +9,10 @@ type RecordingDto =
       UpdatedAt: DateTime
       Deleted: bool }
 
-type CursorPageDto<'TItemDto> =
+type PageDto<'TItemDto> =
     {
         Items: 'TItemDto list
-        Cursor: string option
+        NextCursor: string option
     }
 
-type ListRecordingsCursorPagedQueryResultDto = CursorPageDto<RecordingDto>
+type ListRecordingsQueryResultDto = PageDto<RecordingDto>

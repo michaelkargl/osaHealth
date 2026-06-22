@@ -21,21 +21,21 @@ module private CursorToken =
     let encode (id: Guid) : string<Base64> =
         id.ToByteArray() |> Convert.ToBase64String |> UMX.tag
 
-let handleRecordingCursorPagedQuery
+let handleListRecordingsQuery
     (findAll: Guid<RecordingId> option -> int -> Task<Recording list>)
-    (query: ListRecordingsCursorPagedQuery)
-    : Task<Result<ListRecordingsCursorPagedQueryResult, DomainError>> =
+    (query: ListRecordingsQuery)
+    : Task<Result<ListRecordingsQueryResult, DomainError>> =
     task {
         let recordingId =
-            query.Cursor
+            query.Page.Cursor
             |> Option.map UMX.tag<Base64>
             |> CursorToken.tryDecode
             |> Option.map UMX.tag<RecordingId>
 
-        let! recordings = findAll recordingId query.Limit
+        let! recordings = findAll recordingId query.Page.Limit
 
         let nextCursor =
-            if recordings.Length < query.Limit then
+            if recordings.Length < query.Page.Limit then
                 None
             else
                 recordings
@@ -48,6 +48,6 @@ let handleRecordingCursorPagedQuery
 
         return
             Ok
-                { Cursor = nextCursor
+                { NextCursor = nextCursor
                   Items = recordings }
     }

@@ -126,6 +126,35 @@ See [onion-architecture.md](onion-architecture.md) for the full explanation and 
 
 ## F
 
+### Fake
+
+**Input matters.** A fake has actual working logic — simpler than the real implementation, but not
+hardwired to a fixed response. Write to it and then read from it, and you get back what you wrote.
+
+A [stub](#stub) ignores its inputs entirely. A fake processes them:
+
+```fsharp
+let store = Dictionary<Guid, Recording>()
+
+let fakeUpsert (recording: Recording) =
+    store[UMX.untag recording.Id] <- recording
+    Task.FromResult ()
+
+let fakeFindAll _ limit =
+    store.Values |> Seq.truncate limit |> Seq.toList |> Task.FromResult
+```
+
+| Double | Input matters? | Verifies calls? |
+|--------|----------------|-----------------|
+| Stub   | No             | No              |
+| Fake   | Yes            | No              |
+| Mock   | Either         | Yes             |
+
+Use a fake when test cases depend on data written by earlier steps — upsert then list, write then read.
+A stub cannot do this because it ignores the write and always returns the same fixed response.
+
+See also: [Stub](#stub), [Mock](#mock).
+
 ### Fat DTO
 
 A DTO that serves multiple consumers — typically multiple endpoints or delivery mechanisms (HTTP, gRPC, CLI) — causing
@@ -234,6 +263,39 @@ See also: [Offset Pagination](#offset-pagination), [Pagination](#pagination).
 
 See [Phantom Types](#phantom-types).
 
+### Mock
+
+**Verifies interactions.** A mock records how it was called — number of calls, argument values, call
+order — and can fail the test if those expectations were not met. The defining characteristic is
+*verification*, not implementation.
+
+```fsharp
+let calls = ResizeArray<UpsertRecordingCommand>()
+
+let mockPersist (cmd: UpsertRecordingCommand) =
+    calls.Add(cmd)
+    Task.FromResult (Ok ())
+
+// After the handler runs...
+Assert.Equal(1, calls.Count)
+Assert.Equal(expectedCommand, calls[0])
+```
+
+| Double | Input matters? | Verifies calls? |
+|--------|----------------|-----------------|
+| Stub   | No             | No              |
+| Fake   | Yes            | No              |
+| Mock   | Either         | Yes             |
+
+A mock does not need to have [fake](#fake) behaviour. The simplest mock is a [stub](#stub) that also
+records calls. A mock can have fake behaviour too — but that is a design choice, not the definition.
+
+In osaHealth, because dependencies are plain functions, mocks are rarely needed. A `ResizeArray` that
+captures calls (in test code only) is enough when interaction verification matters — no mocking
+framework required.
+
+See also: [Stub](#stub), [Fake](#fake).
+
 ---
 
 ## P
@@ -296,6 +358,32 @@ with `DateTime.UtcNow` inside domain logic.
 ### Smells
 
 See [Code Smells](#code-smells).
+
+### Stub
+
+**Input is irrelevant.** A stub returns the same pre-configured response no matter what you pass in.
+The goal is to satisfy a dependency so the unit under test can run in isolation — nothing more.
+
+```fsharp
+// Production — real MongoDB query
+let findAll = Recordings.listAll collection
+
+// Stub — always returns an empty page; input is ignored
+let findAllStub _ _ = Task.FromResult ([] : Recording list)
+```
+
+The `_` parameters are not inspected. Pass in any cursor, any limit — the stub does not care.
+
+| Double | Input matters? | Verifies calls? |
+|--------|----------------|-----------------|
+| Stub   | No             | No              |
+| Fake   | Yes            | No              |
+| Mock   | Either         | Yes             |
+
+In osaHealth, stubs are plain F# functions passed as arguments. Because dependencies are injected as
+function parameters, a lambda is all you need — no mocking framework required.
+
+See also: [Fake](#fake), [Mock](#mock), [Pure function](#pure-function).
 
 ---
 

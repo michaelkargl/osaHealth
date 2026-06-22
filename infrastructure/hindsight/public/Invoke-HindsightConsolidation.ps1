@@ -42,7 +42,7 @@ function Invoke-HindsightConsolidation {
 
     $endpoint = "$HindsightUrl/v1/default/banks/$BankId/consolidate"
 
-    if ($PSCmdlet.ShouldProcess($endpoint, "POST — trigger consolidation")) {
+    if ($PSCmdlet.ShouldProcess($endpoint, "POST - trigger consolidation")) {
         $response = Invoke-RestMethod -Method POST -Uri $endpoint -ContentType 'application/json'
         Write-Host "Consolidation triggered for bank '$BankId'."
         Write-Host ($response | ConvertTo-Json -Depth 5)

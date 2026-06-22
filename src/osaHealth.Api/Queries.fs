@@ -1,19 +1,24 @@
 module osaHealth.Api.Queries
 
+open System
+open FSharp.UMX
 open osaHealth.Domain.Entities
+open osaHealth.Domain.Measures
 
-type CursorPagedQuery =
-    {
-        Cursor: string option
-        Limit: int
-    }
+type PageQuery = { Cursor: string option; Limit: int }
 
-type CursorPage<'TItem> =
+type Page<'TItem> =
     {
         Items: 'TItem list
-        Cursor: string option
+        NextCursor: string option
     }
 
+type ListRecordingsQuery =
+    {
+        Page: PageQuery
+        UserId: string<UserId>
+        From: DateTime option
+        To: DateTime option
+    }
 
-type ListRecordingsCursorPagedQuery = CursorPagedQuery
-type ListRecordingsCursorPagedQueryResult = CursorPage<Recording>
+type ListRecordingsQueryResult = Page<Recording>
