@@ -6,15 +6,34 @@ open MongoDB.Bson.Serialization.Attributes
 open osaHealth.Domain
 open osaHealth.Domain.Measures
 
+
+module RecordingEntity =
+    module BsonFieldNames =
+        [<Literal>]
+        let Id = "_id"
+        
+        [<Literal>]
+        let UserId = "user_id"
+        
+        [<Literal>]
+        let DateEpoch = "date_epoch"
+        
+        [<Literal>]
+        let UpdatedAt = "updated_at"
+
+        [<Literal>]
+        let Deleted = "deleted"
+
+
 type RecordingEntity =
     { [<BsonId>]
       Id: Guid<RecordingId>
-      [<BsonElement("user_id")>]
+      [<BsonElement(RecordingEntity.BsonFieldNames.UserId)>]
       UserId: string<UserId>
-      [<BsonElement("date_epoch")>]
+      [<BsonElement(RecordingEntity.BsonFieldNames.DateEpoch)>]
       DateEpoch: DateTime
-      [<BsonElement("updated_at")>]
+      [<BsonElement(RecordingEntity.BsonFieldNames.UpdatedAt)>]
       UpdatedAt: DateTime
-      [<BsonElement("deleted")>]
+      [<BsonElement(RecordingEntity.BsonFieldNames.Deleted)>]
       Deleted: bool }
 

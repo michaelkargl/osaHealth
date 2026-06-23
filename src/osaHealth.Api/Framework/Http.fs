@@ -27,6 +27,14 @@ module HttpContext =
             | true, value -> value.ToString() |> Some
             | false, _ -> None
 
+    let tryGetDateTimeQueryParam (key: string) (ctx: HttpContext) : Result<DateTime option, ApiError> =
+        match ctx |> tryGetQueryParam key with
+        | None -> Ok None
+        | Some s ->
+            match DateTimeOffset.TryParse s with
+            | true, dt -> Ok(Some dt.UtcDateTime)
+            | false, _ -> Error(InvalidFormat(key, s))
+
     let getRequiredStringParam (key: string) (ctx: HttpContext) : Result<string, ApiError> =
         tryGetQueryParam key ctx
         |> function

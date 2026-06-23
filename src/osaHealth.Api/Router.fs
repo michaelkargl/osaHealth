@@ -6,10 +6,13 @@ open Microsoft.OpenApi
 open MongoDB.Driver
 open Oxpecker
 open Oxpecker.OpenApi
+open osaHealth.Api.Endpoints
 open osaHealth.Api.Models
 open osaHealth.Repository.Entities
 
 module DI = osaHealth.Api.DependencyInjection
+
+
 
 let endpoints (recordingsCollection: IMongoCollection<RecordingEntity>) =
     [ route "/" <| text "Hello World!"
@@ -53,10 +56,37 @@ let endpoints (recordingsCollection: IMongoCollection<RecordingEntity>) =
                             operation.Summary <- "Lists all recordings"
 
                             let parameters: IList<IOpenApiParameter> = List()
-                            
+
                             parameters.Add(
                                 OpenApiParameter(
-                                    Name = "cursor",
+                                    Name = ListRecordings.QueryParams.UserId,
+                                    In = ParameterLocation.Query,
+                                    Required = true,
+                                    Schema = OpenApiSchema(Type = JsonSchemaType.String)
+                                )
+                            )
+
+                            parameters.Add(
+                                OpenApiParameter(
+                                    Name = ListRecordings.QueryParams.From,
+                                    In = ParameterLocation.Query,
+                                    Required = false,
+                                    Schema = OpenApiSchema(Type = JsonSchemaType.String)
+                                )
+                            )
+
+                            parameters.Add(
+                                OpenApiParameter(
+                                    Name = ListRecordings.QueryParams.To,
+                                    In = ParameterLocation.Query,
+                                    Required = false,
+                                    Schema = OpenApiSchema(Type = JsonSchemaType.String)
+                                )
+                            )
+
+                            parameters.Add(
+                                OpenApiParameter(
+                                    Name = ListRecordings.QueryParams.Cursor,
                                     In = ParameterLocation.Query,
                                     Description = "Opaque pagination cursor returned by the previous page",
                                     Required = false,
@@ -66,14 +96,14 @@ let endpoints (recordingsCollection: IMongoCollection<RecordingEntity>) =
 
                             parameters.Add(
                                 OpenApiParameter(
-                                    Name = "limit",
+                                    Name = ListRecordings.QueryParams.Limit,
                                     In = ParameterLocation.Query,
                                     Description = "Maximum number of recordings to return",
                                     Required = true,
                                     Schema = OpenApiSchema(Type = JsonSchemaType.Number)
                                 )
                             )
-                            
+
                             operation.Parameters <- parameters
 
                             Task.CompletedTask

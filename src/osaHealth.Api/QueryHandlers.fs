@@ -22,7 +22,7 @@ module private CursorToken =
         id.ToByteArray() |> Convert.ToBase64String |> UMX.tag
 
 let handleListRecordingsQuery
-    (findAll: Guid<RecordingId> option -> int -> Task<Recording list>)
+    (findAll: string<UserId> -> DateTime option -> DateTime option -> Guid<RecordingId> option -> int -> Task<Recording list>)
     (query: ListRecordingsQuery)
     : Task<Result<ListRecordingsQueryResult, DomainError>> =
     task {
@@ -32,7 +32,7 @@ let handleListRecordingsQuery
             |> CursorToken.tryDecode
             |> Option.map UMX.tag<RecordingId>
 
-        let! recordings = findAll recordingId query.Page.Limit
+        let! recordings = findAll query.UserId query.From query.To recordingId query.Page.Limit
 
         let nextCursor =
             if recordings.Length < query.Page.Limit then

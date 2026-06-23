@@ -1,5 +1,6 @@
 ﻿module osaHealth.Repositories
 
+open System
 open System.Threading.Tasks
 open MongoDB.Driver
 open FSharp.UMX
@@ -8,6 +9,7 @@ open osaHealth.Domain.Entities
 open osaHealth.Repository.Entities
 open osaHealth.Repository.Mapping
 
+// TODO: shouldn't this be a configurable string?
 [<Literal>]
 let CollectionName = "recordings"
 
@@ -23,20 +25,36 @@ module Recordings =
 
     let listAll
         (collection: IMongoCollection<RecordingEntity>)
+        (userId: string<UserId>)
+        (from: DateTime option)
+        (``to``: DateTime option)
         (after: Guid<RecordingId> option)
         (limit: int)
         : Task<Recording list> =
         task {
             let filter =
-                match after with
-                | Some recordingId -> Builders<RecordingEntity>.Filter.Gt(_.Id, recordingId)
-                | None -> Builders<RecordingEntity>.Filter.Empty
+                [ Builders<RecordingEntity>.Filter.Eq(RecordingEntity.BsonFieldNames.UserId, userId)
+                  |> Some
 
-             // TODO: replace "_id" magic string with a typed field reference (BsonFields module)
-             // TODO: switch cursor field from _id to compound (updatedAt, _id) for chronological pagination stability
-            let sort = Builders<RecordingEntity>.Sort.Ascending("_id")
+                  after
+                  |> Option.map (fun a -> Builders<RecordingEntity>.Filter.Gt(RecordingEntity.BsonFieldNames.Id, a))
 
-            let! entities = collection.Find(filter).Sort(sort).Limit(limit).ToListAsync()
+                  from
+                  |> Option.map (fun f ->
+                      Builders<RecordingEntity>.Filter.Gte(RecordingEntity.BsonFieldNames.DateEpoch, f))
 
-            return entities |> Seq.map RecordingEntity.toDomain |> Seq.toList
+                  ``to``
+                  |> Option.map (fun t ->
+                      Builders<RecordingEntity>.Filter.Lte(RecordingEntity.BsonFieldNames.DateEpoch, t)) ]
+                |> List.choose id
+                |> Builders<RecordingEntity>.Filter.And
+
+            let! query =
+                collection
+                    .Find(filter)
+                    .Sort(Builders<RecordingEntity>.Sort.Ascending(RecordingEntity.BsonFieldNames.DateEpoch))
+                    .Limit(limit)
+                    .ToListAsync()
+
+            return query |> Seq.map RecordingEntity.toDomain |> Seq.toList
         }
