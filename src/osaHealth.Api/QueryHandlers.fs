@@ -50,7 +50,7 @@ let handleListRecordingsQuery
             |> CursorToken.tryDecode
             |> Option.map (fun (date, id) -> (date, id |> UMX.tag))
 
-        let! recordings = findAll query.UserId query.From query.To cursorToken query.Page.Limit
+        let! recordings = findAll (query.UserId |> UMX.tag<UserId>) query.From query.To cursorToken query.Page.Limit
 
         let nextCursor =
             if recordings.Length < query.Page.Limit then

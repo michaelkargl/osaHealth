@@ -10,11 +10,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../docs/coding-guidelines-fsharp.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/coding-guidelines-fsharp.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../docs/onion-architecture.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/onion-architecture.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Queries.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Queries.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Validation.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Validation.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -198,7 +199,7 @@
       <workItem from="1782034866869" duration="23948000" />
       <workItem from="1782062592473" duration="3407000" />
       <workItem from="1782066104983" duration="4583000" />
-      <workItem from="1782206534627" duration="33713000" />
+      <workItem from="1782206534627" duration="37054000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -384,7 +385,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782293919271</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="feat: fixes encoding/decoding of cursor token">
+      <option name="closed" value="true" />
+      <created>1782298821239</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1782298821239</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -437,7 +446,8 @@
     <MESSAGE value="feat: refactors the listRecordsQuery to have userId and to/from dates" />
     <MESSAGE value="feat: implements additional request properties" />
     <MESSAGE value="docs: create pagination documentation" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs: create pagination documentation" />
+    <MESSAGE value="feat: fixes encoding/decoding of cursor token" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: fixes encoding/decoding of cursor token" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

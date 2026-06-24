@@ -1,9 +1,7 @@
 module osaHealth.Api.Queries
 
 open System
-open FSharp.UMX
-open osaHealth.Domain.Entities
-open osaHealth.Domain.Measures
+  open osaHealth.Domain.Entities
 
 type PageQuery = { Cursor: string option; Limit: int }
 
@@ -16,7 +14,7 @@ type Page<'TItem> =
 type ListRecordingsQuery =
     {
         Page: PageQuery
-        UserId: string<UserId>
+        UserId: string
         From: DateTime option
         To: DateTime option
     }
