@@ -4,6 +4,27 @@
 
 No classes, no inheritance, no interfaces. All dependencies are explicit function parameters. No hidden state, no static initialization with side effects.
 
+## Curried parameters over tuples
+
+Default to curried parameters for any function that is a dependency or is partially applied:
+
+```fsharp
+// ✅ curried — partially applicable, composes with |>
+let encode (date: DateTime) (id: Guid) : string<Base64> = ...
+
+// ❌ tupled — forces all args at once, cannot be partially applied
+let encode (date: DateTime, id: Guid) : string<Base64> = ...
+```
+
+Curried functions are how dependency injection works in this codebase — `DependencyInjection.fs` partially applies infrastructure dependencies into handlers one argument at a time. A tupled dependency cannot be partially applied.
+
+Tuples are appropriate when the values are genuinely grouped and always travel together — a return type, a matched pair, or a case where partial application makes no sense:
+
+```fsharp
+// ✅ tuple as return — these values belong together as one result
+let parseQueryParams ctx : Result<string * DateTime option * DateTime option, ApiError> = ...
+```
+
 ## Domain layer — pure functions only
 
 Domain functions must be [pure](glossary.md#pure-function).
@@ -20,11 +41,13 @@ The consequences are:
 
 | Layer | Examples | Rule |
 |---|---|---|
-| HTTP (DTOs) | `RecordingInput` | Plain .NET primitives (`Guid`, `string`, `DateTime`) |
+| HTTP (DTOs) | `RecordingInput` | Plain .NET primitives (`Guid`, `string`, `DateTime`); nested record types are fine — see note below |
 | Application (Commands/Queries) | `UpsertRecordingCommand` | Plain .NET primitives — no domain branding |
 | Domain / Persistence | `Recording` | Branded types, BSON attributes |
 
 The mapping from unbranded → branded happens exactly once: in the command handler, when constructing a domain entity.
+
+> **"Plain primitives" means leaf types, not flat structure.** A Command or Query can nest record types freely (e.g. `ListRecordingsQuery` has a `Page: PageQuery` field). The constraint is on what a field's type *drags in as a dependency* — a nested record defined in the same assembly is fine; `string<UserId>` is not, because it forces every consumer to reference `FSharp.UMX`.
 
 ## Mapping and data transformation
 
@@ -80,7 +103,7 @@ type UserId = string<UserId>  // add this when AccessToken, RefreshToken etc. ap
 
 ### Layer rule
 
-Brand at the **domain/persistence layer** where the types live long enough to get confused. Do not brand at the command or DTO layer — commands are short-lived and flow in one direction, so propagating measures upward only creates coupling.
+Brand at the **domain/persistence layer** where the types live long enough to get confused. Do not brand at the command or DTO layer. The reason is dependency coupling: a Command or Query is a contract into the application core — any caller (HTTP handler, test, CLI) must be able to construct it. A branded field forces every consumer to reference the branding library (`FSharp.UMX`). Plain primitives keep the contract constructible with the BCL alone.
 
 ```fsharp
 // ✅ correct — tagging happens once, at the entity construction boundary
@@ -149,12 +172,13 @@ Do not throw or catch exceptions inside domain or application service code. Retu
 
 A computation expression (CE) is a block of code that the compiler desugars into a chain of function calls. The block reads as the happy path — the CE handles the plumbing (awaiting tasks, short-circuiting on errors) so the code inside doesn't have to.
 
-Two CEs are used in this codebase:
+Three CEs are used in this codebase:
 
 | CE | Source | Purpose |
 |---|---|---|
 | `task { }` | `FSharp.Core` | Wrap async operations |
 | `result { }` | `FsToolkit.ErrorHandling` | Chain `Result` values, short-circuit on `Error` |
+| `taskResult { }` | `FsToolkit.ErrorHandling` | Combine both — await *and* short-circuit on `Error` |
 
 ### `task { }` — async
 
@@ -194,6 +218,40 @@ result {
 | `return v` | `'T` | Wraps `v` in `Ok v` |
 
 The error type `'E` must be consistent across all `let!` bindings in a single `result { }` block.
+
+### `taskResult { }` — async + error short-circuit
+
+Use when a handler needs to both await async operations *and* short-circuit on the first `Error`. A single `let!` awaits the `Task` *and* unwraps the `Ok` — two things in one operator.
+
+```fsharp
+taskResult {
+    let! user =
+        findUserReturningOk userId                   // Task<Result<User, DbError>>
+        |> TaskResult.mapError (fun e -> e.Message)  // normalise the error to a string
+
+    let! recording =
+        findRecordingReturningError user             // Task<Result<Recording, DbError>>
+        |> TaskResult.mapError (fun e -> e.Message)
+    // ^ Error → the block short-circuits HERE; nothing below runs
+
+    do!
+        markAsReadReturningOk recording              // do! awaits Task<Result<unit, _>>, discards Ok ()
+        |> TaskResult.mapError (fun e -> e.Message)
+
+    return recording
+}
+// one handler for whatever error bubbled up — it only ever sees the message string
+|> TaskResult.mapError (fun errorMessage -> logger.LogError errorMessage)
+```
+
+Each inner `TaskResult.mapError` normalises the step's error type to `string`. This keeps the single terminal handler at the bottom simple — it only needs to handle one unified error shape. Map above; keep the bottom handler simple.
+
+| Helper | Purpose |
+|---|---|
+| `TaskResult.ofResult` | Lift a plain `Result` into `Task<Result>` so it composes inside the block |
+| `TaskResult.mapError` | Transform the error type — required when combining steps that produce different error shapes |
+
+The error type `'E` must be consistent across all `let!` / `do!` bindings in a single `taskResult { }` block. Use `TaskResult.mapError` to unify error shapes before binding.
 
 ### Why `result { }` is not in FSharp.Core
 

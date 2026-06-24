@@ -128,7 +128,7 @@ In osaHealth: `osaHealth.Api`.
 | Validate the request (`validateInsertRecordingRequest`) | Business rules — those belong in [Domain Model Layer](#domain-model-layer) |
 | Map input to a command (`Recording.createCommand`) | Calling the database directly — that is [Infrastructure Layer](#infrastructure-layer)'s job |
 | Apply UMX tags when constructing a domain type | BSON attributes, MongoDB driver types |
-| Handle HTTP request / response | |
+| Handle HTTP request / response | Domain-branded types (`string<UserId>`) in Commands/Queries — see [UMX layer rule](coding-guidelines-fsharp.md#layer-rule) |
 | Wire dependencies via partial application | |
 
 ### Domain Services Layer
