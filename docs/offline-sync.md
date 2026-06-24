@@ -157,7 +157,14 @@ sequenceDiagram
 
 ### Tie-breaking
 
-If two recordings share the same `updated_ms` value, a simple `updated_ms > cursor` query will silently skip one of them. The compound cursor `(updated_ms, id)` handles this: MongoDB's `_id` (ObjectId) is inherently monotonic, so ties are broken by insertion order.
+If two recordings share the same `updated_ms` value, a simple `updated_ms > cursor` query will silently skip one of them. The compound cursor `(updated_ms, id)` handles this because `_id` is **unique and stable** — no two rows can share the same `(updated_ms, _id)` pair, so ties are always broken. The tiebreaker only needs to be **unique and stable** — no two rows share the same
+`(updated_ms, _id)` pair, and the Id never changes once assigned. The Ids carry no time
+ordering of their own; that does not matter, because the tiebreaker's only job is to
+distinguish two rows that share the same timestamp.
+
+- **Stable** — the Id assigned to a row never changes. The cursor encodes it, so it must still point to the same row on the next request.
+
+See also: [Compound Cursor](glossary.md#compound-cursor) in the glossary.
 
 ```javascript
 db.recordings.find({

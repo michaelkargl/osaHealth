@@ -71,7 +71,7 @@ db.recordings.find({
 }).sort({ updated_ms: 1, _id: 1 }).limit(N)
 ```
 
-The compound cursor `(updated_ms, _id)` handles ties — two recordings written within the same millisecond — because MongoDB's `_id` (ObjectId) is inherently monotonic and unique.
+The compound cursor `(updated_ms, _id)` handles ties — two recordings written within the same millisecond — because `_id` is **unique and stable**. No two rows can share the same `(updated_ms, _id)` pair, so ties are always broken. The tiebreaker does not need to be monotonic or time-ordered; uniqueness is sufficient.
 
 A compound index on `(userId, updated_ms, _id)` covers the filter and sort without a collection scan.
 
