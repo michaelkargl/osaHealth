@@ -1,25 +1,33 @@
 module osaHealth.Api.QueryHandlers
 
 open System
+open System.Buffers.Text
 open System.Threading.Tasks
 open FSharp.UMX
+open FsToolkit.ErrorHandling
 open osaHealth.Api.Queries
 open osaHealth.Domain.Entities
 open osaHealth.Domain.ErrorHandling
 open osaHealth.Domain.Measures
 
-module private CursorToken =
-    let decode (token: string<Base64>) : (DateTime * Guid) =
-        // byte index:   0        7  8                     23
-        //               ├────────┤  ├──────────────────────┤
-        //                DateTicks   Guid (16 bytes)
-        //               (Int64, 8B)
-        let tokenBytes = token |> UMX.untag |> Convert.FromBase64String
-        let ticks = BitConverter.ToInt64(tokenBytes, 0)
-        let date = DateTime(ticks, DateTimeKind.Utc)
-        let id = Guid(tokenBytes[8..])
+module private CursorToken =    
+    let decode (token: string<Base64>) : Result<(DateTime * Guid), DomainError> =
+        result {
+            // byte index:   0        7  8                     23
+            //               ├────────┤  ├──────────────────────┤
+            //                DateTicks   Guid (16 bytes)
+            //               (Int64, 8B)
+            let token = token |> UMX.untag
+            
+            
+            if not (Convert.TryFromBase64 (token, Span(buffer))) 
+            let tokenBytes = token |> UMX.untag |> Convert.FromBase64String
+            let ticks = BitConverter.ToInt64(tokenBytes, 0)
+            let date = DateTime(ticks, DateTimeKind.Utc)
+            let id = Guid(tokenBytes[8..])
 
-        (date, id)
+            return Ok (date, id)
+        }
 
     let tryDecode (token: string<Base64> option) : (DateTime * Guid) option =
         match token |> Option.map UMX.untag with

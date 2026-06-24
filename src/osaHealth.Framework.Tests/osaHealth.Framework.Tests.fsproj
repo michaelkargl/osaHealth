@@ -9,6 +9,7 @@
     <ItemGroup>
         <Compile Include="Scenario.Tests.fs" />
         <Compile Include="Json.Tests.fs" />
+        <Compile Include="String.Tests.fs" />
         <None Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
