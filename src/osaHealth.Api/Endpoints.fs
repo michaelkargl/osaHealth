@@ -99,7 +99,7 @@ module ListRecordings =
                     |> handleQuery
                     |> TaskResult.mapError DomainError.toHttpResponse
 
-                queryResult |> ListRecordingsQueryResult.toDto |> ctx.WriteJson |> ignore
+                do! queryResult |> ListRecordingsQueryResult.toDto |> ctx.WriteJson
 
              }
              |> TaskResult.mapError (fun (statusCode, errors) -> ctx |> HttpContext.writeErrors statusCode errors))

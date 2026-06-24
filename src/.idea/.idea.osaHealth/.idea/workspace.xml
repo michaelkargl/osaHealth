@@ -11,12 +11,9 @@
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/DependencyInjection.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/DependencyInjection.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Endpoints.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Framework/Http.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Framework/Http.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Router.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Router.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Entities.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Entities.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Validation.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Validation.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -28,6 +25,11 @@
     <option name="firstShow" value="false" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
@@ -82,7 +84,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "b0a507d4-ebb4-4d5d-8f26-bf2953c7f540.executor": "Debug",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "feat/adds-additional-filters-to-list-recordings-endpoint",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -196,7 +198,7 @@
       <workItem from="1782034866869" duration="23948000" />
       <workItem from="1782062592473" duration="3407000" />
       <workItem from="1782066104983" duration="4583000" />
-      <workItem from="1782206534627" duration="16425000" />
+      <workItem from="1782206534627" duration="33713000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -358,7 +360,31 @@
       <option name="project" value="LOCAL" />
       <updated>1782135734916</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="feat: implements additional request properties">
+      <option name="closed" value="true" />
+      <created>1782224065436</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1782224065436</updated>
+    </task>
+    <task id="LOCAL-00022" summary="feat: implements additional request properties">
+      <option name="closed" value="true" />
+      <created>1782293915274</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1782293915274</updated>
+    </task>
+    <task id="LOCAL-00023" summary="docs: create pagination documentation">
+      <option name="closed" value="true" />
+      <created>1782293919271</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1782293919271</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -377,7 +403,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="spike/osa15-query-api-repl" />
+                        <option value="main" />
                       </list>
                     </value>
                   </entry>
@@ -409,7 +435,9 @@
     <MESSAGE value="docs: documents computational expressions" />
     <MESSAGE value="chore: peer reviewing fixes" />
     <MESSAGE value="feat: refactors the listRecordsQuery to have userId and to/from dates" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: refactors the listRecordsQuery to have userId and to/from dates" />
+    <MESSAGE value="feat: implements additional request properties" />
+    <MESSAGE value="docs: create pagination documentation" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: create pagination documentation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
