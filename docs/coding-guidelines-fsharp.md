@@ -286,6 +286,10 @@ Three tiers, no blank lines between tiers, alphabetical within each:
 2. Framework namespaces, parent before child
 3. Project-specific, shared before specific
 
+## Compiler confidence
+
+F# has a strong compiler. Exhaustive pattern-match warnings, unused-binding errors, and missing-open diagnostics are caught before the code reaches review. A review comment that duplicates a compiler warning wastes the author's attention. Let the compiler carry what it can; focus review attention on what it cannot see: architectural fit, domain-rule correctness, error-path coverage, and layer-boundary discipline.
+
 ## Null safety
 
 No nulls. Use `option<'T>` and `Result<'T, 'E>`. No `Option.Value`, no `unbox`. Pattern match explicitly.
