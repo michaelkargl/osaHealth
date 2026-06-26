@@ -10,7 +10,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="" />
+    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -229,7 +232,7 @@
       <workItem from="1782066104983" duration="4583000" />
       <workItem from="1782206534627" duration="68063000" />
       <workItem from="1782385274771" duration="9769000" />
-      <workItem from="1782457882444" duration="42789000" />
+      <workItem from="1782457882444" duration="44217000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -543,7 +546,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782500474273</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="feat: corrects InvalidCursor error handling to resolve in 400 error code instead of payment required">
+      <option name="closed" value="true" />
+      <created>1782501108394</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1782501108394</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -579,7 +590,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="docs: adds more documentation" />
     <MESSAGE value="feat: adds unfinished query handling" />
     <MESSAGE value="feat: implements listAll endpoint (without cursor)" />
     <MESSAGE value="feat: implements cursor token pagination" />
@@ -604,7 +614,8 @@
     <MESSAGE value="feat: increases test output to have more infos in CI" />
     <MESSAGE value="feat: enables steps to inject context information" />
     <MESSAGE value="feat: corrects backend database ADR" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: corrects backend database ADR" />
+    <MESSAGE value="feat: corrects InvalidCursor error handling to resolve in 400 error code instead of payment required" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: corrects InvalidCursor error handling to resolve in 400 error code instead of payment required" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
