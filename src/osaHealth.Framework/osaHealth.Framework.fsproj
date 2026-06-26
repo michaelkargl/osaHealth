@@ -10,6 +10,8 @@
         <Compile Include="Library.fs"/>
         <Compile Include="Json.fs" />
         <Compile Include="StringUtil.fs" />
+        <Compile Include="DateTime.fs" />
+        <Compile Include="Guid.fs" />
         <Compile Include="Api.fs" />
         <Compile Include="Dapr.fs" />
         <Compile Include="Testing\Bdd.fs" />

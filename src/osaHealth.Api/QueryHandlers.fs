@@ -1,39 +1,48 @@
 module osaHealth.Api.QueryHandlers
 
 open System
-open System.Buffers.Text
 open System.Threading.Tasks
 open FSharp.UMX
 open FsToolkit.ErrorHandling
+open osaHealth.Framework
 open osaHealth.Api.Queries
 open osaHealth.Domain.Entities
 open osaHealth.Domain.ErrorHandling
 open osaHealth.Domain.Measures
 
-module private CursorToken =    
+module private CursorToken =
     let decode (token: string<Base64>) : Result<(DateTime * Guid), DomainError> =
         result {
+            let rawToken = token |> UMX.untag
+
+            let! bytes =
+                match StringUtil.tryFromBase64 rawToken with
+                | None | Some [||] ->
+                    Error (DomainError.InvalidCursor (rawToken, "invalid base64"))
+                | Some bytes -> Ok bytes
+
             // byte index:   0        7  8                     23
             //               ├────────┤  ├──────────────────────┤
             //                DateTicks   Guid (16 bytes)
             //               (Int64, 8B)
-            let token = token |> UMX.untag
-            
-            
-            if not (Convert.TryFromBase64 (token, Span(buffer))) 
-            let tokenBytes = token |> UMX.untag |> Convert.FromBase64String
-            let ticks = BitConverter.ToInt64(tokenBytes, 0)
-            let date = DateTime(ticks, DateTimeKind.Utc)
-            let id = Guid(tokenBytes[8..])
+            let! date =
+                match DateTime.tryParseUtc bytes 0 with
+                | Some dt -> Ok dt
+                | None -> Error (DomainError.InvalidCursor (rawToken, "invalid date ticks"))
 
-            return Ok (date, id)
+            let! id =
+                match Guid.tryParse bytes 8 with
+                | Some guid -> Ok guid
+                | None -> Error (DomainError.InvalidCursor (rawToken, "invalid guid"))
+
+            return (date, id)
         }
 
     let tryDecode (token: string<Base64> option) : (DateTime * Guid) option =
         match token |> Option.map UMX.untag with
         | None -> None
         | Some token when String.IsNullOrWhiteSpace token -> None
-        | Some token -> token |> UMX.tag<Base64> |> decode |> Some
+        | Some token -> token |> UMX.tag<Base64> |> decode |> Result.toOption
 
     let encode (date: DateTime) (id: Guid) : string<Base64> =
         let tickBytes = BitConverter.GetBytes(date.Ticks) // int64 / 8 = 8 bytes

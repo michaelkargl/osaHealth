@@ -9,17 +9,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/String.Tests.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.claude/skills/code-review/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/../.claude/skills/code-review/SKILL.md" afterDir="false" />
+    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="Merge branch 'feat/adds-additional-filters-to-list-recordings-endpoint' of https://github.com/michaelkargl/osaHealth into feat/adds-additional-filters-to-list-recordings-endpoint&#10;&#10;# Conflicts:&#10;#&#9;.claude/skills/code-review/SKILL.md&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml">
+      <change afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/DateTime.Tests.fs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osaHealth.Framework/DateTime.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Domain/ErrorHandling.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Domain/ErrorHandling.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/Json.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/Json.Tests.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/Scenario.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/Scenario.Tests.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/StringUtil.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/StringUtil.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/Testing/Bdd.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/Testing/Bdd.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/Library.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/Library.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/osaHealth.Framework.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/osaHealth.Framework.fsproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +41,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2f2b1d92f1ffcf2dabd664473f8c9dafa6039595ac228ce4b75a0f1619c5991/AsyncTaskMethodBuilderT.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4d431e535966d3e8d58aed86698f4938fdfbde11da876f5c3a222aa8c29b1/Task.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/69bc68e9420a6e628e801fd8651369ad2af3593c76dcc11a4270ec68d/ExecutionContext.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9282df70362b17ffae24d589dffe1e9bc7a730f1d7622551e6e964f/MethodBaseInvoker.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9821d52e54ff1a7d7dd80bd13626e1a2be123c42826b59db5a2bdb156dc87/SortDefinition.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9971d1c65cfdf3da1549dd688d6854cabfbb979db4704ead46e5c4a524ddc6/SortDefinitionBuilder.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a0bb57407e64e473814b6906c6e2a4cd6622c898e843bb759436eacf23a/FactAttribute.cs" root0="SKIP_HIGHLIGHTING" />
@@ -51,6 +50,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/cdaaa5868173abd92f9d4bfd17abc59484f63cbd2c6bc6a8ba4b7c6aa24b713a/IFindFluent.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d88f483cd54064393aeea32f68a5d177e889ab9bf10d096ec63b84fd7a2fdf/Routing.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/dd54c6832d8c4bec23fde3446bb82d90d06c8b4d5f21f3d5c11ed57ec702a/prim-types.fs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f491c956cc4165e9c1f6c97ffd56544de55a4f233dcbb77061d21b6db70dfb/list.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f549490aa3b6c2871619466d156d8feb0faf01877129e4d82bf1467dbde9047/ReplaceOneResult.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../.claude/settings.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Api/CommandHandlers.fs" root0="FORCE_HIGHLIGHTING" />
@@ -63,6 +63,7 @@
     <setting file="file://$PROJECT_DIR$/osaHealth.Domain/ErrorHandling.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Domain/Measures.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Framework.Tests/String.Tests.fs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/osaHealth.Framework/DateTime.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Framework/Json.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Framework/Library.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Repository/Entities.fs" root0="FORCE_HIGHLIGHTING" />
@@ -206,6 +207,7 @@
       <workItem from="1782066104983" duration="4583000" />
       <workItem from="1782206534627" duration="68063000" />
       <workItem from="1782385274771" duration="9769000" />
+      <workItem from="1782457882444" duration="7397000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
