@@ -293,3 +293,59 @@ F# has a strong compiler. Exhaustive pattern-match warnings, unused-binding erro
 ## Null safety
 
 No nulls. Use `option<'T>` and `Result<'T, 'E>`. No `Option.Value`, no `unbox`. Pattern match explicitly.
+
+## Testing — Given/When/Then scenarios
+
+Tests are written as Given/When/Then scenarios using the in-house `Bdd.Scenario` framework. Each feature gets its own **feature file** (the scenarios) and **step file** (the reusable step functions and the context record).
+
+### One assertion per test
+
+A scenario verifies **one behavior** and ends with **one `THEN`** carrying a single assertion. A trailing `AND` is permitted only for a trivial guard — a null / non-null check, or an HTTP status check that is a precondition for reading the `THEN`.
+
+Do **not** chain `WHEN → THEN → WHEN → THEN`. That shape is a god-test: it verifies several behaviors at once, so a failure no longer points at one thing and the scenario can't be named for the behavior it covers.
+
+When the behavior is inherently a **sequence** (pagination, a multi-step workflow, a state machine), do not fragment it into multiple `THEN`s and do not split it into separate tests — splitting drops the cross-step assertion that *is* the behavior. Instead absorb the whole sequence into the `WHEN` and assert the end state once:
+
+```fsharp
+// ❌ god-test — multiple behaviors, ambiguous failure
+|> WHEN "the first page is requested" ...
+|> THEN "it holds the same-date pair" ...
+|> WHEN "the second page is requested with the cursor" ...
+|> THEN "it holds the remaining recording" ...
+|> AND  "all rows appear across both pages" ...
+
+// ✅ the sequence lives in the WHEN; one behavior, one assertion
+|> WHEN "every page is fetched by following the cursor" (fun ctx ->
+    // loop GET /recordings?...&cursor=… until NextCursor is None,
+    // accumulating ids into ctx.AllItems
+    ...)
+|> THEN "each recording appears exactly once, ordered by (date, id)" (fun ctx ->
+    Assert.Equal<string list>(expectedOrderFrom ctx.SeededRecordings, ctx.AllItems)
+    ctx)
+```
+
+The single equality catches both a skipped row and a duplicated row — a stronger regression lock than either the multi-`THEN` or the split-test version.
+
+### Steps operate only on the context record
+
+Step lambdas receive the context record as their parameter and must read and write **only** that record. They must not close over values declared outside the scenario — the context record *is* the channel between steps.
+
+- `GIVEN` steps **set** fields (seeded entities, configuration).
+- `WHEN` steps **read** inputs from the context, call the system under test, and **set** the result fields.
+- `THEN` steps read context fields for **both sides** of the assertion — expected values come from what a `GIVEN` seeded, never from an outer-scope binding.
+
+```fsharp
+// ❌ closes over an outer-scope binding — hidden dependency, not reusable
+let expectedIds = [ idA; idB ]
+|> THEN "..." (fun ctx -> Assert.Equal<_>(expectedIds, ctx.PageItems); ctx)
+
+// ✅ expected value was seeded into the context by a GIVEN
+|> GIVEN "two recordings with the same date" (fun ctx ->
+    { ctx with SeededRecordings = [ recordingA; recordingB ] })
+|> THEN "..." (fun ctx ->
+    Assert.Equal<_>(ctx.SeededRecordings |> List.map _.Id, ctx.PageItems); ctx)
+```
+
+### Step wording
+
+Steps read as plain sentences. Avoid abbreviations and cryptic shorthand; split a compound precondition into separate `GIVEN`/`AND` steps rather than packing it into one cryptic line.

@@ -229,7 +229,7 @@
       <workItem from="1782066104983" duration="4583000" />
       <workItem from="1782206534627" duration="68063000" />
       <workItem from="1782385274771" duration="9769000" />
-      <workItem from="1782457882444" duration="34140000" />
+      <workItem from="1782457882444" duration="42321000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -519,7 +519,23 @@
       <option name="project" value="LOCAL" />
       <updated>1782492094593</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="feat: increases test output to have more infos in CI">
+      <option name="closed" value="true" />
+      <created>1782492469010</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1782492469010</updated>
+    </task>
+    <task id="LOCAL-00038" summary="feat: enables steps to inject context information">
+      <option name="closed" value="true" />
+      <created>1782500147139</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1782500147139</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -555,8 +571,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat: adds successful Recordings persistence" />
-    <MESSAGE value="feat: separates the layers by mapping between themn" />
     <MESSAGE value="feat: adds validation and error handling" />
     <MESSAGE value="docs: adds more documentation" />
     <MESSAGE value="feat: adds unfinished query handling" />
@@ -580,7 +594,9 @@
     <MESSAGE value="feat: implements xunit logging and output capture" />
     <MESSAGE value="feat: Adds first version of end to end tests" />
     <MESSAGE value="ci: add dotnet test job for Framework and Api integration tests&#10;&#10;- Run Framework.Tests for unit tests (DateTime, Guid, Domain logic)&#10;- Run Api.Tests integration tests (list-recordings compound cursor &amp; filters)&#10;- Tests require Docker; ubuntu-latest runner has Docker preinstalled for Testcontainers.MongoDb&#10;&#10;Co-Authored-By: Claude Sonnet 4.6 &lt;noreply@anthropic.com&gt;" />
-    <option name="LAST_COMMIT_MESSAGE" value="ci: add dotnet test job for Framework and Api integration tests&#10;&#10;- Run Framework.Tests for unit tests (DateTime, Guid, Domain logic)&#10;- Run Api.Tests integration tests (list-recordings compound cursor &amp; filters)&#10;- Tests require Docker; ubuntu-latest runner has Docker preinstalled for Testcontainers.MongoDb&#10;&#10;Co-Authored-By: Claude Sonnet 4.6 &lt;noreply@anthropic.com&gt;" />
+    <MESSAGE value="feat: increases test output to have more infos in CI" />
+    <MESSAGE value="feat: enables steps to inject context information" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enables steps to inject context information" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

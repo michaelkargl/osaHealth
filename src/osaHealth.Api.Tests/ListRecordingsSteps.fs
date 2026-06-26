@@ -16,15 +16,20 @@ open Xunit
 type Context =
     { Collection: IMongoCollection<RecordingEntity>
       Client: HttpClient
+      UserId: string
+      From: DateTime option
+      To: DateTime option
       Items: JsonElement list
       NextCursor: string option }
 
-let mkRecording (id: Guid) (userId: string) (dateEpoch: DateTime) : Recording =
+let createRecording (id: Guid) (userId: string) (dateEpoch: DateTime) : Recording =
     { Id = id |> UMX.tag<RecordingId>
       UserId = userId |> UMX.tag<UserId>
       DateEpoch = dateEpoch
       UpdatedAt = DateTime.UtcNow
       Deleted = false }
+
+let recordingId (recording: Recording) : Guid = UMX.untag recording.Id
 
 let seed (recordings: Recording list) (ctx: Context) : Task<Context> =
     task {
@@ -42,9 +47,9 @@ let private buildUrl (userId: string) (limit: int) (cursor: string option) (from
     |> String.concat "&"
     |> sprintf "/recordings?%s"
 
-let requestPage (userId: string) (limit: int) (cursor: string option) (from: DateTime option) (``to``: DateTime option) (ctx: Context) : Task<Context> =
+let private fetch (client: HttpClient) (url: string) : Task<JsonElement list * string option> =
     task {
-        let! response = ctx.Client.GetAsync(buildUrl userId limit cursor from ``to``)
+        let! response = client.GetAsync(url)
         Assert.Equal(HttpStatusCode.OK, response.StatusCode)
 
         let! body = response.Content.ReadAsStringAsync()
@@ -57,7 +62,31 @@ let requestPage (userId: string) (limit: int) (cursor: string option) (from: Dat
             let el = doc.RootElement.GetProperty("nextCursor")
             if el.ValueKind = JsonValueKind.Null then None else el.GetString() |> Some
 
+        return items, nextCursor
+    }
+
+let requestPage (userId: string) (limit: int) (cursor: string option) (from: DateTime option) (``to``: DateTime option) (ctx: Context) : Task<Context> =
+    task {
+        let! items, nextCursor = fetch ctx.Client (buildUrl userId limit cursor from ``to``)
         return { ctx with Items = items; NextCursor = nextCursor }
+    }
+
+/// Fetches every page by following the cursor until it runs out, accumulating all items in order.
+/// The page walk lives here (inside the WHEN step) so scenarios keep a single end-state THEN
+/// instead of a when/then/when/then chain. See docs/coding-guidelines-fsharp.md (Testing).
+let walkAllPages (userId: string) (limit: int) (from: DateTime option) (``to``: DateTime option) (ctx: Context) : Task<Context> =
+    task {
+        let mutable cursor = None
+        let mutable items = []
+        let mutable morePages = true
+
+        while morePages do
+            let! pageItems, nextCursor = fetch ctx.Client (buildUrl userId limit cursor from ``to``)
+            items <- items @ pageItems
+            cursor <- nextCursor
+            morePages <- nextCursor.IsSome
+
+        return { ctx with Items = items; NextCursor = None }
     }
 
 let assertItemIds (expectedIds: Guid list) (ctx: Context) : Task<Context> =

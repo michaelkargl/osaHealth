@@ -65,15 +65,15 @@ The expected query shape for the sync loop pull:
 db.recordings.find({
   userId: "user-A",
   $or: [
-    { updated_ms: { $gt: lastCursor } },
-    { updated_ms: lastCursor, _id: { $gt: lastId } }
+    { DateEpoch: { $gt: lastCursor } },
+    { DateEpoch: lastCursor, _id: { $gt: lastId } }
   ]
-}).sort({ updated_ms: 1, _id: 1 }).limit(N)
+}).sort({ DateEpoch: 1, _id: 1 }).limit(N)
 ```
 
-The compound cursor `(updated_ms, _id)` handles ties — two recordings written within the same millisecond — because `_id` is **unique and stable**. No two rows can share the same `(updated_ms, _id)` pair, so ties are always broken. The tiebreaker does not need to be monotonic or time-ordered; uniqueness is sufficient.
+The compound cursor `(DateEpoch, _id)` handles ties — two recordings written within the same millisecond — because `_id` is **unique and stable**. No two rows can share the same `(DateEpoch, _id)` pair, so ties are always broken. The tiebreaker does not need to be monotonic or time-ordered; uniqueness is sufficient.
 
-A compound index on `(userId, updated_ms, _id)` covers the filter and sort without a collection scan.
+A compound index on `(userId, DateEpoch, _id)` covers the filter and sort without a collection scan.
 
 **Evaluation in progress:** The same three test scenarios from the Dapr spike will be reproduced against a direct MongoDB connection:
 1. Filter basics

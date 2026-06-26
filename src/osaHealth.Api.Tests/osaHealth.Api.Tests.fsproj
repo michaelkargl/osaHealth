@@ -10,7 +10,7 @@
         <Compile Include="MongoFixture.fs" />
         <Compile Include="TestHost.fs" />
         <Compile Include="ListRecordingsSteps.fs" />
-        <Compile Include="ListRecordingsFeature.fs" />
+        <Compile Include="ListRecordingsFeature.Tests.fs" />
         <Compile Include="Tests.fs" />
         <None Include="xunit.runner.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
