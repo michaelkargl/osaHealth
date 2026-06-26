@@ -10,10 +10,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api.Tests/MongoFixture.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api.Tests/MongoFixture.fs" afterDir="false" />
-    </list>
+    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -232,7 +229,7 @@
       <workItem from="1782066104983" duration="4583000" />
       <workItem from="1782206534627" duration="68063000" />
       <workItem from="1782385274771" duration="9769000" />
-      <workItem from="1782457882444" duration="33728000" />
+      <workItem from="1782457882444" duration="34140000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -506,7 +503,23 @@
       <option name="project" value="LOCAL" />
       <updated>1782491041091</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="ci: add dotnet test job for Framework and Api integration tests&#10;&#10;- Run Framework.Tests for unit tests (DateTime, Guid, Domain logic)&#10;- Run Api.Tests integration tests (list-recordings compound cursor &amp; filters)&#10;- Tests require Docker; ubuntu-latest runner has Docker preinstalled for Testcontainers.MongoDb&#10;&#10;Co-Authored-By: Claude Sonnet 4.6 &lt;noreply@anthropic.com&gt;">
+      <option name="closed" value="true" />
+      <created>1782491892379</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1782491892379</updated>
+    </task>
+    <task id="LOCAL-00036" summary="ci: add dotnet test job for Framework and Api integration tests&#10;&#10;- Run Framework.Tests for unit tests (DateTime, Guid, Domain logic)&#10;- Run Api.Tests integration tests (list-recordings compound cursor &amp; filters)&#10;- Tests require Docker; ubuntu-latest runner has Docker preinstalled for Testcontainers.MongoDb&#10;&#10;Co-Authored-By: Claude Sonnet 4.6 &lt;noreply@anthropic.com&gt;">
+      <option name="closed" value="true" />
+      <created>1782492094593</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1782492094593</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -542,7 +555,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="Merge remote-tracking branch 'origin/main' into spike/osa15-query-api-repl&#10;&#10;# Conflicts:&#10;#&#9;src/.idea/.idea.osaHealth/.idea/indexLayout.xml&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml&#10;#&#9;src/Repl/dapr-query-api/Framework.fsx&#10;#&#9;src/osaHealth.Api/osaHealth.Api.fsproj" />
     <MESSAGE value="feat: adds successful Recordings persistence" />
     <MESSAGE value="feat: separates the layers by mapping between themn" />
     <MESSAGE value="feat: adds validation and error handling" />
@@ -567,7 +579,8 @@
     <MESSAGE value="chore: removes third party reference in osaHealth.Framework" />
     <MESSAGE value="feat: implements xunit logging and output capture" />
     <MESSAGE value="feat: Adds first version of end to end tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Adds first version of end to end tests" />
+    <MESSAGE value="ci: add dotnet test job for Framework and Api integration tests&#10;&#10;- Run Framework.Tests for unit tests (DateTime, Guid, Domain logic)&#10;- Run Api.Tests integration tests (list-recordings compound cursor &amp; filters)&#10;- Tests require Docker; ubuntu-latest runner has Docker preinstalled for Testcontainers.MongoDb&#10;&#10;Co-Authored-By: Claude Sonnet 4.6 &lt;noreply@anthropic.com&gt;" />
+    <option name="LAST_COMMIT_MESSAGE" value="ci: add dotnet test job for Framework and Api integration tests&#10;&#10;- Run Framework.Tests for unit tests (DateTime, Guid, Domain logic)&#10;- Run Api.Tests integration tests (list-recordings compound cursor &amp; filters)&#10;- Tests require Docker; ubuntu-latest runner has Docker preinstalled for Testcontainers.MongoDb&#10;&#10;Co-Authored-By: Claude Sonnet 4.6 &lt;noreply@anthropic.com&gt;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
