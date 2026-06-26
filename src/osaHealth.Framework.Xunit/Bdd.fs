@@ -1,4 +1,4 @@
-module osaHealth.Framework.Testing.Bdd
+namespace osaHealth.Framework.Testing.Bdd
 
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
@@ -18,16 +18,21 @@ type Step<'TContext, 'TResult> =
 type Scenario<'TContext, 'TResult> =
     { Name: string
       Initial: 'TContext
-      Steps: Step<'TContext, 'TResult> list }
+      Steps: Step<'TContext, 'TResult> list
+      Log: string -> unit }
 
 module Scenario =
     type Factory =
         static member create
-            (initial: 'TContext, [<CallerMemberName; Optional; DefaultParameterValue("")>] name: string)
-            : Scenario<'TContext, 'TResult> =
+            (
+                initial: 'TContext,
+                log: string -> unit,
+                [<CallerMemberName; Optional; DefaultParameterValue("")>] name: string
+            ) : Scenario<'TContext, 'TResult> =
             { Name = name
               Initial = initial
-              Steps = [] }
+              Steps = []
+              Log = log }
 
     let private appendStep
         (keyword: StepKeyword)
@@ -42,8 +47,8 @@ module Scenario =
                       Description = description
                       Action = action } ] }
 
-    let private printStep (keyword: StepKeyword) (description: string) : unit =
-        printfn $"  %s{keyword.ToString()}: %s{description}"
+    let private logStep (keyword: StepKeyword) (description: string) (log: string -> unit) : unit =
+        log $"  %s{keyword.ToString()}: %s{description}"
 
     let GIVEN
         (description: string)
@@ -74,30 +79,30 @@ module Scenario =
         appendStep And description action scenario
 
     let run (scenario: Scenario<'TContext, 'TContext>) : unit =
-        printfn "\n\n-------------------------------------"
-        printfn $"Scenario: %s{scenario.Name}"
+        scenario.Log "\n\n-------------------------------------"
+        scenario.Log $"Scenario: %s{scenario.Name}"
 
         scenario.Steps
         |> List.fold
             (fun context step ->
-                printStep step.Keyword step.Description
+                logStep step.Keyword step.Description scenario.Log
                 step.Action context)
             scenario.Initial
         |> ignore
 
-        printfn "-------------------------------------"
+        scenario.Log "-------------------------------------"
 
     let runAsync (scenario: Scenario<'TContext, Task<'TContext>>) : Task<unit> =
         task {
-            printfn "\n\n-------------------------------------"
-            printfn $"Scenario: %s{scenario.Name}"
+            scenario.Log "\n\n-------------------------------------"
+            scenario.Log $"Scenario: %s{scenario.Name}"
 
             let mutable context = scenario.Initial
 
             for step in scenario.Steps do
-                printStep step.Keyword step.Description
+                logStep step.Keyword step.Description scenario.Log
                 let! nextContext = step.Action context
                 context <- nextContext
 
-            printfn "-------------------------------------"
+            scenario.Log "-------------------------------------"
         }

@@ -3,6 +3,7 @@ module osaHealth.Framework.Tests.String_Tests
 open Xunit
 open osaHealth.Framework
 open osaHealth.Framework.Testing.Bdd.Scenario
+open osaHealth.Framework.Testing.Bdd.Xunit
 
 let tryFromBase64Cases: obj[] seq =
     seq {

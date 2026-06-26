@@ -14,6 +14,5 @@
         <Compile Include="Guid.fs" />
         <Compile Include="Api.fs" />
         <Compile Include="Dapr.fs" />
-        <Compile Include="Testing\Bdd.fs" />
     </ItemGroup>
 </Project>

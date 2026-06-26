@@ -3,6 +3,7 @@ module osaHealth.Framework.Tests.ScenarioTests
 open System.Threading.Tasks
 open Xunit
 open osaHealth.Framework.Testing.Bdd.Scenario
+open osaHealth.Framework.Testing.Bdd.Xunit
 
 [<Fact>]
 let ``scenario runs steps in order and propagates assertion failures`` () =
