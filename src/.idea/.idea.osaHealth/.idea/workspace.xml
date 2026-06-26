@@ -11,15 +11,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/osaHealth.Api.Tests/MongoFixture.fs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osaHealth.Api.Tests/TestHost.fs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osaHealth.Api/Host.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api.Tests/osaHealth.Api.Tests.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api.Tests/osaHealth.Api.Tests.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Program.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Program.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/DateTime.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/DateTime.Tests.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api.Tests/MongoFixture.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api.Tests/MongoFixture.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,27 +83,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.osaHealth.Api.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Project.osaHealth.Api.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Project.osaHealth.Framework.Tests.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;b0a507d4-ebb4-4d5d-8f26-bf2953c7f540.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feat/adds-additional-filters-to-list-recordings-endpoint&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.osaHealth.Api.executor": "Debug",
+    ".NET Project.osaHealth.Api.executor": "Run",
+    ".NET Project.osaHealth.Framework.Tests.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "b0a507d4-ebb4-4d5d-8f26-bf2953c7f540.executor": "Debug",
+    "git-widget-placeholder": "feat/adds-additional-filters-to-list-recordings-endpoint",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "reference.settings.ide.settings.notifications",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Project.osaHealth.Framework.Tests">
     <configuration name="osaHealth.Api.Tests" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -239,7 +232,7 @@
       <workItem from="1782066104983" duration="4583000" />
       <workItem from="1782206534627" duration="68063000" />
       <workItem from="1782385274771" duration="9769000" />
-      <workItem from="1782457882444" duration="32946000" />
+      <workItem from="1782457882444" duration="33728000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -505,7 +498,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782486948554</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="feat: Adds first version of end to end tests">
+      <option name="closed" value="true" />
+      <created>1782491041091</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1782491041091</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -541,7 +542,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat: Adds Framework.Tests project" />
     <MESSAGE value="Merge remote-tracking branch 'origin/main' into spike/osa15-query-api-repl&#10;&#10;# Conflicts:&#10;#&#9;src/.idea/.idea.osaHealth/.idea/indexLayout.xml&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml&#10;#&#9;src/Repl/dapr-query-api/Framework.fsx&#10;#&#9;src/osaHealth.Api/osaHealth.Api.fsproj" />
     <MESSAGE value="feat: adds successful Recordings persistence" />
     <MESSAGE value="feat: separates the layers by mapping between themn" />
@@ -566,7 +566,8 @@
     <MESSAGE value="feat: adds async support to BDD scenario" />
     <MESSAGE value="chore: removes third party reference in osaHealth.Framework" />
     <MESSAGE value="feat: implements xunit logging and output capture" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: implements xunit logging and output capture" />
+    <MESSAGE value="feat: Adds first version of end to end tests" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Adds first version of end to end tests" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

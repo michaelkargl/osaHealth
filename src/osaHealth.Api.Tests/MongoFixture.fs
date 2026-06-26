@@ -4,7 +4,13 @@ open System.Threading.Tasks
 open MongoDB.Driver
 open Testcontainers.MongoDb
 
-let private container = lazy MongoDbBuilder().Build()
+// ---------------------------------------------------------------------------------------------
+// ATTENTION: Keep this docker image at the same version than defined in the docker-compose file
+// ---------------------------------------------------------------------------------------------
+[<Literal>]
+let MongoDbDockerImage = "mongo:8-noble"
+
+let private container = lazy (MongoDbBuilder(MongoDbDockerImage).Build())
     
 let private getDbClientAsync =
     task {
