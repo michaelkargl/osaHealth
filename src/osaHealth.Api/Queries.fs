@@ -1,7 +1,7 @@
 module osaHealth.Api.Queries
 
 open System
-  open osaHealth.Domain.Entities
+open osaHealth.Domain.Entities
 
 type PageQuery = { Cursor: string option; Limit: int }
 

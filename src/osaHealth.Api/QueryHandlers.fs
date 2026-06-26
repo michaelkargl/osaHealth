@@ -9,6 +9,7 @@ open osaHealth.Api.Queries
 open osaHealth.Domain.Entities
 open osaHealth.Domain.ErrorHandling
 open osaHealth.Domain.Measures
+open System.Buffers.Binary
 
 module private CursorToken =
     let decode (token: string<Base64>) : Result<(DateTime * Guid), DomainError> =
@@ -45,7 +46,8 @@ module private CursorToken =
         | Some token -> token |> UMX.tag<Base64> |> decode |> Result.toOption
 
     let encode (date: DateTime) (id: Guid) : string<Base64> =
-        let tickBytes = BitConverter.GetBytes(date.Ticks) // int64 / 8 = 8 bytes
+        let tickBytes = Array.zeroCreate<byte> 8
+        BinaryPrimitives.WriteInt64LittleEndian(tickBytes.AsSpan(), date.ToUniversalTime().Ticks)
         let idBytes = id.ToByteArray() // Guid -> (36 chars - 4 hyphens) / 2 hex digits -> 16 raw bytes
 
         Array.append tickBytes idBytes |> Convert.ToBase64String |> UMX.tag

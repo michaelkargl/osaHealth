@@ -6,7 +6,6 @@ open System
 let defaultIfNullOrWhiteSpace (defaultStr: string) (str: string) : string =
     if String.IsNullOrWhiteSpace str then defaultStr else str
 
-
 let tryFromBase64 (raw: string) : byte[] option =
     // 1 base64 char  = 6 bits
     // Buffer size: N characters × 6 bits/char ÷ 8 bits/byte, rounded up.

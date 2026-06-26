@@ -12,6 +12,75 @@ See [onion-architecture.md](onion-architecture.md#application-core).
 
 See [onion-architecture.md](onion-architecture.md#application-services-layer).
 
+### Async / Awaiter State Machine
+
+When you write do!/let! on a task (or await in C#), the compiler turns the method into a state machine. At each await point it generates roughly this:
+
+```fsharp
+let awaiter = theTask.GetAwaiter()
+if awaiter.IsCompleted then
+    // ── FAST PATH ──
+    // result is already sitting there; just read it and keep running
+    let result = awaiter.GetResult()
+    // ...fall straight through to the next line, same thread, same stack frame
+else
+    // ── SLOW PATH ──
+    // not done yet: hand a continuation to the task and RETURN out of the method.
+    // the rest of the method runs later, as a callback, when the task completes.
+    awaiter.OnCompleted(fun () -> resumeHere result)
+    return
+```
+
+---
+
+## B
+
+### Big Endian
+
+Most significant byte is stored at the lowest memory address — the "big" end comes first.
+
+```
+Value: 0x12345678
+
+Address:    [0]  [1]  [2]  [3]
+Contents:  [12] [34] [56] [78]
+            ↑
+        most significant byte first
+```
+
+```fs
+// read a little endian value
+BinaryPrimitives.ReadInt64BigEndian(System.ReadOnlySpan<byte>(bytes, offset, sizeof<int64>))
+```
+
+See [Endianness](#endianness). Contrast with [Little Endian](#little-endian).
+
+### BOM (Byte Order Mark)
+
+A short marker (2–4 bytes) placed at the very start of a text stream to signal its
+encoding and byte order, so a receiver can decode it correctly without prior agreement.
+
+```
+UTF-16 Little Endian: FF FE  (reads "I am little-endian UTF-16")
+UTF-16 Big Endian:    FE FF  (reads "I am big-endian UTF-16")
+UTF-8:                EF BB BF (no byte-order ambiguity, but marks it as UTF-8)
+```
+
+BOM is one solution to the [Endianness](#endianness) problem: the sender embeds the
+byte order as an in-band signal rather than relying on a pre-established contract.
+
+| Approach | Prior agreement? | Marker sent? | Typical use |
+|----------|------------------|--------------|-------------|
+| **BOM** | No | Yes (2–4 bytes overhead) | Unknown text sources, generic protocols |
+| **Contract** | Yes | No | Internal binary formats where both ends are controlled |
+
+In osaHealth, cursor tokens use the **contract** approach — both sides agree to
+little-endian (`WriteInt64LittleEndian` / `ReadInt64LittleEndian`) with no marker
+sent. BOM would only be needed if cursors could come from arbitrary third-party
+sources, which they cannot.
+
+See [Endianness](#endianness).
+
 ---
 
 ## C
@@ -58,6 +127,42 @@ See [onion-architecture.md](onion-architecture.md#domain-services-layer).
 ---
 
 ## E
+
+### Endianness
+
+The byte order used when storing a multi-byte value in memory
+
+There are two conventions:
+
+1. [Big Endian](#big-endian) — most significant byte at the lowest address
+2. [Little Endian](#little-endian) — least significant byte at the lowest address
+
+`BitConverter.GetBytes` writes bytes in the **system's native byte order** — whichever
+the host CPU uses. Within a single process this is invisible: the same process reads back
+exactly what it wrote. It becomes a bug the moment a byte array **crosses a boundary**:
+sent to a client, cached, persisted, or read by a restarted server on a different host —
+because the reader may be on a different architecture and interpret the bytes in the wrong
+order.
+
+**Rule:** when a multi-byte primitive crosses a process boundary, sender and receiver must agree on
+byte order. Establish the contract explicitly: encode and decode using the **same byte order**, using
+`System.Buffers.Binary.BinaryPrimitives` to make it visible (e.g., `WriteInt64LittleEndian` paired with
+`ReadInt64LittleEndian`). No flag is sent — just bytes in that order. If both sides keep the contract,
+the value round-trips correctly regardless of CPU architecture. Using `BitConverter` (implicit, native
+byte order) breaks the contract.
+
+**When it matters:** multi-byte primitives (`Int64`, `Int32`, `Int16`, `Double`) serialized to bytes
+crossing a process boundary.
+
+**When it doesn't:** single-byte values (`byte`, `char`), spec-defined structures (`Guid`), opaque byte arrays
+(like Base64 output), values that never leave memory.
+
+> Example: Cursor tokens (24-byte Base64 blobs encoding `DateTime.Ticks + Guid`) are returned to clients
+and replayed on the next request — crossing the process boundary each time. The `Int64` ticks use
+`WriteInt64LittleEndian` (encode) paired with `ReadInt64LittleEndian` (decode); the `Guid` uses its native
+`ToByteArray()` / constructor (spec-defined byte order, endianness-independent).
+
+See [Big Endian](#big-endian), [Little Endian](#little-endian).
 
 ### Error
 
@@ -203,6 +308,30 @@ URL. This must hold for every request without exception.
 Cursor-based pagination anchored to record values rather than row offsets — stable under
 concurrent writes, O(1) query cost at any depth. See
 [pagination.md](pagination.md#keyset-pagination).
+
+---
+
+## L
+
+### Little Endian
+
+Least significant byte is stored at the lowest memory address — the "little" end comes first.
+
+```
+Value: 0x12345678
+
+Address:    [0]  [1]  [2]  [3]
+Contents:  [78] [56] [34] [12]
+            ↑
+        least significant byte first
+```
+
+```fs
+// read a little endian value
+BinaryPrimitives.ReadInt64LittleEndian(System.ReadOnlySpan<byte>(bytes, offset, sizeof<int64>))
+```
+
+See [Endianness](#endianness). Contrast with [Big Endian](#big-endian).
 
 ---
 

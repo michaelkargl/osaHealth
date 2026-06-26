@@ -9,15 +9,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="Merge branch 'feat/adds-additional-filters-to-list-recordings-endpoint' of https://github.com/michaelkargl/osaHealth into feat/adds-additional-filters-to-list-recordings-endpoint&#10;&#10;# Conflicts:&#10;#&#9;.claude/skills/code-review/SKILL.md&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml">
-      <change afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/DateTime.Tests.fs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osaHealth.Framework/DateTime.fs" afterDir="false" />
+    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../docs/glossary.md" beforeDir="false" afterPath="$PROJECT_DIR$/../docs/glossary.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/indexLayout.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/Queries.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Queries.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/QueryHandlers.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/Library.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/Library.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/osaHealth.Framework.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/osaHealth.Framework.fsproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/Scenario.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/Scenario.Tests.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/DateTime.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/DateTime.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/StringUtil.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/StringUtil.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/Testing/Bdd.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/Testing/Bdd.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -207,7 +208,7 @@
       <workItem from="1782066104983" duration="4583000" />
       <workItem from="1782206534627" duration="68063000" />
       <workItem from="1782385274771" duration="9769000" />
-      <workItem from="1782457882444" duration="7397000" />
+      <workItem from="1782457882444" duration="20861000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -433,7 +434,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782309947628</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="feat: Improves error handling around cursor token">
+      <option name="closed" value="true" />
+      <created>1782465478750</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1782465478750</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,7 +502,8 @@
     <MESSAGE value="docs: document taskResult and domain branding in cqrs layer" />
     <MESSAGE value="feat: removes UMX branding from cqrs layer" />
     <MESSAGE value="feat: adds /code-review SKILL and additional security / performance docs" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: adds /code-review SKILL and additional security / performance docs" />
+    <MESSAGE value="feat: Improves error handling around cursor token" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Improves error handling around cursor token" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
