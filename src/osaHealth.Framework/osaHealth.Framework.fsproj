@@ -16,8 +16,4 @@
         <Compile Include="Dapr.fs" />
         <Compile Include="Testing\Bdd.fs" />
     </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="FSharp.UMX" Version="1.1.0" />
-    </ItemGroup>
 </Project>
