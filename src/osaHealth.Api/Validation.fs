@@ -23,11 +23,11 @@ let validateListRecordingsRequest
     (limit: int)
     : Result<unit, ApiError list> =
     let errors =
-        [ if String.IsNullOrWhiteSpace userId then ApiError.FieldMissingOrEmpty "userid"
-          if limit < 1 then ApiError.ConstraintViolation("limit", "must be > 0")
-          if cursor |> Option.exists String.IsNullOrWhiteSpace then ApiError.FieldMissingOrEmpty "cursor"
+        [ if String.IsNullOrWhiteSpace userId then ApiError.FieldMissingOrEmpty (nameof userId)
+          if limit < 1 then ApiError.ConstraintViolation((nameof limit), "must be > 0")
+          if cursor |> Option.exists String.IsNullOrWhiteSpace then ApiError.FieldMissingOrEmpty (nameof cursor)
           match from, ``to`` with
-          | Some f, Some t when f > t -> ApiError.ConstraintViolation("from", "must be <= to")
+          | Some f, Some t when f > t -> ApiError.ConstraintViolation((nameof from), "must be <= to")
           | _ -> () ]
 
     match errors with

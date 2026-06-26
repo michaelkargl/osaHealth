@@ -20,12 +20,14 @@
         <Compile Include="Endpoints.fs" />
         <Compile Include="DependencyInjection.fs" />
         <Compile Include="Router.fs" />
+        <Compile Include="Host.fs" />
         <Compile Include="EnvVars.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\osaHealth.Domain\osaHealth.Domain.fsproj" />
+        <ProjectReference Include="..\osaHealth.Framework\osaHealth.Framework.fsproj" />
         <ProjectReference Include="..\osaHealth.Repository\osaHealth.Repository.fsproj" />
     </ItemGroup>
 
@@ -35,6 +37,7 @@
              reference without creating a duplicate that NuGet silently loses. -->
         <PackageReference Update="FSharp.Core" Version="10.1.301" />
         <PackageReference Include="FsToolkit.ErrorHandling" Version="5.2.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Oxpecker" Version="2.0.1" />
         <PackageReference Include="Oxpecker.OpenApi" Version="2.1.2" />
         <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />

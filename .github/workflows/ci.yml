@@ -32,3 +32,26 @@ jobs:
 
       - name: Build Docker Compose services
         run: docker compose build
+
+  dotnet-tests:
+    name: .NET Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore src/osaHealth.slnx
+
+      - name: Build
+        run: dotnet build src/osaHealth.slnx --no-restore
+
+      - name: Run Framework Tests
+        run: dotnet test src/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj --no-build --verbosity normal
+
+      - name: Run API Integration Tests
+        run: dotnet test src/osaHealth.Api.Tests/osaHealth.Api.Tests.fsproj --no-build --verbosity normal

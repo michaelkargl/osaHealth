@@ -9,15 +9,21 @@ open osaHealth.Domain.Entities
 open osaHealth.Repository.Entities
 open osaHealth.Repository.Mapping
 
-// TODO: shouldn't this be a configurable string?
-[<Literal>]
-let CollectionName = "recordings"
 
 module Recordings =
+    // TODO: shouldn't this be a configurable string?
+    [<Literal>]
+    let CollectionName = "recordings"
+
+    module FieldNames = RecordingEntity.BsonFieldNames
+
+    let private FilterBuilder = Builders<RecordingEntity>.Filter
+    let private SortBuilder = Builders<RecordingEntity>.Sort
+
     let upsert (collection: IMongoCollection<RecordingEntity>) (recording: Recording) : Task<unit> =
         task {
             let entity = Recording.toEntity recording
-            let filter = Builders<RecordingEntity>.Filter.Eq(_.Id, entity.Id)
+            let filter = FilterBuilder.Eq(FieldNames.Id, entity.Id)
             let options = ReplaceOptions(IsUpsert = true)
             let! _ = collection.ReplaceOneAsync(filter, entity, options)
             ()
@@ -28,33 +34,31 @@ module Recordings =
         (userId: string<UserId>)
         (from: DateTime option)
         (``to``: DateTime option)
-        (after: Guid<RecordingId> option)
+        (after: (DateTime * Guid<RecordingId>) option)
         (limit: int)
         : Task<Recording list> =
         task {
             let filter =
-                [ Builders<RecordingEntity>.Filter.Eq(RecordingEntity.BsonFieldNames.UserId, userId)
-                  |> Some
+                [ FilterBuilder.Eq(FieldNames.UserId, userId) |> Some
 
+                  // Compound cursor: mirrors (DateEpoch, Id) sort order — see docs/pagination.md
                   after
-                  |> Option.map (fun a -> Builders<RecordingEntity>.Filter.Gt(RecordingEntity.BsonFieldNames.Id, a))
+                  |> Option.map (fun (date, id) ->
+                      let afterDate = FilterBuilder.Gt(FieldNames.DateEpoch, date)
+                      let sameDate = FilterBuilder.Eq(FieldNames.DateEpoch, date)
+                      let afterId = FilterBuilder.Gt(FieldNames.Id, id)
+                      FilterBuilder.Or(afterDate, FilterBuilder.And(sameDate, afterId)))
 
-                  from
-                  |> Option.map (fun f ->
-                      Builders<RecordingEntity>.Filter.Gte(RecordingEntity.BsonFieldNames.DateEpoch, f))
+                  from |> Option.map (fun f -> FilterBuilder.Gte(FieldNames.DateEpoch, f))
 
-                  ``to``
-                  |> Option.map (fun t ->
-                      Builders<RecordingEntity>.Filter.Lte(RecordingEntity.BsonFieldNames.DateEpoch, t)) ]
+                  ``to`` |> Option.map (fun t -> FilterBuilder.Lte(FieldNames.DateEpoch, t)) ]
                 |> List.choose id
-                |> Builders<RecordingEntity>.Filter.And
+                |> FilterBuilder.And
 
-            let! query =
-                collection
-                    .Find(filter)
-                    .Sort(Builders<RecordingEntity>.Sort.Ascending(RecordingEntity.BsonFieldNames.DateEpoch))
-                    .Limit(limit)
-                    .ToListAsync()
+            let sort =
+                SortBuilder.Combine(SortBuilder.Ascending(FieldNames.DateEpoch), SortBuilder.Ascending(FieldNames.Id))
+
+            let! query = collection.Find(filter).Sort(sort).Limit(limit).ToListAsync()
 
             return query |> Seq.map RecordingEntity.toDomain |> Seq.toList
         }

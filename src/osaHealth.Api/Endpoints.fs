@@ -6,7 +6,6 @@ open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Logging
 open Oxpecker
-open FSharp.UMX
 open FsToolkit.ErrorHandling
 open osaHealth.Api.Commands
 open osaHealth.Api.ErrorHandling
@@ -16,7 +15,6 @@ open osaHealth.Api.Models
 open osaHealth.Api.Validation
 open osaHealth.Api.Framework.Http
 open osaHealth.Domain.ErrorHandling
-open osaHealth.Domain.Measures
 
 let randomHandler: EndpointHandler =
     fun (ctx: HttpContext) ->
@@ -93,13 +91,13 @@ module ListRecordings =
 
                 let! queryResult =
                     { Page = { Cursor = cursor; Limit = limit }
-                      UserId = UMX.tag<UserId> userId
+                      UserId = userId
                       From = from
                       To = ``to`` }
                     |> handleQuery
                     |> TaskResult.mapError DomainError.toHttpResponse
 
-                queryResult |> ListRecordingsQueryResult.toDto |> ctx.WriteJson |> ignore
+                do! queryResult |> ListRecordingsQueryResult.toDto |> ctx.WriteJson
 
              }
              |> TaskResult.mapError (fun (statusCode, errors) -> ctx |> HttpContext.writeErrors statusCode errors))

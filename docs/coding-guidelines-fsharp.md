@@ -4,6 +4,27 @@
 
 No classes, no inheritance, no interfaces. All dependencies are explicit function parameters. No hidden state, no static initialization with side effects.
 
+## Curried parameters over tuples
+
+Default to curried parameters for any function that is a dependency or is partially applied:
+
+```fsharp
+// ✅ curried — partially applicable, composes with |>
+let encode (date: DateTime) (id: Guid) : string<Base64> = ...
+
+// ❌ tupled — forces all args at once, cannot be partially applied
+let encode (date: DateTime, id: Guid) : string<Base64> = ...
+```
+
+Curried functions are how dependency injection works in this codebase — `DependencyInjection.fs` partially applies infrastructure dependencies into handlers one argument at a time. A tupled dependency cannot be partially applied.
+
+Tuples are appropriate when the values are genuinely grouped and always travel together — a return type, a matched pair, or a case where partial application makes no sense:
+
+```fsharp
+// ✅ tuple as return — these values belong together as one result
+let parseQueryParams ctx : Result<string * DateTime option * DateTime option, ApiError> = ...
+```
+
 ## Domain layer — pure functions only
 
 Domain functions must be [pure](glossary.md#pure-function).
@@ -20,11 +41,13 @@ The consequences are:
 
 | Layer | Examples | Rule |
 |---|---|---|
-| HTTP (DTOs) | `RecordingInput` | Plain .NET primitives (`Guid`, `string`, `DateTime`) |
+| HTTP (DTOs) | `RecordingInput` | Plain .NET primitives (`Guid`, `string`, `DateTime`); nested record types are fine — see note below |
 | Application (Commands/Queries) | `UpsertRecordingCommand` | Plain .NET primitives — no domain branding |
 | Domain / Persistence | `Recording` | Branded types, BSON attributes |
 
 The mapping from unbranded → branded happens exactly once: in the command handler, when constructing a domain entity.
+
+> **"Plain primitives" means leaf types, not flat structure.** A Command or Query can nest record types freely (e.g. `ListRecordingsQuery` has a `Page: PageQuery` field). The constraint is on what a field's type *drags in as a dependency* — a nested record defined in the same assembly is fine; `string<UserId>` is not, because it forces every consumer to reference `FSharp.UMX`.
 
 ## Mapping and data transformation
 
@@ -80,7 +103,7 @@ type UserId = string<UserId>  // add this when AccessToken, RefreshToken etc. ap
 
 ### Layer rule
 
-Brand at the **domain/persistence layer** where the types live long enough to get confused. Do not brand at the command or DTO layer — commands are short-lived and flow in one direction, so propagating measures upward only creates coupling.
+Brand at the **domain/persistence layer** where the types live long enough to get confused. Do not brand at the command or DTO layer. The reason is dependency coupling: a Command or Query is a contract into the application core — any caller (HTTP handler, test, CLI) must be able to construct it. A branded field forces every consumer to reference the branding library (`FSharp.UMX`). Plain primitives keep the contract constructible with the BCL alone.
 
 ```fsharp
 // ✅ correct — tagging happens once, at the entity construction boundary
@@ -149,12 +172,13 @@ Do not throw or catch exceptions inside domain or application service code. Retu
 
 A computation expression (CE) is a block of code that the compiler desugars into a chain of function calls. The block reads as the happy path — the CE handles the plumbing (awaiting tasks, short-circuiting on errors) so the code inside doesn't have to.
 
-Two CEs are used in this codebase:
+Three CEs are used in this codebase:
 
 | CE | Source | Purpose |
 |---|---|---|
 | `task { }` | `FSharp.Core` | Wrap async operations |
 | `result { }` | `FsToolkit.ErrorHandling` | Chain `Result` values, short-circuit on `Error` |
+| `taskResult { }` | `FsToolkit.ErrorHandling` | Combine both — await *and* short-circuit on `Error` |
 
 ### `task { }` — async
 
@@ -195,6 +219,40 @@ result {
 
 The error type `'E` must be consistent across all `let!` bindings in a single `result { }` block.
 
+### `taskResult { }` — async + error short-circuit
+
+Use when a handler needs to both await async operations *and* short-circuit on the first `Error`. A single `let!` awaits the `Task` *and* unwraps the `Ok` — two things in one operator.
+
+```fsharp
+taskResult {
+    let! user =
+        findUserReturningOk userId                   // Task<Result<User, DbError>>
+        |> TaskResult.mapError (fun e -> e.Message)  // normalise the error to a string
+
+    let! recording =
+        findRecordingReturningError user             // Task<Result<Recording, DbError>>
+        |> TaskResult.mapError (fun e -> e.Message)
+    // ^ Error → the block short-circuits HERE; nothing below runs
+
+    do!
+        markAsReadReturningOk recording              // do! awaits Task<Result<unit, _>>, discards Ok ()
+        |> TaskResult.mapError (fun e -> e.Message)
+
+    return recording
+}
+// one handler for whatever error bubbled up — it only ever sees the message string
+|> TaskResult.mapError (fun errorMessage -> logger.LogError errorMessage)
+```
+
+Each inner `TaskResult.mapError` normalises the step's error type to `string`. This keeps the single terminal handler at the bottom simple — it only needs to handle one unified error shape. Map above; keep the bottom handler simple.
+
+| Helper | Purpose |
+|---|---|
+| `TaskResult.ofResult` | Lift a plain `Result` into `Task<Result>` so it composes inside the block |
+| `TaskResult.mapError` | Transform the error type — required when combining steps that produce different error shapes |
+
+The error type `'E` must be consistent across all `let!` / `do!` bindings in a single `taskResult { }` block. Use `TaskResult.mapError` to unify error shapes before binding.
+
 ### Why `result { }` is not in FSharp.Core
 
 `task { }` ships with F# because async is a language-level concern. `result { }` does not — the standard library provides `Result<'T, 'E>` as a type but no CE to chain it. `FsToolkit.ErrorHandling` provides the CE; it is the established community standard for this pattern.
@@ -228,6 +286,66 @@ Three tiers, no blank lines between tiers, alphabetical within each:
 2. Framework namespaces, parent before child
 3. Project-specific, shared before specific
 
+## Compiler confidence
+
+F# has a strong compiler. Exhaustive pattern-match warnings, unused-binding errors, and missing-open diagnostics are caught before the code reaches review. A review comment that duplicates a compiler warning wastes the author's attention. Let the compiler carry what it can; focus review attention on what it cannot see: architectural fit, domain-rule correctness, error-path coverage, and layer-boundary discipline.
+
 ## Null safety
 
 No nulls. Use `option<'T>` and `Result<'T, 'E>`. No `Option.Value`, no `unbox`. Pattern match explicitly.
+
+## Testing — Given/When/Then scenarios
+
+Tests are written as Given/When/Then scenarios using the in-house `Bdd.Scenario` framework. Each feature gets its own **feature file** (the scenarios) and **step file** (the reusable step functions and the context record).
+
+### One assertion per test
+
+A scenario verifies **one behavior** and ends with **one `THEN`** carrying a single assertion. A trailing `AND` is permitted only for a trivial guard — a null / non-null check, or an HTTP status check that is a precondition for reading the `THEN`.
+
+Do **not** chain `WHEN → THEN → WHEN → THEN`. That shape is a god-test: it verifies several behaviors at once, so a failure no longer points at one thing and the scenario can't be named for the behavior it covers.
+
+When the behavior is inherently a **sequence** (pagination, a multi-step workflow, a state machine), do not fragment it into multiple `THEN`s and do not split it into separate tests — splitting drops the cross-step assertion that *is* the behavior. Instead absorb the whole sequence into the `WHEN` and assert the end state once:
+
+```fsharp
+// ❌ god-test — multiple behaviors, ambiguous failure
+|> WHEN "the first page is requested" ...
+|> THEN "it holds the same-date pair" ...
+|> WHEN "the second page is requested with the cursor" ...
+|> THEN "it holds the remaining recording" ...
+|> AND  "all rows appear across both pages" ...
+
+// ✅ the sequence lives in the WHEN; one behavior, one assertion
+|> WHEN "every page is fetched by following the cursor" (fun ctx ->
+    // loop GET /recordings?...&cursor=… until NextCursor is None,
+    // accumulating ids into ctx.AllItems
+    ...)
+|> THEN "each recording appears exactly once, ordered by (date, id)" (fun ctx ->
+    Assert.Equal<string list>(expectedOrderFrom ctx.SeededRecordings, ctx.AllItems)
+    ctx)
+```
+
+The single equality catches both a skipped row and a duplicated row — a stronger regression lock than either the multi-`THEN` or the split-test version.
+
+### Steps operate only on the context record
+
+Step lambdas receive the context record as their parameter and must read and write **only** that record. They must not close over values declared outside the scenario — the context record *is* the channel between steps.
+
+- `GIVEN` steps **set** fields (seeded entities, configuration).
+- `WHEN` steps **read** inputs from the context, call the system under test, and **set** the result fields.
+- `THEN` steps read context fields for **both sides** of the assertion — expected values come from what a `GIVEN` seeded, never from an outer-scope binding.
+
+```fsharp
+// ❌ closes over an outer-scope binding — hidden dependency, not reusable
+let expectedIds = [ idA; idB ]
+|> THEN "..." (fun ctx -> Assert.Equal<_>(expectedIds, ctx.PageItems); ctx)
+
+// ✅ expected value was seeded into the context by a GIVEN
+|> GIVEN "two recordings with the same date" (fun ctx ->
+    { ctx with SeededRecordings = [ recordingA; recordingB ] })
+|> THEN "..." (fun ctx ->
+    Assert.Equal<_>(ctx.SeededRecordings |> List.map _.Id, ctx.PageItems); ctx)
+```
+
+### Step wording
+
+Steps read as plain sentences. Avoid abbreviations and cryptic shorthand; split a compound precondition into separate `GIVEN`/`AND` steps rather than packing it into one cryptic line.

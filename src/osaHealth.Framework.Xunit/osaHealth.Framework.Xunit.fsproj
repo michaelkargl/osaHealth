@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <RootNamespace>osaHealth.Framework.Testing</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Bdd.fs" />
+        <Compile Include="Bdd.Xunit.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="xunit.v3.extensibility.core" Version="3.2.2" />
+    </ItemGroup>
+
+</Project>

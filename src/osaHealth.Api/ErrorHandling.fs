@@ -44,6 +44,7 @@ module DomainError =
         | DomainError.NotFound(entity, id) -> ApiError.NotFound(entity, id)
         | DomainError.Conflict reason -> ApiError.ConstraintViolation("", reason)
         | DomainError.InvalidState reason -> ApiError.ConstraintViolation("", reason)
+        | DomainError.InvalidCursor (token, _) -> ApiError.InvalidFormat("cursor", token)
 
     let toApiErrors (error: DomainError) : ApiError list = [ (toApiError error) ]
 
@@ -52,3 +53,4 @@ module DomainError =
         | DomainError.NotFound _ -> 404, toApiErrors error
         | DomainError.Conflict _ -> 409, toApiErrors error
         | DomainError.InvalidState _ -> 422, toApiErrors error
+        | DomainError.InvalidCursor _ -> 400, toApiErrors error

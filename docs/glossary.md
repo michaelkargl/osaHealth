@@ -12,6 +12,75 @@ See [onion-architecture.md](onion-architecture.md#application-core).
 
 See [onion-architecture.md](onion-architecture.md#application-services-layer).
 
+### Async / Awaiter State Machine
+
+When you write do!/let! on a task (or await in C#), the compiler turns the method into a state machine. At each await point it generates roughly this:
+
+```fsharp
+let awaiter = theTask.GetAwaiter()
+if awaiter.IsCompleted then
+    // ── FAST PATH ──
+    // result is already sitting there; just read it and keep running
+    let result = awaiter.GetResult()
+    // ...fall straight through to the next line, same thread, same stack frame
+else
+    // ── SLOW PATH ──
+    // not done yet: hand a continuation to the task and RETURN out of the method.
+    // the rest of the method runs later, as a callback, when the task completes.
+    awaiter.OnCompleted(fun () -> resumeHere result)
+    return
+```
+
+---
+
+## B
+
+### Big Endian
+
+Most significant byte is stored at the lowest memory address — the "big" end comes first.
+
+```
+Value: 0x12345678
+
+Address:    [0]  [1]  [2]  [3]
+Contents:  [12] [34] [56] [78]
+            ↑
+        most significant byte first
+```
+
+```fs
+// read a little endian value
+BinaryPrimitives.ReadInt64BigEndian(System.ReadOnlySpan<byte>(bytes, offset, sizeof<int64>))
+```
+
+See [Endianness](#endianness). Contrast with [Little Endian](#little-endian).
+
+### BOM (Byte Order Mark)
+
+A short marker (2–4 bytes) placed at the very start of a text stream to signal its
+encoding and byte order, so a receiver can decode it correctly without prior agreement.
+
+```
+UTF-16 Little Endian: FF FE  (reads "I am little-endian UTF-16")
+UTF-16 Big Endian:    FE FF  (reads "I am big-endian UTF-16")
+UTF-8:                EF BB BF (no byte-order ambiguity, but marks it as UTF-8)
+```
+
+BOM is one solution to the [Endianness](#endianness) problem: the sender embeds the
+byte order as an in-band signal rather than relying on a pre-established contract.
+
+| Approach | Prior agreement? | Marker sent? | Typical use |
+|----------|------------------|--------------|-------------|
+| **BOM** | No | Yes (2–4 bytes overhead) | Unknown text sources, generic protocols |
+| **Contract** | Yes | No | Internal binary formats where both ends are controlled |
+
+In osaHealth, cursor tokens use the **contract** approach — both sides agree to
+little-endian (`WriteInt64LittleEndian` / `ReadInt64LittleEndian`) with no marker
+sent. BOM would only be needed if cursors could come from arbitrary third-party
+sources, which they cannot.
+
+See [Endianness](#endianness).
+
 ---
 
 ## C
@@ -25,24 +94,19 @@ Known smells:
 
 - [Fat DTO](#fat-dto) — a DTO serving multiple consumers, accumulating null fields per caller
 
+### Compound Cursor
+
+A cursor encoding two sort fields to precisely identify position when the primary sort key
+is not unique (e.g. a timestamp). See [pagination.md](pagination.md#compound-cursor) for
+the full explanation including the filter construction and why it uses `OR`, not `AND`.
+
+---
+
 ### Cursor
 
-A marker that identifies a specific position in a result set. When paginating, the server issues a cursor
-after each page; the client sends it back on the next request to say "continue from here." The name comes
-from the same root as a text cursor — a pointer to a current position.
-
-```
-Result set:  [ 1 ][ 2 ][ 3 ][ 4 ][ 5 ][ 6 ][ 7 ][ 8 ]
-                            ↑
-                         cursor
-                   (last record seen)
-```
-
-*Note: SQL cursors (Oracle, MSSQL) are stateful — the database holds the position between fetches and the
-cursor must be closed when done. API pagination cursors are the inverse: the position is encoded in the
-token and carried by the caller. The server holds nothing.*
-
-See also: [Cursor Pagination](#cursor-pagination), [Keyset Pagination](#keyset-pagination).
+An opaque bookmark encoding the position of the last record seen in a paginated result set.
+The server issues it; the client sends it back unchanged on the next request. See
+[pagination.md](pagination.md#cursor).
 
 ### Cursor Pagination
 
@@ -63,6 +127,42 @@ See [onion-architecture.md](onion-architecture.md#domain-services-layer).
 ---
 
 ## E
+
+### Endianness
+
+The byte order used when storing a multi-byte value in memory
+
+There are two conventions:
+
+1. [Big Endian](#big-endian) — most significant byte at the lowest address
+2. [Little Endian](#little-endian) — least significant byte at the lowest address
+
+`BitConverter.GetBytes` writes bytes in the **system's native byte order** — whichever
+the host CPU uses. Within a single process this is invisible: the same process reads back
+exactly what it wrote. It becomes a bug the moment a byte array **crosses a boundary**:
+sent to a client, cached, persisted, or read by a restarted server on a different host —
+because the reader may be on a different architecture and interpret the bytes in the wrong
+order.
+
+**Rule:** when a multi-byte primitive crosses a process boundary, sender and receiver must agree on
+byte order. Establish the contract explicitly: encode and decode using the **same byte order**, using
+`System.Buffers.Binary.BinaryPrimitives` to make it visible (e.g., `WriteInt64LittleEndian` paired with
+`ReadInt64LittleEndian`). No flag is sent — just bytes in that order. If both sides keep the contract,
+the value round-trips correctly regardless of CPU architecture. Using `BitConverter` (implicit, native
+byte order) breaks the contract.
+
+**When it matters:** multi-byte primitives (`Int64`, `Int32`, `Int16`, `Double`) serialized to bytes
+crossing a process boundary.
+
+**When it doesn't:** single-byte values (`byte`, `char`), spec-defined structures (`Guid`), opaque byte arrays
+(like Base64 output), values that never leave memory.
+
+> Example: Cursor tokens (24-byte Base64 blobs encoding `DateTime.Ticks + Guid`) are returned to clients
+and replayed on the next request — crossing the process boundary each time. The `Int64` ticks use
+`WriteInt64LittleEndian` (encode) paired with `ReadInt64LittleEndian` (decode); the `Guid` uses its native
+`ToByteArray()` / constructor (spec-defined byte order, endianness-independent).
+
+See [Big Endian](#big-endian), [Little Endian](#little-endian).
 
 ### Error
 
@@ -87,18 +187,8 @@ boundaries ([Infrastructure Layer](onion-architecture.md#infrastructure-layer)).
 
 ### Offset Pagination
 
-A pagination strategy where the client requests results by position: *skip the first N records, return the next M*.
-Simple to implement and easy to reason about, but degrades at scale.
-
-As the offset grows, the database scans and discards an increasing number of rows before returning results. At page 1000
-with a page size of 20, the database skips 19,980 rows on every request.
-
-Offset pagination also suffers from **page drift**: if a record is inserted or deleted between two requests, the page
-boundaries shift and the client may see a duplicate or skip a record entirely.
-
-Appropriate for small, stable datasets or when jumping to a specific page number is a product requirement.
-
-See also: [Keyset Pagination](#keyset-pagination), [Pagination](#pagination).
+Skip/limit pagination — simple but degrades at depth and suffers from page drift under
+concurrent writes. See [pagination.md](pagination.md#offset-pagination).
 
 ### Onion Architecture
 
@@ -215,45 +305,33 @@ URL. This must hold for every request without exception.
 
 ### Keyset Pagination
 
-A pagination strategy where the client tracks position using an opaque cursor — an encoded pointer to the last record
-seen — rather than a numeric page or row offset.
+Cursor-based pagination anchored to record values rather than row offsets — stable under
+concurrent writes, O(1) query cost at any depth. See
+[pagination.md](pagination.md#keyset-pagination).
 
-On each request, the **API** (server) decodes the cursor to a record identifier, queries for records that
-come *after* that identifier (`_id > lastId`), and encodes the last returned record's ID as the next cursor.
-When no cursor is provided, the first page is returned.
+---
 
-The cursor works like a bookmark: the **caller** (client — a mobile app, web frontend, or another service)
-receives it, stores it, and sends it back on the next request without interpreting it. The API is the only
-one who knows what it encodes (opaque cursor). This leaves the API free to change the cursor format without
-breaking callers.
+## L
+
+### Little Endian
+
+Least significant byte is stored at the lowest memory address — the "little" end comes first.
 
 ```
-Records:   [ 1 ][ 2 ][ 3 ][ 4 ][ 5 ][ 6 ][ 7 ][ 8 ]
-           └─── page 1 ───┘
-                           ↑ cursor = "abc..."
+Value: 0x12345678
 
-           GET /recordings?after=abc...
-
-Records:   [ 1 ][ 2 ][ 3 ][ 4 ][ 5 ][ 6 ][ 7 ][ 8 ]
-                           └─── page 2 ───┘
-                                           ↑ cursor = "xyz..."
+Address:    [0]  [1]  [2]  [3]
+Contents:  [78] [56] [34] [12]
+            ↑
+        least significant byte first
 ```
 
-Each page returns a fresh cursor pointing to the last record on that page. The caller always uses the most
-recent one; earlier cursors are discarded. The cursor is stateless — the API stores nothing between
-requests. The cursor *is* the position, encoded as a string the caller hands back. When there are no more
-records, the API returns `null` for the next cursor. The caller stops paginating — no cleanup required on
-either side.
+```fs
+// read a little endian value
+BinaryPrimitives.ReadInt64LittleEndian(System.ReadOnlySpan<byte>(bytes, offset, sizeof<int64>))
+```
 
-| Characteristic | Keyset | [Offset Pagination](#offset-pagination) |
-|---|---|---|
-| Query cost as depth grows | O(1) — filtered by index | O(n) — database skips rows |
-| Page drift | None — anchor is a stable record | Present — inserts/deletes shift page contents |
-| Random access | No — cursor is forward-only | Yes — jump to any page number |
-
-Use keyset pagination when the dataset is large, the sort key is stable, and clients page forward sequentially.
-
-See also: [Offset Pagination](#offset-pagination), [Pagination](#pagination).
+See [Endianness](#endianness). Contrast with [Big Endian](#big-endian).
 
 ---
 
@@ -302,13 +380,9 @@ See also: [Stub](#stub), [Fake](#fake).
 
 ### Pagination
 
-The practice of splitting a large result set into smaller, sequentially accessible chunks. Pagination prevents unbounded
-queries and keeps response sizes predictable.
-
-Known pagination techniques:
-
-- [Keyset Pagination](#keyset-pagination) — cursor-based
-- [Offset Pagination](#offset-pagination) — page number or row offset
+Splitting a large result set into sequentially accessible pages to prevent unbounded
+queries. See [pagination.md](pagination.md) for technique comparison and this project's
+approach.
 
 ### Phantom Types
 
