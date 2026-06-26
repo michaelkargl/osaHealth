@@ -9,11 +9,12 @@ open osaHealth.Domain.Entities
 open osaHealth.Repository.Entities
 open osaHealth.Repository.Mapping
 
-// TODO: shouldn't this be a configurable string?
-[<Literal>]
-let CollectionName = "recordings"
 
 module Recordings =
+    // TODO: shouldn't this be a configurable string?
+    [<Literal>]
+    let CollectionName = "recordings"
+
     module FieldNames = RecordingEntity.BsonFieldNames
 
     let private FilterBuilder = Builders<RecordingEntity>.Filter

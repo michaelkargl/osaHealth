@@ -43,7 +43,6 @@ let ``tryParseUtc parses bytes to DateTime`` (bytes: byte[]) (offset: int) (expe
     |> GIVEN $"bytes of length {bytes.Length}" (fun ctx -> {| ctx with Bytes = bytes |})
     |> AND $"offset {offset}" (fun ctx -> {| ctx with Offset = offset |})
     |> WHEN "parsing to a DateTime" (fun ctx ->
-        failwith "qsdfadsf"
         {| ctx with
             Result = DateTime.tryParseUtc ctx.Bytes ctx.Offset |})
     |> THEN "the result matches the expected DateTime" (fun ctx ->

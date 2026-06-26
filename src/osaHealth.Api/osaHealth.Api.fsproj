@@ -20,6 +20,7 @@
         <Compile Include="Endpoints.fs" />
         <Compile Include="DependencyInjection.fs" />
         <Compile Include="Router.fs" />
+        <Compile Include="Host.fs" />
         <Compile Include="EnvVars.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>

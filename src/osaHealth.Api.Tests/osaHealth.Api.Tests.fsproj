@@ -7,7 +7,14 @@
 
     <ItemGroup>
         <Compile Include="AssemblyInfo.fs" />
-        <Compile Include="Tests.fs"/>
+        <Compile Include="MongoFixture.fs" />
+        <Compile Include="TestHost.fs" />
+        <Compile Include="ListRecordingsSteps.fs" />
+        <Compile Include="ListRecordingsFeature.fs" />
+        <Compile Include="Tests.fs" />
+        <None Include="xunit.runner.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -21,13 +28,8 @@
     </ItemGroup>
     
     <ItemGroup>
+        <ProjectReference Include="..\osaHealth.Api\osaHealth.Api.fsproj" />
         <ProjectReference Include="..\osaHealth.Framework.Xunit\osaHealth.Framework.Xunit.fsproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Include="xunit.runner.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
 </Project>

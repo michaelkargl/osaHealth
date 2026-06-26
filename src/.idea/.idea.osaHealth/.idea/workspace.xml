@@ -11,25 +11,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/osaHealth.Api.Tests/xunit.runner.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osaHealth.Api.Tests/MongoFixture.fs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/osaHealth.Api.Tests/TestHost.fs" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/osaHealth.Api/Host.fs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/AssemblyInfo.fs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osaHealth.Framework.Xunit/Bdd.Xunit.fs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/osaHealth.Framework.Xunit/osaHealth.Framework.Xunit.fsproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api/ErrorHandling.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/ErrorHandling.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api.Tests/osaHealth.Api.Tests.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api.Tests/osaHealth.Api.Tests.fsproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/Program.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/Program.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/DateTime.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/DateTime.Tests.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/Guid.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/Guid.Tests.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/Json.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/Json.Tests.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/Scenario.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/Scenario.Tests.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/String.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/String.Tests.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/xunit.runner.json" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/xunit.runner.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/Testing/Bdd.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Xunit/Bdd.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/osaHealth.Framework.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/osaHealth.Framework.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.slnx" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.slnx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/Respositories.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +57,8 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f491c956cc4165e9c1f6c97ffd56544de55a4f233dcbb77061d21b6db70dfb/list.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f549490aa3b6c2871619466d156d8feb0faf01877129e4d82bf1467dbde9047/ReplaceOneResult.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../.claude/settings.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/osaHealth.Api.Tests/MongoFixture.fs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/osaHealth.Api.Tests/TestHost.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Api.Tests/Tests.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Api/CommandHandlers.fs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/osaHealth.Api/Commands.fs" root0="FORCE_HIGHLIGHTING" />
@@ -247,7 +239,7 @@
       <workItem from="1782066104983" duration="4583000" />
       <workItem from="1782206534627" duration="68063000" />
       <workItem from="1782385274771" duration="9769000" />
-      <workItem from="1782457882444" duration="28824000" />
+      <workItem from="1782457882444" duration="32946000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -505,7 +497,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782484096158</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="feat: implements xunit logging and output capture">
+      <option name="closed" value="true" />
+      <created>1782486948554</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1782486948554</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -541,7 +541,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="chore: moves dapr-eval scripts into a dedicated folder" />
     <MESSAGE value="feat: Adds Framework.Tests project" />
     <MESSAGE value="Merge remote-tracking branch 'origin/main' into spike/osa15-query-api-repl&#10;&#10;# Conflicts:&#10;#&#9;src/.idea/.idea.osaHealth/.idea/indexLayout.xml&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml&#10;#&#9;src/Repl/dapr-query-api/Framework.fsx&#10;#&#9;src/osaHealth.Api/osaHealth.Api.fsproj" />
     <MESSAGE value="feat: adds successful Recordings persistence" />
@@ -566,7 +565,8 @@
     <MESSAGE value="feat: forces little endian encoding for cursor token and utc for dates" />
     <MESSAGE value="feat: adds async support to BDD scenario" />
     <MESSAGE value="chore: removes third party reference in osaHealth.Framework" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: removes third party reference in osaHealth.Framework" />
+    <MESSAGE value="feat: implements xunit logging and output capture" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: implements xunit logging and output capture" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
