@@ -1,29 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <Compile Include="AssemblyInfo.fs" />
-        <Compile Include="MongoFixture.fs" />
-        <Compile Include="TestHost.fs" />
-        <Compile Include="ListRecordingsSteps.fs" />
-        <Compile Include="ListRecordingsFeature.Tests.fs" />
-        <Compile Include="Tests.fs" />
+        <Compile Include="AssemblyInfo.fs"/>
+        <Compile Include="MongoFixture.fs"/>
+        <Compile Include="TestHost.fs"/>
+        <Compile Include="ListRecordingsSteps.fs"/>
+        <Compile Include="ListRecordingsFeature.Tests.fs"/>
+        <Compile Include="Tests.fs"/>
         <None Include="xunit.runner.json">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" Version="6.0.4"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.9" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/>
-        <PackageReference Include="Testcontainers.MongoDb" Version="4.12.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4"/>
-        <PackageReference Update="FSharp.Core" Version="10.1.301" />
-        <PackageReference Include="xunit.v3" Version="3.2.2" />
+        <PackageReference Include="coverlet.collector"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="Testcontainers.MongoDb"/>
+        <PackageReference Include="xunit.runner.visualstudio"/>
+        <PackageReference Update="FSharp.Core"/>
+        <PackageReference Include="xunit.v3"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-        <ProjectReference Include="..\osaHealth.Api\osaHealth.Api.fsproj" />
-        <ProjectReference Include="..\osaHealth.Framework.Xunit\osaHealth.Framework.Xunit.fsproj" />
+        <ProjectReference Include="..\osaHealth.Api\osaHealth.Api.fsproj"/>
+        <ProjectReference Include="..\osaHealth.Framework.Xunit\osaHealth.Framework.Xunit.fsproj"/>
     </ItemGroup>
 
 </Project>

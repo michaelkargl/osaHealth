@@ -28,11 +28,11 @@
              but Oxpecker 2.0.1 requires assembly 10.0.0.0. Update overrides the SDK implicit
              reference without creating a duplicate that NuGet silently loses. -->
         <PackageReference Update="FSharp.Core" Version="10.1.301" />
-        <PackageReference Include="FsToolkit.ErrorHandling" Version="5.2.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Oxpecker" Version="2.0.1" />
-        <PackageReference Include="Oxpecker.OpenApi" Version="2.1.2" />
-        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
+        <PackageReference Include="FsToolkit.ErrorHandling" />
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Include="Oxpecker" />
+        <PackageReference Include="Oxpecker.OpenApi" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI"  />
     </ItemGroup>
 
 </Project>

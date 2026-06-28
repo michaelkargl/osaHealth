@@ -6,8 +6,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FSharp.UMX" Version="1.1.0"/>
-        <PackageReference Include="MongoDB.Driver" Version="3.9.0"/>
+        <PackageReference Include="FSharp.UMX"/>
+        <PackageReference Include="MongoDB.Driver"/>
     </ItemGroup>
 
     <ItemGroup>
