@@ -1,23 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    </PropertyGroup>
-
     <ItemGroup>
-        <Compile Include="Entities.fs" />
-        <Compile Include="Mapping.fs" />
-        <Compile Include="Respositories.fs" />
+        <Compile Include="Entities.fs"/>
+        <Compile Include="Mapping.fs"/>
+        <Compile Include="Respositories.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FSharp.UMX" Version="1.1.0" />
-      <PackageReference Include="MongoDB.Driver" Version="3.9.0" />
+        <PackageReference Include="FSharp.UMX" Version="1.1.0"/>
+        <PackageReference Include="MongoDB.Driver" Version="3.9.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\osaHealth.Domain\osaHealth.Domain.fsproj" />
+        <ProjectReference Include="..\osaHealth.Domain\osaHealth.Domain.fsproj"/>
     </ItemGroup>
 
 </Project>
