@@ -10,7 +10,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="Merge remote-tracking branch 'origin/main' into feat/adds-additional-filters-to-list-recordings-endpoint&#10;&#10;# Conflicts:&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml&#10;#&#9;src/osaHealth.Api.Tests/ListRecordingsSteps.fs&#10;#&#9;src/osaHealth.Api.Tests/osaHealth.Api.Tests.fsproj&#10;#&#9;src/osaHealth.Api/osaHealth.Api.fsproj&#10;#&#9;src/osaHealth.Framework.Tests/DateTime.Tests.fs&#10;#&#9;src/osaHealth.Framework.Tests/Guid.Tests.fs&#10;#&#9;src/osaHealth.Framework.Tests/String.Tests.fs&#10;#&#9;src/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj&#10;#&#9;src/osaHealth.Framework.Xunit/osaHealth.Framework.Xunit.fsproj" />
+    <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Directory.Packages.props" beforeDir="false" afterPath="$PROJECT_DIR$/Directory.Packages.props" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -91,7 +95,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "b0a507d4-ebb4-4d5d-8f26-bf2953c7f540.executor": "Debug",
-    "git-widget-placeholder": "Merging feat/adds-additional-filters-to-list-recordings-endpoint",
+    "git-widget-placeholder": "feat/adds-additional-filters-to-list-recordings-endpoint",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -576,7 +580,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782641983073</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="Merge remote-tracking branch 'origin/main' into feat/adds-additional-filters-to-list-recordings-endpoint">
+      <option name="closed" value="true" />
+      <created>1782922763174</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1782922763174</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -612,8 +624,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat: implements cursor token pagination" />
-    <MESSAGE value="feat: adds error handling" />
     <MESSAGE value="feat: adds exception handling" />
     <MESSAGE value="docs: documents computational expressions" />
     <MESSAGE value="chore: peer reviewing fixes" />
@@ -637,7 +647,9 @@
     <MESSAGE value="feat: corrects InvalidCursor error handling to resolve in 400 error code instead of payment required" />
     <MESSAGE value="feat: sharpens error handling of cursor decoding" />
     <MESSAGE value="feat: adds Directory.Build.props" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: adds Directory.Build.props" />
+    <MESSAGE value="Merge remote-tracking branch 'origin/main' into feat/adds-additional-filters-to-list-recordings-endpoint&#10;&#10;# Conflicts:&#10;#&#9;src/.idea/.idea.osaHealth/.idea/workspace.xml&#10;#&#9;src/osaHealth.Api.Tests/ListRecordingsSteps.fs&#10;#&#9;src/osaHealth.Api.Tests/osaHealth.Api.Tests.fsproj&#10;#&#9;src/osaHealth.Api/osaHealth.Api.fsproj&#10;#&#9;src/osaHealth.Framework.Tests/DateTime.Tests.fs&#10;#&#9;src/osaHealth.Framework.Tests/Guid.Tests.fs&#10;#&#9;src/osaHealth.Framework.Tests/String.Tests.fs&#10;#&#9;src/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj&#10;#&#9;src/osaHealth.Framework.Xunit/osaHealth.Framework.Xunit.fsproj" />
+    <MESSAGE value="Merge remote-tracking branch 'origin/main' into feat/adds-additional-filters-to-list-recordings-endpoint" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merge remote-tracking branch 'origin/main' into feat/adds-additional-filters-to-list-recordings-endpoint" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

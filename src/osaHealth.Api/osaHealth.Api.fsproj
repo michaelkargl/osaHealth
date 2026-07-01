@@ -25,6 +25,10 @@
 
     <ItemGroup>
         <PackageReference Include="FsToolkit.ErrorHandling" />
+        <!-- Explicit direct reference so the patched version pinned in Directory.Packages.props
+             overrides the vulnerable Microsoft.OpenApi 2.0.0 pulled in transitively by
+             Oxpecker.OpenApi. Remove once Oxpecker.OpenApi ships a release that depends on a patched version. -->
+        <PackageReference Include="Microsoft.OpenApi" />
         <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="Oxpecker" />
         <PackageReference Include="Oxpecker.OpenApi" />
