@@ -60,7 +60,7 @@ let private fetch (client: HttpClient) (url: string) : Task<JsonElement list * s
 
         let nextCursor =
             let el = doc.RootElement.GetProperty("nextCursor")
-            if el.ValueKind = JsonValueKind.Null then None else el.GetString() |> Some
+            if el.ValueKind = JsonValueKind.Null then None else el.GetString() |> Option.ofObj
 
         return items, nextCursor
     }

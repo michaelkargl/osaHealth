@@ -7,5 +7,8 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <WarningsAsErrors />
+        <!-- FSharp.Core is referenced explicitly (Directory.Build.targets) so CPM governs its
+             version. Drop the SDK's implicit 10.0.100 reference to avoid a version conflict. -->
+        <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     </PropertyGroup>
 </Project>

@@ -51,8 +51,17 @@ let decodePaginationToken (token: string) : string =
             $"raw=\"%s{token}\" (non-numeric)"
 
 let getPageKeys (json: JsonDocument) : string array =
-    let enumerator = json |> getJsonElement "results" |> _.EnumerateArray()
-    [| for result in enumerator -> result.GetProperty("key").GetString() |]
+    let enumerator =
+        json |> tryGetJsonElement "results" |> Option.map _.EnumerateArray()
+
+    match enumerator with
+    | None -> Array.empty
+    | Some e ->
+        [| for result in e ->
+               match result.TryGetProperty("key") with
+               | true, key -> key.GetString() |> Option.ofObj
+               | false, _ -> None |]
+        |> Array.choose id
 
 let getPageToken (json: JsonDocument) : string =
     match json |> tryGetStringValue "token" with

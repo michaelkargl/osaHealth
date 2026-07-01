@@ -11,14 +11,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Directory.Packages.props" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Api.Tests/osaHealth.Api.Tests.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api.Tests/osaHealth.Api.Tests.fsproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Directory.Build.props" beforeDir="false" afterPath="$PROJECT_DIR$/Directory.Build.props" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Directory.Package.props" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Api.Tests/ListRecordingsSteps.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api.Tests/ListRecordingsSteps.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Api/osaHealth.Api.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Domain/osaHealth.Domain.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Domain/osaHealth.Domain.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/osaHealth.Framework.Tests.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Xunit/osaHealth.Framework.Xunit.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Xunit/osaHealth.Framework.Xunit.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/osaHealth.Framework.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/osaHealth.Framework.fsproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/osaHealth.Repository/osaHealth.Repository.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Repository/osaHealth.Repository.fsproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/DateTime.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/DateTime.Tests.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/Guid.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/Guid.Tests.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/Json.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/Json.Tests.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework.Tests/String.Tests.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework.Tests/String.Tests.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/Dapr.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/Dapr.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/osaHealth.Framework/Json.fs" beforeDir="false" afterPath="$PROJECT_DIR$/osaHealth.Framework/Json.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,27 +93,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.osaHealth.Api.executor&quot;: &quot;Debug&quot;,
-    &quot;.NET Project.osaHealth.Api.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Project.osaHealth.Framework.Tests.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;b0a507d4-ebb4-4d5d-8f26-bf2953c7f540.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feat/adds-additional-filters-to-list-recordings-endpoint&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.ide.settings.notifications&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.osaHealth.Api.executor": "Debug",
+    ".NET Project.osaHealth.Api.executor": "Run",
+    ".NET Project.osaHealth.Framework.Tests.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "b0a507d4-ebb4-4d5d-8f26-bf2953c7f540.executor": "Debug",
+    "git-widget-placeholder": "feat/adds-additional-filters-to-list-recordings-endpoint",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Project.osaHealth.Framework.Tests">
     <configuration name="osaHealth.Api.Tests" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -241,7 +245,13 @@
       <workItem from="1782457882444" duration="44697000" />
       <workItem from="1782560686493" duration="2267000" />
       <workItem from="1782569180844" duration="2642000" />
-      <workItem from="1782641512472" duration="421000" />
+      <workItem from="1782641512472" duration="4116000" />
+      <workItem from="1782647775521" duration="878000" />
+      <workItem from="1782649437150" duration="1988000" />
+      <workItem from="1782651455691" duration="1640000" />
+      <workItem from="1782659713104" duration="8000" />
+      <workItem from="1782879775157" duration="2723000" />
+      <workItem from="1782921226812" duration="831000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -571,7 +581,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782502438701</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="feat: adds Directory.Build.props">
+      <option name="closed" value="true" />
+      <created>1782641983073</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1782641983073</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -607,7 +625,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="feat: implements listAll endpoint (without cursor)" />
     <MESSAGE value="feat: implements cursor token pagination" />
     <MESSAGE value="feat: adds error handling" />
     <MESSAGE value="feat: adds exception handling" />
@@ -632,7 +649,8 @@
     <MESSAGE value="feat: corrects backend database ADR" />
     <MESSAGE value="feat: corrects InvalidCursor error handling to resolve in 400 error code instead of payment required" />
     <MESSAGE value="feat: sharpens error handling of cursor decoding" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: sharpens error handling of cursor decoding" />
+    <MESSAGE value="feat: adds Directory.Build.props" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: adds Directory.Build.props" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
