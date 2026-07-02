@@ -116,6 +116,46 @@ See [Keyset Pagination](#keyset-pagination).
 
 ## D
 
+### Directory.Build.props
+
+An MSBuild file that is **automatically imported into every project** in its folder tree — no
+`<Import>` needed. MSBuild walks upward from each `.fsproj`, finds the nearest
+`Directory.Build.props`, and imports it **early** (before the project's own body), so projects can
+read or override whatever it sets. It is where "settings that apply to every project" live, instead
+of copy-pasting them into all four `.fsproj` files.
+
+Compared to `Directory.Build.props`, which imports **early** in the build process, there is also 
+[Directory.Build.targets](#directorybuildtargets), which imports **late** and has the final say so to speak. 
+
+### Directory.Build.targets
+
+The late-imported sibling of [Directory.Build.props](#directorybuildprops). MSBuild auto-imports it
+the same way, but **after** the project body rather than before — so it gets the "final say", layering
+on top of everything the project declared. Used for settings that must override project content.
+
+### Directory.Packages.props
+
+The configuration file for **Central Package Management (CPM)**. With
+`ManagePackageVersionsCentrally` set to `true`, project files list *which* packages they use
+(`<PackageReference Include="X" />`) but **not** the version; the version comes from a single
+`<PackageVersion Include="X" Version="..." />` line here. One line per package — the single source of
+truth for versions across every project in the solution.
+
+```xml
+<!-- Directory.Packages.props — declares the version -->
+<PackageVersion Include="FSharp.Core" Version="10.1.301" />
+```
+```xml
+<!-- any project (or Directory.Build.props) — references it, no version -->
+<PackageReference Include="FSharp.Core" />
+```
+
+A `PackageVersion` may express a minimum ("floor") rather than an exact pin — "I need at least this,
+newer is fine". NuGet resolves **one** version per package for the whole dependency graph that
+satisfies every floor at once, so a library's floor never forces its own private copy.
+
+See [Directory.Build.props](#directorybuildprops).
+
 ### Domain Model Layer
 
 See [onion-architecture.md](onion-architecture.md#domain-model-layer).

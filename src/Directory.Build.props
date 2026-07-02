@@ -7,8 +7,30 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <WarningsAsErrors />
-        <!-- FSharp.Core is referenced explicitly (Directory.Build.targets) so CPM governs its
-             version. Drop the SDK's implicit 10.0.100 reference to avoid a version conflict. -->
+        <!-- Take over FSharp.Core ourselves (see the ItemGroup below for the full why).
+             The SDK normally adds its own ("implicit") FSharp.Core reference. We switch that
+             off so it does not collide with the explicit reference we add ourselves. This is
+             purely to avoid a duplicate reference to the same package. -->
         <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Why we reference FSharp.Core explicitly for every project:
+
+             We depend on FSharp.UMX (typed IDs like Guid<RecordingId>). UMX carries a
+             TRANSITIVE dependency on FSharp.Core with a minimum ("floor") version of 4.3.4 —
+             i.e. "I need at least 4.3.4, newer is fine". That floor predates the `task`
+             computation expression we rely on, so on its own it is too old.
+
+             NuGet resolves ONE FSharp.Core for the whole project (it does not give each
+             library its own copy). By referencing FSharp.Core directly here, our direct
+             reference outranks UMX's transitive floor, and everyone — UMX included — links
+             against the version we choose.
+
+             No version number on purpose: Central Package Management sets it in one place,
+             Directory.Packages.props (currently 10.1.301). The DisableImplicitFSharpCoreReference
+             property above removes the SDK's built-in FSharp.Core so it does not collide with
+             this reference. -->
+        <PackageReference Include="FSharp.Core" />
+    </ItemGroup>
 </Project>

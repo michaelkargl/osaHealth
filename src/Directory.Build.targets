@@ -1,8 +1,0 @@
-<Project>
-    <ItemGroup>
-        <!-- FSharp.UMX (transitive) pins FSharp.Core to its 4.3.4 floor, which predates the
-             `task` computation expression. Reference it directly so Central Package Management
-             (Directory.Packages.props) governs the version for every project. -->
-        <PackageReference Include="FSharp.Core" />
-    </ItemGroup>
-</Project>
