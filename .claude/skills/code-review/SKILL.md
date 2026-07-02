@@ -6,41 +6,66 @@ description: >
   inline comments via one batched GitHub API call. Native PowerShell — no /tmp, no cygpath,
   no node, no python.
 user-invocable: true
-allowed-tools: PowerShell(Get-Command *), PowerShell(Get-CrTempDir*), PowerShell(Test-CrRepo*), PowerShell(Get-CrPrMetadata*), PowerShell(New-CrWorktree*), PowerShell(Get-CrMergeBase*), PowerShell(Write-CrFileList*), PowerShell(Write-CrDiff*), PowerShell(Get-CrExistingComments*), PowerShell(Publish-CrReview*), PowerShell(Remove-CrWorktree*), Read, Grep, Glob, Write, Agent
+allowed-tools: PowerShell(*Prep-Pr.ps1*), PowerShell(git *), PowerShell(gh *), PowerShell(Remove-Item*), Read, Grep, Glob, Write, Agent
 ---
 
 <!--
-  FLOW  (every step is a self-contained PowerShell call — no module dependency)
+  FLOW  (Prep-Pr.ps1 owns the git plumbing; the skill orchestrates + posts)
 
   /code-review-osa <PR>
      │
-  STEP 1  git remote check ─(not osaHealth)──────────────────────────────────────► STOP
-          $env:TEMP ─► {TEMP_DIR}
-          gh pr view ─► {TITLE} {baseRefName} {HEAD_SHA}
-          git fetch + git worktree add ─► worktree at {TEMP_DIR}\cr-worktree-{PR}
-          git merge-base ─► {MERGE_BASE}
-          git diff --name-only ─► files.txt ─► lanes:
-                                 *.fs / *.fsx      → F#    ┐ reviewed
-                                 docs/**/*.md       → Docs  ┘
-                                 src/frontend/**    → Dart   (DORMANT → "unchecked")
-                                 everything else    → "unchecked"
+  STEP 1  Prep-Pr.ps1 -PrNumber {PR}
+            ├─ verify remote ─(not osaHealth)─► STOP
+            ├─ gh pr view ─► title / base / head SHA
+            ├─ git fetch + worktree add ─► {TEMP_DIR}\cr-worktree-{PR}
+            ├─ git merge-base ─► {MERGE_BASE}
+            ├─ git diff --name-only ─► lanes:  *.fs/*.fsx → F#      ┐ reviewed
+            │                                  docs/**/*.md → Docs   ┘
+            │                                  src/frontend/lib/**/*.dart → Dart (unchecked)
+            │                                  everything else → "unchecked"
+            └─ git diff (F#+Docs) ─► fsharp-docs.diff
+          ─► writes ONE review-context.json ─► skill reads it for every placeholder
      ▼
-  STEP 2  git diff (filtered to F#+Docs) ─► fsharp-docs.diff
-     ▼
-  STEP 3  Read agent-prompt.md ─► substitute placeholders ─► launch BLOCKING Opus Agent
+  STEP 2  Read agent-prompt.md ─► substitute placeholders ─► launch BLOCKING Opus Agent
             agent reads: review-checklist.md + the diff + docs/ guidelines
             agent returns: structured report (checks · MUST/NICE FIX · security · perf)
      ▼
-  STEP 4  Compile + print terminal summary (all sections required)
+  STEP 3  Compile + print terminal summary (all sections required)
      ▼
-  STEP 5  gh api GET comments ─► dedup index (path, title) ─► drop already-posted issues
-            └─ all duplicates? ─► print "no new comments" ─► STEP 6
+  STEP 4  gh api GET comments ─► dedup index (path, title) ─► drop already-posted issues
+            └─ all duplicates? ─► print "no new comments" ─► STEP 5
           verify line numbers in hunks (Grep) ─► Write new-comments.json ─► gh api POST review
      ▼
-  STEP 6  git worktree remove · git branch -D · Remove-Item review dir
+  STEP 5  git worktree remove · git branch -D · Remove-Item review dir
 -->
 
 # Code Review (osaHealth)
+
+## What this does (read this first)
+
+At heart this skill is **four moves**. Everything below is in service of them:
+
+1. **Get an isolated copy of the PR's code** — so the review reads changed files
+   without disturbing your working directory.
+2. **Work out exactly what changed** — which files, and which lines within them.
+3. **Hand that diff to an Opus agent** with `review-checklist.md`, and get back a
+   structured report (must-fix · nice-to-fix · security · perf).
+4. **Post the findings to the PR as inline comments** — deduped, so re-runs don't
+   repeat what was already said.
+
+### Why so many git commands?
+
+They're **three jobs, not seven separate ideas**:
+
+| Job | Commands | Why |
+|-----|----------|-----|
+| Get the code | `git fetch` + `git worktree add` | A worktree is a second checkout in a temp dir — that's what keeps your working directory untouched. |
+| Scope the review | `git merge-base` + `git diff --name-only` + `git diff` | merge-base finds where the PR branched off base; the file list drives the F#/Docs/Dart lanes; the line-level diff lets the agent judge only `+` lines. |
+| Clean up | `git worktree remove` + `git branch -D` | Undo the first job so temp dirs don't accumulate. |
+
+**Adding checks (e.g. OWASP) touches none of this.** Security lives in
+`review-checklist.md` (rule 13) and the "Security Analysis" section of
+`agent-prompt.md`. Extend those; leave the git plumbing alone.
 
 ## Input
 
@@ -83,106 +108,56 @@ These are **FORBIDDEN** during a review:
 
 ---
 
-### Step 1: PR information and worktree
+### Step 1: Prepare the PR (one call)
 
 **1a.** Extract `{PR}` (the PR number) from the input. Repo is always `michaelkargl/osaHealth`.
 
+**1b.** Run the prep script. It owns *all* the git plumbing — verify remote, fetch PR
+metadata, fetch + worktree the PR head, compute the merge-base, partition the changed
+files into lanes, and write the F#+Docs diff — and emits one `review-context.json`:
+
 ```ps1
-# 1b. Verify repo
-$origin = git remote get-url origin 2>&1; if ($LASTEXITCODE -ne 0 -or $origin -notmatch 'michaelkargl/osaHealth') { throw "Cannot review this PR -- the git remote ('$origin') is not michaelkargl/osaHealth." }; Write-Output "Origin verified: $origin"
+& .\.claude\skills\code-review\Prep-Pr.ps1 -PrNumber {PR}
 <#
-If it throws, stop and surface the error message to the user.
-Do not attempt to work around the mismatch.
+Single source of truth for the "get the code" + "scope the review" plumbing.
+If it throws (wrong remote, deleted PR), STOP and surface the message — do not work around it.
+Lane partitioning is done in the script; you do NOT classify files by hand.
 #>
 ```
 
-```ps1
-# 1c. Resolve temp dir
-$env:TEMP
-<#
-Store the output as {TEMP_DIR} — used for Read tool paths, agent prompt, and subsequent commands.
-Example output: C:\Users\kami\AppData\Local\Temp
-#>
-```
-
-```ps1
-# 1d. Fetch PR metadata
-gh pr view {PR} --repo michaelkargl/osaHealth --json title,body,headRefName,baseRefName,headRefOid
-<#
-Extract and store: title, body (truncate to first 500 chars -> {BODY_SUMMARY}),
-headRefName, baseRefName, headRefOid (= {HEAD_SHA}).
-#>
-```
-
-```ps1
-# 1e. Fetch PR branch
-git fetch origin "pull/{PR}/head:cr-pr-{PR}"
-<#
-If it fails, the PR may have been deleted — stop and report.
-#>
-```
-
-```ps1
-# 1e-2. Create worktree
-git worktree add "{TEMP_DIR}\cr-worktree-{PR}" "cr-pr-{PR}"
-<#
-All file reads during the review use {TEMP_DIR}\cr-worktree-{PR}\ as the root.
-#>
-```
-
-```ps1
-# 1f. Get merge base
-git merge-base "origin/{baseRefName}" "cr-pr-{PR}"
-<#
-Store the printed SHA as {MERGE_BASE}.
-#>
-```
-
-```ps1
-# 1g. Write changed-file list
-New-Item -ItemType Directory -Force "{TEMP_DIR}\cr-review-{PR}" | Out-Null; git diff --name-only "{MERGE_BASE}..cr-pr-{PR}" | Out-File -FilePath "{TEMP_DIR}\cr-review-{PR}\files.txt" -Encoding utf8
-<#
-Read the output of this command — it's the path to files.txt. Read it with the Read tool immediately after.
-Do NOT use gh pr view --json files — it paginates silently at 100 files.
-git diff --name-only has no pagination limit.
-#>
-```
+**1c.** Read the context contract the script just wrote. This is the single source for
+every placeholder used in the rest of the review:
 
 ```
-Read("{TEMP_DIR}\cr-review-{PR}\files.txt")
+Read("{TEMP_DIR}\cr-review-{PR}\review-context.json")
 ```
 
-Partition the file list into lanes:
-- **F# lane**: any file matching `*.fs` or `*.fsx`
-- **Docs lane**: any file matching `docs/**/*.md`
-- **Dart lane**: any file matching `src/frontend/lib/**/*.dart` — note as "unchecked", skip review
-- **Other**: everything else — note in summary, never silently skip
+`{TEMP_DIR}` is `$env:TEMP`. The JSON supplies:
+
+| `review-context.json` field | Used as |
+|---|---|
+| `mergeBase` | `{MERGE_BASE}` |
+| `headSha` | `{HEAD_SHA}` |
+| `baseRefName` | base branch |
+| `title` | `{TITLE}` |
+| `bodySummary` | `{BODY_SUMMARY}` (already truncated to 500 chars) |
+| `worktreePath` | root for all worktree file reads |
+| `diffPath` | F#+Docs diff, used for line-number checks in Step 4 |
+| `fsFiles` / `docsFiles` | `{FS_FILE_LIST}` / `{DOCS_FILE_LIST}` |
+| `dartFiles` | carry to the summary as "unchecked" (Dormant lane) |
+| `otherFiles` | carry to the summary as "unchecked" — never silently skip |
+
+**1d.** Sanity-check the diff exists (non-empty whenever `fsFiles`/`docsFiles` is non-empty):
+
+```
+Read("<diffPath from review-context.json>", limit: 5)
+```
+
+If it is empty but `fsFiles`/`docsFiles` listed files, stop and diagnose.
 
 ---
 
-### Step 2: Write diffs
-
-```ps1
-# 2. Write F# + Docs diff
-New-Item -ItemType Directory -Force "{TEMP_DIR}\cr-review-{PR}\diffs" | Out-Null; git diff "{MERGE_BASE}..cr-pr-{PR}" -- {fs_file_1} {fs_file_2} {docs_file_1} | Out-File -FilePath "{TEMP_DIR}\cr-review-{PR}\diffs\fsharp-docs.diff" -Encoding utf8
-<#
-Replace {fs_file_1} {fs_file_2} {docs_file_1} with every F# and Docs file identified in step 1g.
-Sanity check: every file from 1g must be in a lane.
-Files outside F#/Docs/Dart must be noted in the summary as "unchecked".
-#>
-```
-
-Verify the diff was written (non-empty):
-
-```
-Read("{TEMP_DIR}\cr-review-{PR}\diffs\fsharp-docs.diff", limit: 5)
-```
-
-If the output is empty but there were F#/docs files in the change list, stop and diagnose.
-
----
-
-### Step 3: Launch F# + Docs review agent
+### Step 2: Launch F# + Docs review agent
 
 Read the agent prompt template:
 
@@ -190,18 +165,19 @@ Read the agent prompt template:
 Read("C:\Users\kami\workspace\github-space\osaHealth\.claude\skills\code-review\agent-prompt.md")
 ```
 
-Substitute these placeholders in the template text:
+Substitute these placeholders in the template text — every value comes from the
+`review-context.json` read in Step 1c:
 
-| Placeholder | Value |
-|-------------|-------|
-| `{PR}` | PR number |
-| `{TITLE}` | PR title from step 1d |
-| `{BODY_SUMMARY}` | First 500 chars of PR body |
-| `{MERGE_BASE}` | SHA from step 1f |
-| `{HEAD_SHA}` | `headRefOid` from step 1d |
-| `{TEMP_DIR}` | Native path from step 1c |
-| `{FS_FILE_LIST}` | F# files from step 1g |
-| `{DOCS_FILE_LIST}` | Docs files from step 1g |
+| Placeholder | `review-context.json` field |
+|-------------|-----------------------------|
+| `{PR}` | `prNumber` |
+| `{TITLE}` | `title` |
+| `{BODY_SUMMARY}` | `bodySummary` |
+| `{MERGE_BASE}` | `mergeBase` |
+| `{HEAD_SHA}` | `headSha` |
+| `{TEMP_DIR}` | `tempDir` |
+| `{FS_FILE_LIST}` | `fsFiles` |
+| `{DOCS_FILE_LIST}` | `docsFiles` |
 
 Launch a **blocking** Agent with the substituted text as the prompt:
 
@@ -217,7 +193,7 @@ The agent's tool result (~10–15 KB) is the structured report. Do NOT re-read t
 
 ---
 
-### Step 4: Compile and present review summary
+### Step 3: Compile and present review summary
 
 Compile the agent's report into the format below.
 **ALL sections are REQUIRED** — include every section even when it has no findings.
@@ -298,7 +274,7 @@ No performance issues detected. [or table]
 
 ---
 
-### Step 5: Dedup and post inline comments
+### Step 4: Dedup and post inline comments
 
 ```ps1
 # 5a. Fetch existing PR review comments
@@ -327,7 +303,7 @@ Build a set of `(path, title)` pairs. This is the dedup index.
 If every candidate is a duplicate, print:
 > "No new review comments to post on PR #{PR} — all {N} issues from this run are already present as Claude-generated comments."
 
-…and proceed directly to Step 6.
+…and proceed directly to Step 5.
 
 **5d. Verify line numbers:** for each remaining candidate, confirm the reported line is inside a diff hunk by checking `{TEMP_DIR}\cr-review-{PR}\diffs\fsharp-docs.diff` with Grep. If the line is not inside a hunk, snap to the nearest line that IS in the diff context. The GitHub API rejects comments on lines outside the diff.
 
@@ -368,7 +344,7 @@ After the call returns, print: "Posted {N} new review comments on PR #{PR} ({M} 
 
 ---
 
-### Step 6: Cleanup
+### Step 5: Cleanup
 
 ```ps1
 # 6. Remove worktree, branch, and temp dir
