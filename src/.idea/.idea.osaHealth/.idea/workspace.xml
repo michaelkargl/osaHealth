@@ -11,9 +11,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27543ad-d104-4973-8d84-a77dfdf1a4a9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../.claude/skills/code-review/CodeReview.psm1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.claude/skills/code-review/Prep-Pr.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/../.claude/skills/code-review/Prep-Pr.ps1" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.claude/skills/code-review/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/../.claude/skills/code-review/SKILL.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/indexLayout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.claude/skills/code-review/agent-prompt.md" beforeDir="false" afterPath="$PROJECT_DIR$/../.claude/skills/code-review/agent-prompt.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.claude/skills/code-review/review-checklist.md" beforeDir="false" afterPath="$PROJECT_DIR$/../.claude/skills/code-review/review-checklist.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.osaHealth/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -329,7 +330,10 @@
       <workItem from="1782659713104" duration="8000" />
       <workItem from="1782879775157" duration="2723000" />
       <workItem from="1782921226812" duration="831000" />
-      <workItem from="1782967438024" duration="3639000" />
+      <workItem from="1782967438024" duration="3708000" />
+      <workItem from="1783005371571" duration="1733000" />
+      <workItem from="1783007158778" duration="1085000" />
+      <workItem from="1783012393639" duration="3214000" />
     </task>
     <task id="LOCAL-00001" summary="chore: refactors 01-filter-basics to be more verbose">
       <option name="closed" value="true" />
@@ -691,7 +695,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782968652529</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="feat: improves code-review skill maintainability by extracting PR prep code into dedicated script">
+      <option name="closed" value="true" />
+      <created>1782971149092</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1782971149092</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -727,7 +739,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="chore: peer reviewing fixes" />
     <MESSAGE value="feat: refactors the listRecordsQuery to have userId and to/from dates" />
     <MESSAGE value="feat: implements additional request properties" />
     <MESSAGE value="docs: create pagination documentation" />
@@ -752,7 +763,8 @@
     <MESSAGE value="Merge remote-tracking branch 'origin/main' into feat/adds-additional-filters-to-list-recordings-endpoint" />
     <MESSAGE value="chore: patches vulnerable transitive Microssoft.OpenApi dependency" />
     <MESSAGE value="docs: refactors documentation to be more verbose" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs: refactors documentation to be more verbose" />
+    <MESSAGE value="feat: improves code-review skill maintainability by extracting PR prep code into dedicated script" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: improves code-review skill maintainability by extracting PR prep code into dedicated script" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
