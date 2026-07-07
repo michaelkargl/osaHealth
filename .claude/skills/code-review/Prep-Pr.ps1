@@ -38,6 +38,8 @@ param(
     [string]$Repo = 'michaelkargl/osaHealth'
 )
 
+Import-Module (Join-Path $PSScriptRoot 'Cli.psm1') -Force
+
 <#
 .SYNOPSIS
 Throws unless the git remote 'origin' points at the expected repository.
@@ -48,15 +50,15 @@ PR number, used only to phrase the error message.
 .PARAMETER Repo
 Repository slug the origin URL must contain.
 #>
-function Confirm-OriginRemote {
+function Assert-OriginRemote {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)][string]$PrNumber,
         [Parameter(Mandatory)][string]$Repo
     )
 
-    $origin = git remote get-url origin
-    if ($LASTEXITCODE -ne 0 -or $origin -notmatch [regex]::Escape($Repo)) {
+    $origin = Read-Cli git remote get-url origin
+    if ($origin -notmatch [regex]::Escape($Repo)) {
         throw "Cannot review PR $PrNumber -- the git remote ('$origin') is not $Repo. Run from a local clone of that repo."
     }
 }
@@ -67,8 +69,8 @@ Fetches PR metadata from GitHub.
 
 .DESCRIPTION
 Queries 'gh pr view' and returns the fields the review needs: base ref, head SHA,
-title, and the PR body truncated to 500 characters (empty string when the PR has
-no body).
+title, and the PR description truncated to 500 characters (empty string when the
+PR has no description).
 
 .PARAMETER PrNumber
 The pull request number to query.
@@ -83,15 +85,14 @@ function Get-PrMetadata {
         [Parameter(Mandatory)][string]$Repo
     )
 
-    $metaJson = gh pr view $PrNumber --repo $Repo --json title,body,headRefName,baseRefName,headRefOid
-    if ($LASTEXITCODE -ne 0) { throw "gh pr view failed for PR $PrNumber (the PR may not exist)." }
+    $metaJson = Read-Cli gh pr view $PrNumber --repo $Repo --json 'title,body,headRefName,baseRefName,headRefOid' -ErrorCodes @{ 1 = 'the PR may not exist' }
     $meta = $metaJson | ConvertFrom-Json
 
     [pscustomobject]@{
         BaseRef     = $meta.baseRefName
         HeadSha     = $meta.headRefOid
         Title       = $meta.title
-        BodySummary = if ($meta.body) { $meta.body.Substring(0, [Math]::Min(500, $meta.body.Length)) } else { '' }
+        Description = if ($meta.body) { $meta.body.Substring(0, [Math]::Min(500, $meta.body.Length)) } else { '' }
     }
 }
 
@@ -107,7 +108,7 @@ if the directory moves or the repo is cloned elsewhere.
 .PARAMETER PrNumber
 The pull request number the layout is for.
 #>
-function Get-ReviewLayout {
+function Resolve-ReviewPaths {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)][string]$PrNumber
@@ -118,7 +119,7 @@ function Get-ReviewLayout {
     $diffsDir  = Join-Path $reviewDir 'diffs'
     $skillDir  = $PSScriptRoot
 
-    [pscustomobject]@{
+    [pscustomobject] @{
         PrNumber           = $PrNumber
         Branch             = "cr-pr-$PrNumber"
         TempDir            = $tempDir
@@ -143,20 +144,28 @@ Best-effort pre-clean so a re-run never trips over stale state: removes the PR's
 worktree if present, prunes stale worktree registrations, and deletes the PR's
 tracking branch if present.
 
-.PARAMETER Layout
-Review layout object from Get-ReviewLayout.
+.PARAMETER PrNumber
+PR number, used only to phrase the confirmation prompt.
+
+.PARAMETER WorktreePath
+Path of the worktree to remove if present.
+
+.PARAMETER Branch
+Name of the tracking branch to delete if present.
 #>
 function Remove-StaleReviewState {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory)][object]$Layout
+        [Parameter(Mandatory)][string]$PrNumber,
+        [Parameter(Mandatory)][string]$WorktreePath,
+        [Parameter(Mandatory)][string]$Branch
     )
 
-    if (-not $PSCmdlet.ShouldProcess("PR $($Layout.PrNumber)", 'Remove stale review state from previous runs')) { return }
+    if (-not $PSCmdlet.ShouldProcess("PR $PrNumber", 'Remove stale review state from previous runs')) { return }
 
-    if (Test-Path $Layout.WorktreePath) { git worktree remove $Layout.WorktreePath --force }
+    if (Test-Path $WorktreePath) { git worktree remove $WorktreePath --force }
     git worktree prune
-    if (git branch --list $Layout.Branch) { git branch -D $Layout.Branch }
+    if (git branch --list $Branch) { git branch -D $Branch }
 }
 
 <#
@@ -167,22 +176,29 @@ Fetches the PR head and materialises it as an isolated worktree.
 Fetches 'pull/<N>/head' into the PR's tracking branch and adds a git worktree for
 it under $env:TEMP, leaving the main working directory untouched.
 
-.PARAMETER Layout
-Review layout object from Get-ReviewLayout.
+.PARAMETER PrNumber
+The pull request number to fetch.
+
+.PARAMETER Branch
+Name of the tracking branch to fetch the PR head into.
+
+.PARAMETER WorktreePath
+Path at which to add the git worktree.
 #>
 function New-PrWorktree {
-    [CmdletBinding(SupportsShouldProcess)]
+    [CmdletBinding(SupportsShouldProcess)]  
     param(
-        [Parameter(Mandatory)][object]$Layout
+        [Parameter(Mandatory)][string]$PrNumber,
+        [Parameter(Mandatory)][string]$Branch,
+        [Parameter(Mandatory)][string]$WorktreePath
     )
 
-    if (-not $PSCmdlet.ShouldProcess("PR $($Layout.PrNumber)", "Fetch the PR head and add a worktree at $($Layout.WorktreePath)")) { return }
+    # Explicit forward required: $WhatIfPreference doesn't cross the module boundary.
+    Write-Cli git fetch origin "pull/$PrNumber/head:$Branch" `
+        -ErrorCodes @{ 128 = 'the PR may have been deleted' } -WhatIf:$WhatIfPreference
 
-    git fetch origin "pull/$($Layout.PrNumber)/head:$($Layout.Branch)"
-    if ($LASTEXITCODE -ne 0) { throw "git fetch failed for PR $($Layout.PrNumber) (the PR may have been deleted)." }
-
-    git worktree add $Layout.WorktreePath $Layout.Branch
-    if ($LASTEXITCODE -ne 0) { throw "git worktree add failed for PR $($Layout.PrNumber)." }
+    # Explicit forward required: $WhatIfPreference doesn't cross the module boundary.
+    Write-Cli git worktree add $WorktreePath $Branch -WhatIf:$WhatIfPreference
 }
 
 <#
@@ -198,24 +214,27 @@ and Other (everything else). Git emits forward slashes, so the patterns match on
 .PARAMETER BaseRef
 Name of the PR's base branch (without the 'origin/' prefix).
 
-.PARAMETER Layout
-Review layout object from Get-ReviewLayout.
+.PARAMETER PrNumber
+PR number, used only to phrase error messages.
+
+.PARAMETER Branch
+Name of the PR's tracking branch.
 #>
 function Get-ReviewScope {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)][string]$BaseRef,
-        [Parameter(Mandatory)][object]$Layout
+        [Parameter(Mandatory)][string]$PrNumber,
+        [Parameter(Mandatory)][string]$Branch
     )
 
     # Capture before trimming: if git fails its output is $null, and $null.Trim() would
     # mask the intended error below with a null-method exception.
-    $mergeBaseRaw = git merge-base "origin/$BaseRef" $Layout.Branch
-    if ($LASTEXITCODE -ne 0 -or -not $mergeBaseRaw) { throw "git merge-base failed for PR $($Layout.PrNumber)." }
+    $mergeBaseRaw = Read-Cli git merge-base "origin/$BaseRef" $Branch
+    if (-not $mergeBaseRaw) { throw "git merge-base failed for PR $PrNumber." }
     $mergeBase = "$mergeBaseRaw".Trim()
 
-    $changed = git diff --name-only "$mergeBase..$($Layout.Branch)"
-    if ($LASTEXITCODE -ne 0) { throw "git diff --name-only failed for PR $($Layout.PrNumber)." }
+    $changed = Read-Cli git diff --name-only "$mergeBase..$Branch"
     # A PR with no changes emits nothing, leaving $changed = $null; drop that so it
     # cannot pass the OtherFiles filter as a phantom entry.
     $changed = @($changed | Where-Object { $_ })
@@ -242,30 +261,45 @@ Writes the unified diff of the reviewed lanes (F# + Docs) to the layout's diff p
 Creates the diffs directory and writes the line-level diff for the F# and Docs lanes.
 When neither lane has files, writes an empty diff file so downstream reads never miss.
 
-.PARAMETER Scope
-Review scope object from Get-ReviewScope.
+.PARAMETER FsFiles
+F# files in scope for the diff (from Get-ReviewScope).
 
-.PARAMETER Layout
-Review layout object from Get-ReviewLayout.
+.PARAMETER DocsFiles
+Docs files in scope for the diff (from Get-ReviewScope).
+
+.PARAMETER MergeBase
+Merge-base commit the diff is computed from (from Get-ReviewScope).
+
+.PARAMETER DiffPath
+Destination path of the unified diff file.
+
+.PARAMETER DiffsDir
+Directory containing DiffPath; created if missing.
+
+.PARAMETER Branch
+Name of the PR's tracking branch, the diff's end ref.
 #>
 function Write-ReviewDiff {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory)][object]$Scope,
-        [Parameter(Mandatory)][object]$Layout
+        [Parameter(Mandatory)][string[]]$FsFiles,
+        [Parameter(Mandatory)][string[]]$DocsFiles,
+        [Parameter(Mandatory)][string]$MergeBase,
+        [Parameter(Mandatory)][string]$DiffPath,
+        [Parameter(Mandatory)][string]$DiffsDir,
+        [Parameter(Mandatory)][string]$Branch
     )
 
-    if (-not $PSCmdlet.ShouldProcess($Layout.DiffPath, 'Write the F# + Docs diff')) { return }
+    New-Item -ItemType Directory -Force $DiffsDir | Out-Null
 
-    New-Item -ItemType Directory -Force $Layout.DiffsDir | Out-Null
-
-    $reviewFiles = @($Scope.FsFiles + $Scope.DocsFiles)
+    $reviewFiles = @($FsFiles + $DocsFiles)
     if ($reviewFiles.Count -gt 0) {
-        git diff "--output=$($Layout.DiffPath)" "$($Scope.MergeBase)..$($Layout.Branch)" -- $reviewFiles
-        if ($LASTEXITCODE -ne 0) { throw "git diff failed for PR $($Layout.PrNumber)." }
+        $diffArgs = @('diff', "--output=$DiffPath", "$MergeBase..$Branch", '--') + $reviewFiles
+        # Explicit forward required: $WhatIfPreference doesn't cross the module boundary.
+        Write-Cli -Command 'git' -Arguments $diffArgs -WhatIf:$WhatIfPreference
     }
     else {
-        Set-Content -Path $Layout.DiffPath -Value '' -Encoding utf8
+        Set-Content -Path $DiffPath -Value '' -Encoding utf8
     }
 }
 
@@ -333,7 +367,9 @@ function Write-ReviewSummary {
         'Dart files'  = "$($Context.dartFiles.Count) (unchecked)"
         'Other files' = "$($Context.otherFiles.Count) (unchecked)"
     }
-    $summary.GetEnumerator() | ForEach-Object { '{0,-12} {1}' -f $_.Key, $_.Value } | Write-Host
+    
+    $width = ($summary.Keys | Measure-Object -Property Length -Maximum).Maximum
+    $summary.GetEnumerator() | ForEach-Object { "{0,-$width} {1}" -f $_.Key, $_.Value } | Write-Host
 }
 
 <#
@@ -347,23 +383,43 @@ function Invoke-Main {
     Set-StrictMode -Version Latest
     $ErrorActionPreference = 'Stop'
 
-    Confirm-OriginRemote -PrNumber $PrNumber -Repo $Repo
+    Assert-OriginRemote -PrNumber $PrNumber -Repo $Repo
     $meta   = Get-PrMetadata -PrNumber $PrNumber -Repo $Repo
-    $layout = Get-ReviewLayout -PrNumber $PrNumber
+    $layout = Resolve-ReviewPaths -PrNumber $PrNumber
 
-    Remove-StaleReviewState -Layout $layout
-    New-PrWorktree -Layout $layout
+    Remove-StaleReviewState `
+        -PrNumber $PrNumber `
+        -WorktreePath $layout.WorktreePath `
+        -Branch $layout.Branch
 
-    # The scope computation needs the fetched PR branch, which -WhatIf skips.
+    New-PrWorktree `
+        -PrNumber $PrNumber `
+        -Branch $layout.Branch `
+        -WorktreePath $layout.WorktreePath
+
+    # Get-ReviewScope is read-only and always executes -- it can't itself skip
+    # under -WhatIf. But it depends on the PR branch New-PrWorktree just (not
+    # actually) fetched, so calling it here would either error on a nonexistent
+    # ref or, if gated, throw the merge-base null-check below. Stop here instead.
     if ($WhatIfPreference) {
-        Write-Host 'What if: Would compute the merge-base, partition changed files into lanes, and write the diff and review-context.json.'
+        Write-Host 'What if: Would compute the review scope and write the diff and review-context.json.'
         return
     }
 
-    $scope = Get-ReviewScope -BaseRef $meta.BaseRef -Layout $layout
-    Write-ReviewDiff -Scope $scope -Layout $layout
+    $scope = Get-ReviewScope `
+                -BaseRef $meta.BaseRef `
+                -PrNumber $PrNumber `
+                -Branch $layout.Branch
+    
+    Write-ReviewDiff `
+        -FsFiles $scope.FsFiles `
+        -DocsFiles $scope.DocsFiles `
+        -MergeBase $scope.MergeBase `
+        -DiffPath $layout.DiffPath `
+        -DiffsDir $layout.DiffsDir `
+        -Branch $layout.Branch
 
-    $context = [ordered]@{
+    $context = [ordered] @{
         prNumber           = $PrNumber
         repo               = $Repo
         branch             = $layout.Branch
@@ -379,12 +435,13 @@ function Invoke-Main {
         headSha            = $meta.HeadSha
         baseRefName        = $meta.BaseRef
         title              = $meta.Title
-        bodySummary        = $meta.BodySummary
+        description        = $meta.Description
         fsFiles            = $scope.FsFiles
         docsFiles          = $scope.DocsFiles
         dartFiles          = $scope.DartFiles
         otherFiles         = $scope.OtherFiles
     }
+
     Write-ReviewContext -Context $context -Path $layout.ContextPath
     Write-ReviewSummary -Context $context -Path $layout.ContextPath
 }

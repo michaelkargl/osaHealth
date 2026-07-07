@@ -7,11 +7,11 @@ Review the F# and documentation changes in PR {prNumber} and return a structured
 - NEVER use the Bash tool — use Read, Grep, and Glob tools only for file inspection
 - NEVER read ~/.claude/skills/* — the checklist path you need is given in Setup step 1
 - NEVER create worktrees, checkout branches, or modify the working directory
-- Use the Read tool with the absolute Windows paths given below — never guess or rebuild paths
+- Use the Read tool with the absolute paths given below — never guess or rebuild paths
 
 ## Context
 - PR Title: {title}
-- PR Description (truncated): {bodySummary}
+- PR Description (truncated): {description}
 - Merge base: {mergeBase}
 - Head SHA: {headSha}
 - Worktree root (the PR's code): {worktreePath}

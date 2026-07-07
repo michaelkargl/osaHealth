@@ -23,3 +23,16 @@ o Step 1 prep (Prep-Pr.ps1)
 ```
 
 The repo is always `michaelkargl/osaHealth`.
+
+## PowerShell conventions
+
+Functions take explicit, typed, primitive (or array) parameters for exactly the
+data they use — never an opaque object/hashtable bundling more than the function
+needs. An object parameter hides the real dependency surface: the signature no
+longer discloses what the function actually depends on, and the function can't be
+tested or reasoned about independently of the whole object's shape.
+
+Exception: a parameter whose entire purpose is to carry a data payload through
+(e.g. serializing or printing the full thing, like `Write-ReviewContext`'s
+`$Context`) is fine — every field is genuinely used by the callee, so there's no
+hidden coupling.
