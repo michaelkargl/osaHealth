@@ -304,6 +304,9 @@ A rule that must always be true, no matter what. If it is ever false, the system
 *Example from this codebase:* the server always derives `userId` from the auth token — never from the request body or
 URL. This must hold for every request without exception.
 
+See [oop.md](oop.md#2-object-construction--invariants) for where invariant-enforcement logic should live on an object
+(one enforcement point, constructor vs. setter, the assignment-order trap for multi-field invariants).
+
 ---
 
 ## K
