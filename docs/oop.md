@@ -3,6 +3,14 @@
 A running reference on OOP fundamentals. Each topic gets its own section, documented as
 we work through it — general principles, not tied to any one language.
 
+> **🚧 WORK IN PROGRESS — to be revisited.** Sections 1–2 below are finished. Next up,
+> not yet written: **where domain logic lives vs. where IO lives** (an entity does all
+> of the deciding, none of the doing — the fix for an anemic entity plus a fat service
+> that stole its decisions) and **dependency injection into entities** (constructor vs.
+> method injection, why an entity never holds a repository, and why a `*Service`
+> collaborator is sometimes secretly a value object in disguise). Don't treat this doc
+> as complete until this banner is gone.
+
 ---
 
 ## 1. Encapsulation
