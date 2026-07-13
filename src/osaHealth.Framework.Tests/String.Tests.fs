@@ -7,11 +7,11 @@ open osaHealth.Framework.Testing.Bdd.Xunit
 
 let tryFromBase64Cases: obj[] seq =
     seq {
-        [| box "AQID"; box (Some [| 1uy; 2uy; 3uy |]) |] // no padding, 4 chars → 3 bytes
-        [| box "AAAA"; box (Some [| 0uy; 0uy; 0uy |]) |] // zero bytes, no padding
-        [| box "AA=="; box (Some [| 0uy |]) |] // padding reduces output to 1 byte
-        [| box ""; box (Some([||]: byte[])) |] // empty input → empty output
-        [| box "!!!"; box (None: byte[] option) |] // invalid base64 characters → None
+        [| "AQID" :> obj; Some [| 1uy; 2uy; 3uy |] :> obj |] // no padding, 4 chars → 3 bytes
+        [| "AAAA" :> obj; Some [| 0uy; 0uy; 0uy |] :> obj |] // zero bytes, no padding
+        [| "AA==" :> obj; Some [| 0uy |] :> obj |] // padding reduces output to 1 byte
+        [| "" :> obj; Some Array.empty<byte> :> obj |] // empty input → empty output
+        [| "!!!" :> obj; None :> obj |] // invalid base64 characters → None
     }
 
 [<Theory>]

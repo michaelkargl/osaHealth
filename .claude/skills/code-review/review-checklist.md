@@ -3,6 +3,9 @@
 Single source of truth for the `code-review-osa` skill.
 Edit here — never duplicate rule text in `SKILL.md` or any agent prompt.
 
+The lane globs in the headings below are labels for humans; the matching patterns are
+implemented in `Prep-Pr.ps1`. This file owns review *policy*; the script owns file *matching*.
+
 ---
 
 ## F# files (`*.fs`, `*.fsx`)
@@ -110,9 +113,8 @@ Do not review Flutter code; guidelines for it are not yet formalised.
 | 30–49%  | Speculative — could be intentional; frame as a question |
 | <30%    | Discard — do not raise |
 
-- Below **75%**: embed a clarifying question in the inline comment body.
-- Below **50%**: also surface the question in the "Questions Requiring Clarification"
-  section of the terminal summary.
+- Below **50%**: include a Clarifying Question in the report entry and list it in the
+  "Questions Requiring Clarification" section of the terminal summary.
 
 ---
 

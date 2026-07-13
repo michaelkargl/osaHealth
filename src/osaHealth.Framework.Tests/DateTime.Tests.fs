@@ -11,23 +11,23 @@ let tryParseUtcCases: obj[] seq =
         let validDate = DateTime.UtcNow
         let validBytes = BitConverter.GetBytes(validDate.Ticks)
 
-        [| box validBytes; box 0; validDate |> Some |> box |]
+        [| validBytes :> obj; 0 :> obj; validDate |> Some :> obj |]
 
         let minDate = DateTime.MinValue
         let minBytes = BitConverter.GetBytes(minDate.Ticks)
 
-        [| box minBytes; box 0; Some minDate |> box |]
+        [| minBytes :> obj; 0 :> obj; Some minDate :> obj |]
 
         let maxDate = DateTime.MaxValue
         let maxBytes = BitConverter.GetBytes(maxDate.Ticks)
 
-        [| box maxBytes; box 0; maxDate |> Some |> box |]
+        [| maxBytes :> obj; 0 :> obj; maxDate |> Some :> obj |]
 
-        [| BitConverter.GetBytes(-1L) |> box; box 0; box None |] // ticks below min
-        [| box (BitConverter.GetBytes(Int64.MaxValue)); box 0; box None |] // ticks above max
-        [| box [| 1uy; 2uy; 3uy |]; box 0; box None |] // insufficient bytes
-        [| box [| 1uy; 2uy; 3uy |]; box 1; box None |] // offset beyond buffer
-        [| box validBytes; box 8; box None |] // offset too large
+        [| BitConverter.GetBytes(-1L) :> obj; 0 :> obj; None :> obj |] // ticks below min
+        [| BitConverter.GetBytes(Int64.MaxValue) :> obj; 0 :> obj; None :> obj |] // ticks above max
+        [| [| 1uy; 2uy; 3uy |] :> obj; 0 :> obj; None :> obj |] // insufficient bytes
+        [| [| 1uy; 2uy; 3uy |] :> obj; 1 :> obj; None :> obj |] // offset beyond buffer
+        [| validBytes :> obj; 8 :> obj; None :> obj |] // offset too large
     }
 
 [<Theory>]

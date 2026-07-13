@@ -9,18 +9,18 @@ let tryParseCases: obj[] seq =
     seq {
         let validGuid = System.Guid.NewGuid()
         let validBytes = validGuid.ToByteArray()
-        [| box validBytes; box 0; Some validGuid |> box |]
+        [| validBytes :> obj; 0 :> obj; Some validGuid :> obj |]
         
         // Guid with offset
         let anotherGuid = System.Guid.NewGuid()
         let anotherBytes = anotherGuid.ToByteArray()
         let bufferWith24Bytes = Array.append (System.BitConverter.GetBytes(1L)) anotherBytes
-        [| box bufferWith24Bytes; box 8; Some anotherGuid |> box |]
+        [| bufferWith24Bytes :> obj; 8 :> obj; Some anotherGuid :> obj |]
         
-        [| box [| 1uy; 2uy; 3uy |]; box 0; box None |] // insufficient bytes
-        [| box [| 1uy; 2uy; 3uy |]; box 1; box None |] // offset beyond buffer
-        [| box [| 1uy; 2uy; 3uy |]; box -1; box None |] // offset too small
-        [| box [| 1uy; 2uy; 3uy |]; box 8; box None |] // offset too large
+        [| [| 1uy; 2uy; 3uy |] :> obj; 0 :> obj; None :> obj |] // insufficient bytes
+        [| [| 1uy; 2uy; 3uy |] :> obj; 1 :> obj; None :> obj |] // offset beyond buffer
+        [| [| 1uy; 2uy; 3uy |] :> obj; -1 :> obj; None :> obj |] // offset too small
+        [| [| 1uy; 2uy; 3uy |] :> obj; 8 :> obj;  None :> obj |] // offset too large
     }
 
 [<Theory>]

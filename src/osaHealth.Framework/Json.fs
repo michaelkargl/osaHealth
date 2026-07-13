@@ -25,9 +25,11 @@ let getJsonElement (prop: string) (document: JsonDocument) : JsonElement =
     document |> tryGetJsonElement prop |> _.Value
 
 let tryGetStringValue (prop: string) (document: JsonDocument) : string option =
-    match tryGetJsonElement prop document with
-    | Some element -> Some (element.GetString())
-    | _ -> None
+    tryGetJsonElement prop document
+    |> Option.bind (fun element ->
+        match element.GetString() with
+        | null -> None
+        | str -> Some str)
 
-let getStringValue (prop: string) (document: JsonDocument): string =
+let getStringValue (prop: string) (document: JsonDocument) : string =
     document |> tryGetStringValue prop |> _.Value

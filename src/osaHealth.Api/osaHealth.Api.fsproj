@@ -1,12 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <IsPackable>false</IsPackable>
-        <Nullable>enable</Nullable>
-        <LangVersion>latestmajor</LangVersion>
-    </PropertyGroup>
-
     <ItemGroup>
         <Compile Include="ErrorHandling.fs" />
         <Compile Include="Framework\Http.fs" />
@@ -32,15 +24,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!-- Pin via Update (not Include): FSharp.UMX (transitive) resolves FSharp.Core to 9.0.0.0,
-             but Oxpecker 2.0.1 requires assembly 10.0.0.0. Update overrides the SDK implicit
-             reference without creating a duplicate that NuGet silently loses. -->
-        <PackageReference Update="FSharp.Core" Version="10.1.301" />
-        <PackageReference Include="FsToolkit.ErrorHandling" Version="5.2.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Oxpecker" Version="2.0.1" />
-        <PackageReference Include="Oxpecker.OpenApi" Version="2.1.2" />
-        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
+        <PackageReference Include="FsToolkit.ErrorHandling" />
+        <!-- Explicit direct reference so the patched version pinned in Directory.Packages.props
+             overrides the vulnerable Microsoft.OpenApi 2.0.0 pulled in transitively by
+             Oxpecker.OpenApi. Remove once Oxpecker.OpenApi ships a release that depends on a patched version. -->
+        <PackageReference Include="Microsoft.OpenApi" />
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Include="Oxpecker" />
+        <PackageReference Include="Oxpecker.OpenApi" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI"  />
     </ItemGroup>
 
 </Project>

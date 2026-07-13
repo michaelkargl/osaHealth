@@ -54,7 +54,7 @@ let ``prettyPrint returns the input unchanged when given invalid JSON`` () =
 
 [<Fact>]
 let ``tryGetJsonElement returns Some with the element when the property exists`` () =
-    let ctx = {| Document = (null: JsonDocument); Result = (None: JsonElement option) |}
+    let ctx = {| Document = JsonDocument.Parse("null"); Result = (None: JsonElement option) |}
 
     Factory.create ctx
     |> GIVEN "a JSON document with a known property" (fun ctx ->
@@ -69,7 +69,7 @@ let ``tryGetJsonElement returns Some with the element when the property exists``
 
 [<Fact>]
 let ``tryGetJsonElement returns None when the property is absent`` () =
-    let ctx = {| Document = (null: JsonDocument); Result = (None: JsonElement option) |}
+    let ctx = {| Document = JsonDocument.Parse("null"); Result = (None: JsonElement option) |}
 
     Factory.create ctx
     |> GIVEN "a JSON document without the requested property" (fun ctx ->
@@ -83,7 +83,7 @@ let ``tryGetJsonElement returns None when the property is absent`` () =
 
 [<Fact>]
 let ``tryGetStringValue returns Some with the string when the property exists`` () =
-    let ctx = {| Document = (null: JsonDocument); Result = (None: string option) |}
+    let ctx = {| Document = JsonDocument.Parse("null"); Result = (None: string option) |}
 
     Factory.create ctx
     |> GIVEN "a JSON document with a string property" (fun ctx ->
@@ -97,7 +97,7 @@ let ``tryGetStringValue returns Some with the string when the property exists`` 
 
 [<Fact>]
 let ``tryGetStringValue returns None when the property is absent`` () =
-    let ctx = {| Document = (null: JsonDocument); Result = (None: string option) |}
+    let ctx = {| Document = JsonDocument.Parse("null"); Result = (None: string option) |}
 
     Factory.create ctx
     |> GIVEN "a JSON document without the requested property" (fun ctx ->
@@ -111,7 +111,7 @@ let ``tryGetStringValue returns None when the property is absent`` () =
 
 [<Fact>]
 let ``getStringValue returns the string when the property exists`` () =
-    let ctx = {| Document = (null: JsonDocument); Result = "" |}
+    let ctx = {| Document = JsonDocument.Parse("null"); Result = "" |}
 
     Factory.create ctx
     |> GIVEN "a JSON document with a string property" (fun ctx ->
