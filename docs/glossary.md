@@ -128,6 +128,11 @@ See [onion-architecture.md](onion-architecture.md#domain-services-layer).
 
 ## E
 
+### Encapsulation
+
+Hiding state behind behavior so an object can never be observed violating its own
+invariants — not merely making fields private. See [oop.md](oop.md#1-encapsulation).
+
 ### Endianness
 
 The byte order used when storing a multi-byte value in memory
