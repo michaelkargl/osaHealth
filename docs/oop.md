@@ -6,8 +6,10 @@ we work through it — general principles, not tied to any one language.
 > **🚧 WORK IN PROGRESS.** Sections 1–4 are written. Still to come: abstraction,
 > inheritance vs. composition, polymorphism, the Liskov Substitution Principle,
 > interfaces vs. abstract classes, SOLID, coupling & cohesion, immutability, the Law of
-> Demeter, encapsulate-what-varies, and god objects. Don't treat this doc as complete
-> until this banner is gone.
+> Demeter, encapsulate-what-varies, god objects, value objects vs. entities, aggregates,
+> and — as the capstone that names the pattern language sections 3–4 already use —
+> Domain-Driven Design and how it fits into OOP. Don't treat this doc as complete until
+> this banner is gone.
 
 ---
 
