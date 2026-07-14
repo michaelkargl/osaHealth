@@ -4,6 +4,22 @@
 
 ## A
 
+### Adapter
+
+The infrastructure-side implementation of a [Port](#port) — the code that knows *how* to carry out what the domain
+asked for. Thin in interface, arbitrarily thick in implementation: it may hold any amount of **mechanism**, and never
+any **policy**.
+
+See [oop.md](oop.md#rule-3--adapters-own-mechanism-never-policy). Contrast with [Shim](#shim).
+
+### Anemic Domain Model
+
+A domain object reduced to a bag of properties — getters, setters, no behavior — while the rules that should live
+inside it are held by a separate `*Service` that mutates it from the outside. Technically encapsulated, procedurally
+structured.
+
+See [oop.md](oop.md#rule-1--the-object-owns-its-own-functionality). Related: [Code Smells](#code-smells).
+
 ### Application Core
 
 See [onion-architecture.md](onion-architecture.md#application-core).
@@ -93,6 +109,8 @@ decision will create friction as the codebase evolves — harder to test, harder
 Known smells:
 
 - [Fat DTO](#fat-dto) — a DTO serving multiple consumers, accumulating null fields per caller
+- [Anemic Domain Model](#anemic-domain-model) — an object with no behavior; its rules live in a `*Service` that
+  mutates it from the outside
 
 ### Compound Cursor
 
@@ -409,6 +427,27 @@ underlying value — zero overhead.
 
 See also: [UMX Measure Types](#umx-measure-types).
 
+### Port
+
+An interface **defined by the domain**, describing a capability a domain object needs from the outside world — a socket
+it plugs a request into. The object knows *where to enter the request*; it never learns how the request is carried out,
+so its rules survive a change of mechanism. Not every interface is a port: a repository is not one, because persisting
+itself was never part of being a train.
+
+See [oop.md](oop.md#rule-2--the-object-acts-through-ports-never-through-mechanism). Implemented by
+an [Adapter](#adapter).
+
+### Ports and Adapters
+
+An architectural style (also called **Hexagonal Architecture**): the domain sits at the centre, declares [ports](#port)
+for everything it needs from the outside world, and infrastructure supplies [adapters](#adapter) that implement them.
+Every dependency points inward. The test that the lines are drawn correctly — can you run the object with no hardware
+and no database?
+
+See [oop.md](oop.md#3-behavior-ports-and-adapters). Closely related to
+[Onion Architecture](#onion-architecture), which this codebase uses: the same inward-pointing rule, described in layers
+rather than in sockets.
+
 ### Pure function
 
 A function with no side effects that always returns the same output for the same inputs. No I/O, no mutation, no
@@ -436,6 +475,16 @@ with `DateTime.UtcNow` inside domain logic.
 ---
 
 ## S
+
+### Shim
+
+A thin layer of code whose only job is to make one interface satisfy another. It holds no rules and makes no decisions —
+it translates a call and gets out of the way. If a shim starts deciding things, it has stopped being a shim. Named for
+the physical object: a thin piece of material wedged into a gap to make two parts fit.
+
+**Not a synonym for [Adapter](#adapter)**, though the two collapse in CRUD-shaped systems where the domain already
+speaks the mechanism's language. A shim is thin *by definition*; an adapter is thin only in its *interface*. See
+[oop.md](oop.md#rule-3--adapters-own-mechanism-never-policy).
 
 ### Smells
 
