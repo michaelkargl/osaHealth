@@ -6,7 +6,8 @@ we work through it — general principles, not tied to any one language.
 > **🚧 WORK IN PROGRESS.** Sections 1–4 are written. Still to come: abstraction,
 > inheritance vs. composition, polymorphism, the Liskov Substitution Principle,
 > interfaces vs. abstract classes, SOLID, coupling & cohesion, immutability, the Law of
-> Demeter, and god objects. Don't treat this doc as complete until this banner is gone.
+> Demeter, encapsulate-what-varies, and god objects. Don't treat this doc as complete
+> until this banner is gone.
 
 ---
 
@@ -208,7 +209,7 @@ cannot be part of the train.
 
 The domain object is a **digital twin**: abstract where the hardware is concrete. It is
 not simple in *logic* — it may be the most complex thing you own — it is simple in
-*coupling*. It depends on nothing. The hardware gets plugged in later.
+*coupling*. It depends on nothing concrete. The hardware gets plugged in later.
 
 ### The rules (overview)
 
@@ -531,7 +532,7 @@ class TrainControlService {
 
 ### Rule 3 — A `*Service` collaborator is often a value object wearing a uniform
 
-"The train needs an `IRouteService` injected so `SetRoute` can call it" deserves a hard
+"The train needs an `IRouteService` injected so `Follow` can call it" deserves a hard
 look at what that service actually *does*. If a route is just data and rules — stops,
 gradients, speed limits, no IO — it isn't a service at all.
 
@@ -556,7 +557,8 @@ the name.
 
 A port is permanent — the train always has traction. A **clock**, a pricing policy, an
 exchange rate is *situational*: it belongs to the operation, not the object's whole life.
-Pass it to the method (**double dispatch**).
+Pass it to the method (**method injection** — sometimes called *double dispatch* in DDD
+circles, though the term classically means something narrower).
 
 ```
 // ❌ CONSTRUCTOR — every Train now depends on a clock forever, including the ninety
@@ -589,7 +591,8 @@ var train    = new Train(traction, maxSpeed: 200);
 var service  = new TrainControlService(new MongoTrainRepository(db));
 
 // ...and in a test, the same domain object, no hardware, no database:
-var train = new Train(new FakeTraction(), maxSpeed: 200);
+var fakeTraction = new FakeTraction();
+var train = new Train(fakeTraction, maxSpeed: 200);
 train.Accelerate(120, kmSinceService: 0);
 Assert.Equal(0.6, fakeTraction.LastOutput);       // no mocking framework in sight
 ```

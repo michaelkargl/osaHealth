@@ -10,7 +10,7 @@ The infrastructure-side implementation of a [Port](#port) — the code that know
 asked for. Thin in interface, arbitrarily thick in implementation: it may hold any amount of **mechanism**, and never
 any **policy**.
 
-See [oop.md](oop.md#rule-3--adapters-own-mechanism-never-policy). Contrast with [Shim](#shim).
+See [oop.md](oop.md#3-behavior-ports-and-adapters). Contrast with [Shim](#shim).
 
 ### Anemic Domain Model
 
@@ -18,7 +18,7 @@ A domain object reduced to a bag of properties — getters, setters, no behavior
 inside it are held by a separate `*Service` that mutates it from the outside. Technically encapsulated, procedurally
 structured.
 
-See [oop.md](oop.md#rule-1--the-object-owns-its-own-functionality). Related: [Code Smells](#code-smells).
+See [oop.md](oop.md#3-behavior-ports-and-adapters). Related: [Code Smells](#code-smells).
 
 ### Application Core
 
@@ -434,8 +434,7 @@ it plugs a request into. The object knows *where to enter the request*; it never
 so its rules survive a change of mechanism. Not every interface is a port: a repository is not one, because persisting
 itself was never part of being a train.
 
-See [oop.md](oop.md#rule-2--the-object-acts-through-ports-never-through-mechanism). Implemented by
-an [Adapter](#adapter).
+See [oop.md](oop.md#3-behavior-ports-and-adapters). Implemented by an [Adapter](#adapter).
 
 ### Ports and Adapters
 
@@ -484,7 +483,7 @@ the physical object: a thin piece of material wedged into a gap to make two part
 
 **Not a synonym for [Adapter](#adapter)**, though the two collapse in CRUD-shaped systems where the domain already
 speaks the mechanism's language. A shim is thin *by definition*; an adapter is thin only in its *interface*. See
-[oop.md](oop.md#rule-3--adapters-own-mechanism-never-policy).
+[oop.md](oop.md#3-behavior-ports-and-adapters).
 
 ### Smells
 
